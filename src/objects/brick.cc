@@ -7,7 +7,7 @@ brick::brick(float x, float y) { //}: entity() {
 
     // Load the texture
     if (!texture.loadFromFile(constants::brick_path())) {
-        throw std::runtime_error("Failed to load brick01.png.");
+        throw std::runtime_error("Failed to load the brick texture.");
     }
     // Set sprite
     sprite = std::make_unique<sf::Sprite>(texture);

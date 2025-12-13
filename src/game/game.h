@@ -10,6 +10,7 @@
 #include "ball.h"
 #include "brick.h"
 #include "constants.h"
+#include "entity.h"
 #include "paddle.h"
 
 // A class to manage the entities in the game
@@ -26,11 +27,12 @@
 // These are stored as alias pointers (non-owning) to the allocated objects
 // This is useful for performing an operation on e.g. all bricks
 
-// Use aliases to simplify the code
+// Use aliases to simplify the code (C++11)
 using entity_vector = std::vector<std::unique_ptr<entity>>;
-using entity_alias_vector = std::vector<entity*>;
+using entity_alias_vector = std::vector<entity *>;
 
 class entity_manager {
+
     // A vector to store all the entities in the game (all brick objects, background, ball, paddle)
     entity_vector all_entities;
 
@@ -39,13 +41,16 @@ class entity_manager {
     // The vector will contain non-owning pointers to the objects
     // Do not delete these pointers!
     // Do not use them after the objects they point to have been destroyed!
-    std::map<size_t, entity_alias_vector> grouped_entities;
+    std::map<size_t, entity_alias_vector> grouped_entities; // The hash code retuns a size_t type
+
 public:
+
     // Function to create an entity object of type T using args as the constructor arguments
     // We use a variadic template to pass any number of arguments
     // We use perfect forwarding to avoid any unnecessary copying of the arguments
     template <typename T, typename... Args>
     T& create(Args&&... args) {
+
         // Check that the type parameter is derived from the entity base class
         static_assert(std::is_base_of<entity, T>::value,
             R"("T" type parameter in create() must be derived from "entity")");
@@ -56,7 +61,7 @@ public:
 
         // Make an alias pointer to the allocated memory
         // This will be stored in the entity_type_vector
-        auto ptr_alias = ptr.get(); // get returns a classical C++ pointer to the object (an address)
+        auto ptr_alias = ptr.get(); // ptr.get() returns a classical C++ pointer to the object
 
         // Get the hash code for the entity object's type
         auto hash = typeid(T).hash_code();
@@ -100,6 +105,10 @@ public:
 };
 
 class game {
+
+    // Enum with allowed values for the game's state
+    enum class game_state { paused, running };
+
     // Create the game's window using an object of class RenderWindow
     // The constructor takes an SFML 2D vector with the window dimensions
     // and an std::string with the window title
@@ -107,26 +116,14 @@ class game {
     sf::RenderWindow game_window{ sf::VideoMode({constants::window_width, constants::window_height}),
         "Simple Breakout Game Version 10"};
 
-    // Create the background object
-    background the_background{0.0f, 0.0f};
-
-    // Create a ball object in the middle of the screen
-    ball the_ball{constants::window_width/2.0f, constants::window_height/2.0f};
-
-    // Create a paddle object at the bottom of the screen in the middle
-    paddle the_paddle{constants::window_width/2.0f, constants::window_height - constants::paddle_height};
-
-    // Create the grid of bricks
-    // We will use an std::vector to store them
-    std::vector<std::unique_ptr<brick>> bricks;
-
-    // Enum with allowed values for the game's state
-    enum class game_state { paused, running };
+    // Instead of embedding every entity in the game class, use an entity_manager
+    entity_manager manager;
 
     // Member to store the current state of the game
     game_state state{game_state::running};
 
 public:
+
     game();
     
     // Reinitialize the game

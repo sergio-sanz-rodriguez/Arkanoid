@@ -9,7 +9,7 @@ paddle::paddle(float x, float y) { //: moving_entity() {
       
     // Load the texture
     if (!texture.loadFromFile(constants::paddle_path())) {
-        throw std::runtime_error("Failed to load paddle.png.");
+        throw std::runtime_error("Failed to load the paddle texture.");
     }    
     //sprite.setTexture(texture);
     sprite = std::make_unique<sf::Sprite>(texture);

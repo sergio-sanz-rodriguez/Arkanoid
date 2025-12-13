@@ -8,7 +8,7 @@ ball::ball(float x, float y) { //: moving_entity() {
       
     // Load the texture
     if (!texture.loadFromFile(constants::ball_path())) {
-        throw std::runtime_error("Failed to load ball.png.");
+        throw std::runtime_error("Failed to load the ball texture.");
     }    
     //sprite.setTexture(texture);
     sprite = std::make_unique<sf::Sprite>(texture);
