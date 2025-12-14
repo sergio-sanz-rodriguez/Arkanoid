@@ -77,8 +77,9 @@ void ball::update() {
     }
     else if ((y() + radius) >= constants::window_height) {
         //velocity.y = -velocity.y;
-        sprite->setPosition({ x(), constants::window_height - radius });
-        velocity.y = -std::abs(velocity.y); // ensure moving up
+        //sprite->setPosition({ x(), constants::window_height - radius });
+        //velocity.y = -std::abs(velocity.y); // ensure moving up
+        destroy();
     }
 }
 

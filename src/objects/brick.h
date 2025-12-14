@@ -11,18 +11,29 @@
 // When the ball hits a brick, the brick is destroyed and disappears
 // When a brick is destroyed, it is deleted from the vector
 class brick: public entity {
-	// Private data members
-	static sf::Texture texture;
+    // Private data members
+    static sf::Texture texture;
+
+    // How many times the brick can be hit before destroying it
+    int strength{ constants::brick_strength };
+
+    // Color of the brick
+    sf::Color color;
 
 public:
-	// Interface of the class
+    // Interface of the class
 
-	// Constructors
-	brick(float x, float y);
+    // Constructors
+    brick(float x, float y, sf::Color c);
 
-	// Implement the pure virtual functions
-	void update() override;
-	void draw(sf::RenderWindow& window) override;
+    // Helper functions for brick strength
+    void set_strength(int) noexcept;
+    void weaken() noexcept;
+    bool is_too_weak() const noexcept;
+
+    // Implement the pure virtual functions
+    void update() override;
+    void draw(sf::RenderWindow& window) override;
 };
 
 #endif // BRICK_H

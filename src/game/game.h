@@ -107,25 +107,41 @@ public:
 class game {
 
     // Enum with allowed values for the game's state
-    enum class game_state { paused, running };
+    enum class game_state { game_over, paused, player_wins, running };
 
     // Create the game's window using an object of class RenderWindow
     // The constructor takes an SFML 2D vector with the window dimensions
     // and an std::string with the window title
     // The SFML code is in the sf namespace
     sf::RenderWindow game_window{ sf::VideoMode({constants::window_width, constants::window_height}),
-        "Simple Breakout Game Version 10"};
+        "Arkanoid by Sergio Sanz"};
 
     // Instead of embedding every entity in the game class, use an entity_manager
     entity_manager manager;
 
+    // Use SFML text and font classes to communicate with text with the player
+    sf::Font verdana;
+    sf::Text text_state;
+    sf::Text text_lives;
+
     // Member to store the current state of the game
     game_state state{game_state::running};
+
+    // Define a vector with all the possible colors for the bricks
+    std::vector<sf::Color> vcolor{ 
+        constants::red,
+        constants::orange,
+        constants::green,
+        constants::cyan,
+        constants::blue };
+
+    // How many lives does the player have left?
+    int lives{ constants::player_lives };
 
 public:
 
     game();
-    
+
     // Reinitialize the game
     void reset();
 

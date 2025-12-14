@@ -26,9 +26,14 @@ void handle_collision(ball &b, const paddle& p) {
 // Resolve potential collision between the ball and a brick
 void handle_collision(ball& the_ball, brick& block) {
     if (is_interacting(block, the_ball)) {
-        
-        // The brick is destroyed
-        block.destroy();
+
+        // Update the brick's strength
+        block.weaken();
+
+        if (block.is_too_weak()) {
+            // The brick is destroyed
+            block.destroy();
+        }
 
         // Make the new direction depend on where the collision occurs on the brick
         // If the ball collides on the side of the brick, make the ball bounce to the left/right

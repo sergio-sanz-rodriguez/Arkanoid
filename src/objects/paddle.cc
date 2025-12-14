@@ -1,5 +1,5 @@
 #include "paddle.h"
-#include <SFML/Graphics.hpp>
+//#include <SFML/Graphics.hpp>
 
 // Initialize static data
 sf::Texture paddle::texture;
