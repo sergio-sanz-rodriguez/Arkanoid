@@ -40,7 +40,8 @@ struct constants {
     static constexpr float brick_height{ 20.0f };
     static constexpr float brick_offset{ brick_width * 0.8f };
     static constexpr int player_lives{ 3 };
-    static constexpr std::string_view image_dir{ "D:\\Courses\\Arkanoid\\Arkanoid\\assets\\images\\" };
+    //static constexpr std::string_view image_dir{ "D:\\Courses\\Arkanoid\\Arkanoid\\assets\\images\\" };
+    static constexpr std::string_view image_dir{ "..\\..\\assets\\images\\" };
     static constexpr std::string_view background_filename{ "background_stars.jpg" };
     static constexpr std::string_view ball_filename{ "ball_llblue.png" };
     static constexpr std::string_view paddle_filename{ "paddle.png" };
