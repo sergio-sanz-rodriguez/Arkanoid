@@ -149,9 +149,16 @@ void game::run() {
                 game_window.close();
             }
 
-            // Start screen: any key starts the game
-            if (state == game_state::start_screen) {
-                if (event->is<sf::Event::KeyPressed>()) {
+            if (event->is<sf::Event::KeyPressed>()) {
+
+                // Start screen: any key starts
+                if (state == game_state::start_screen) {
+                    state = game_state::running;
+                }
+
+                // End screens: any key restarts
+                if (state == game_state::game_over || state == game_state::player_wins) {
+                    reset();
                     state = game_state::running;
                 }
             }
