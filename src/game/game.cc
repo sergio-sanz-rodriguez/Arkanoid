@@ -46,7 +46,7 @@ void entity_manager::draw(sf::RenderWindow& window) {
         e->draw(window);
 }
 
-game::game() : text_state(verdana), text_lives(verdana) {
+game::game() : text_state(verdana), text_lives(verdana), text_instructions(verdana) {
 
     // Limit the framerate
     game_window.setFramerateLimit(60);      // Max rate is 60 frames per second
@@ -55,7 +55,7 @@ game::game() : text_state(verdana), text_lives(verdana) {
     paddle::set_window(game_window);
 
     // Load a font from file
-    if (!verdana.openFromFile(constants::font_filename)) {
+    if (!verdana.openFromFile(constants::font_verdana)) {
         std::cerr << "Failed to load font!" << std::endl;
         // Handle font loading failure (could exit, use default font, etc.)
     }
@@ -73,6 +73,22 @@ game::game() : text_state(verdana), text_lives(verdana) {
     text_lives.setCharacterSize(12);
     text_lives.setFillColor(sf::Color::White);
     text_lives.setString("Lives: " + std::to_string(lives));
+
+    text_instructions.setFont(verdana);
+    text_instructions.setPosition({ constants::window_width / 16.0f, constants::window_height / 4 });
+    text_instructions.setCharacterSize(20);
+    text_instructions.setFillColor(sf::Color::White);
+    text_instructions.setString(
+        "Welcome to Arkanoid!\n\n"
+        "Instructions:\n\n"
+        "- Left arrow / Move mouse left, to move paddle left\n"
+        "- Right Arrow / Move mouse right to move paddle right\n"
+        "- Up arrow to increase ball speed\n"
+        "- Down arrow to decrease ball speed\n"
+        "- P button to pause and resume the game\n"
+        "- R button to reset the game\n\n"
+        "Press any key to start."
+    );
 
 }
 
@@ -103,7 +119,6 @@ void game::reset() {
             // Create the brick object
             //sf::Color c = vcolor[j % vcolor.size()]; // Access the color at the correct index
             sf::Color c = vcolor[color_dist(rng)]; // Pick a random color
-            c.a = 255; // Ensure full opacity
             manager.create<brick>(x, y, c); // Create the brick with the color
         }
     }
@@ -123,12 +138,28 @@ void game::run() {
         // Clear the screen
         game_window.clear(sf::Color::Black);
 
+
         // Check for any events since the last loop iteration
         // If the user clicks on "close" or presses "Escape", we close the window program
         while (auto event = game_window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 game_window.close();
             }
+
+            // Start screen: any key starts the game
+            if (state == game_state::start_screen) {
+                if (event->is<sf::Event::KeyPressed>()) {
+                    state = game_state::running;
+                }
+            }
+        }
+
+        // Start screen draw
+        if (state == game_state::start_screen) {
+           // manager.draw(game_window);
+            game_window.draw(text_instructions);
+            game_window.display();
+            continue;
         }
 
         // Check for user input

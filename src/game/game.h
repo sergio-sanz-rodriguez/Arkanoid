@@ -107,7 +107,7 @@ public:
 class game {
 
     // Enum with allowed values for the game's state
-    enum class game_state { game_over, paused, player_wins, running };
+    enum class game_state { game_over, paused, player_wins, start_screen, running };
 
     // Create the game's window using an object of class RenderWindow
     // The constructor takes an SFML 2D vector with the window dimensions
@@ -121,11 +121,13 @@ class game {
 
     // Use SFML text and font classes to communicate with text with the player
     sf::Font verdana;
+    sf::Font consola;
     sf::Text text_state;
     sf::Text text_lives;
+    sf::Text text_instructions;
 
     // Member to store the current state of the game
-    game_state state{game_state::running};
+    game_state state{game_state::start_screen};
 
     // Define a vector with all the possible colors for the bricks
     std::vector<sf::Color> vcolor{ 
