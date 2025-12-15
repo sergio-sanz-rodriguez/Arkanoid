@@ -1,6 +1,11 @@
+<p align="center">
+  <img src="assets/images/arkanoid.png" alt="Project Banner" width="50%">
+</p>
+
+
 # Arkanoid
 
-A simple Arkanoid / Breakout clone written in C++ using SFML.
+The classical Arkanoid game written in Modern C++ using [Simple and Fast Multimedia Library (SFML)](https://www.sfml-dev.org/).
 
 ## Features
 - Paddle and ball mechanics
@@ -10,4 +15,5 @@ A simple Arkanoid / Breakout clone written in C++ using SFML.
 
 ## Build
 - Visual Studio 2022
+- C++17
 - SFML
