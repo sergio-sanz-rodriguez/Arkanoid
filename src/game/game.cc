@@ -46,7 +46,10 @@ void entity_manager::draw(sf::RenderWindow& window) {
         e->draw(window);
 }
 
-game::game() : text_state(verdana), text_lives(verdana), text_instructions(verdana) {
+game::game() : 
+    text_state(verdana), 
+    text_lives(verdana), 
+    text_instructions(verdana) {
 
     // Limit the framerate
     game_window.setFramerateLimit(60);      // Max rate is 60 frames per second
@@ -103,7 +106,7 @@ void game::reset() {
 
     // Reset the entities and their positions
     manager.create<background>(0.0f, 0.0f);
-    manager.create<ball>(constants::window_width / 2.0f, constants::window_height / 2.0f);
+    manager.create<ball>(constants::window_width / 2.0f, constants::window_height - constants::paddle_height, current_ball_speed);
     manager.create<paddle>(constants::window_width / 2.0f, constants::window_height - constants::paddle_height);
 
     // Create random number generator and uniform distribution
@@ -221,14 +224,21 @@ void game::run() {
 
         // If the game is running
         else {
-        
+
             // If there are no remaining balls on the screen
             if (manager.get_all<ball>().empty()) {
                 // Spawn a new one and reduce the player's remaining lives
-                manager.create<ball>(constants::window_width / 2.0f, constants::window_height / 2.0f);
+                manager.create<ball>(constants::window_width / 2.0f, constants::window_height / 2.0f, current_ball_speed);
                 --lives;
 
                 //state = game_state::paused;
+            }
+
+            // Remember speed while ball still exists
+            else {
+                manager.apply_all<ball>([this](ball& b) {
+                    current_ball_speed = b.get_speed();
+                });
             }
 
             // If there are no remaining bricks on the screen, the player has won!

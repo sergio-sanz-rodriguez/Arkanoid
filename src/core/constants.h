@@ -47,7 +47,6 @@ struct constants {
     static constexpr std::string_view brick_filename{ "brick_s.png" };
     //static constexpr std::string_view font_filename{ "/usr/local/share/fonts/webfonts/verdana.ttf" };
     static constexpr std::string_view font_verdana{ "C:\\Windows\\fonts\\verdana.ttf" };
-    //static constexpr std::string_view font_consola{ "C:\\Windows\\fonts\\consolas.ttf" };
     static std::string background_path() { return std::string(image_dir) + std::string(background_filename); }
     static std::string ball_path() { return std::string(image_dir) + std::string(ball_filename); }
     static std::string paddle_path() { return std::string(image_dir) + std::string(paddle_filename); }

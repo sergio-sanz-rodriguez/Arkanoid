@@ -121,7 +121,6 @@ class game {
 
     // Use SFML text and font classes to communicate with text with the player
     sf::Font verdana;
-    sf::Font consola;
     sf::Text text_state;
     sf::Text text_lives;
     sf::Text text_instructions;
@@ -139,6 +138,10 @@ class game {
 
     // How many lives does the player have left?
     int lives{ constants::player_lives };
+
+    // Actual ball and paddle speeds
+    float current_ball_speed{ constants::ball_speed };
+    float current_paddle_speed{ constants::paddle_speed };
 
 public:
 

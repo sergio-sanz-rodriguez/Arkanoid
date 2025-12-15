@@ -4,12 +4,12 @@
 // Initialize static data
 sf::Texture ball::texture;
 
-ball::ball(float x, float y) { //: moving_entity() {
-      
+ball::ball(float x, float y, float speed) {
+
     // Load the texture
     if (!texture.loadFromFile(constants::ball_path())) {
         throw std::runtime_error("Failed to load the ball texture.");
-    }    
+    }
     //sprite.setTexture(texture);
     sprite = std::make_unique<sf::Sprite>(texture);
 
@@ -18,12 +18,12 @@ ball::ball(float x, float y) { //: moving_entity() {
     sprite->setOrigin(get_centre());
     sprite->scale({ 0.5f, 0.5f });
     sprite->setPosition({ x, y });
-    
+
     // Set the radius of the ball
     radius = get_bounding_box().size.x / 2.0f;
 
     // Set the velocity of the ball
-    velocity = { constants::ball_speed, constants::ball_speed };
+    velocity = { speed, -speed };
 }
 
 void ball::move_up() noexcept {
@@ -108,14 +108,10 @@ void ball::process_player_input() {
     velocity.x *= speed / vx;
     velocity.y *= speed / vy;
 
-    //if (velocity.x < constants::ball_speed) {
-    //    velocity.x = velocity.y;
-    //}
+}
 
-    // scale velocity to match the new speed (same direction)
-    //float scale = speed / std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
-    //#velocity.x *= scale;
-    //#velocity.y *= scale;
+float ball::get_speed() const noexcept {
+    return std::max(std::abs(velocity.x), std::abs(velocity.y));
 }
 
 // Drawing function

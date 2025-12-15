@@ -21,9 +21,13 @@ class ball : public moving_entity {
       // Arguments are the initial coordinates of the centre of the ball
       // SFML uses the computer graphics convention
       // (0, 0) is the top left corner of the screen
-      // x increases to the right
-      // y increases downwards
-      ball(float x, float y);
+      // x: increases to the right
+      // y: increases downwards
+      // speed: the current ball speed
+      ball(float x, float y, float speed = constants::ball_speed);
+
+      // Get ball speed
+      float get_speed() const noexcept;
 
       // Required overrides
       void move_up() noexcept override;
@@ -34,6 +38,7 @@ class ball : public moving_entity {
       // Implement the pure virtual functions
       void update() override;
       void draw(sf::RenderWindow& window) override;
+
 };
 
 #endif // BALL_H
