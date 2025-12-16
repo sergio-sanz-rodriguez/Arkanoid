@@ -139,13 +139,17 @@ class game {
     // How many lives does the player have left?
     int lives{ constants::player_lives };
 
-    // Actual ball and paddle speeds
-    float current_ball_speed{ constants::ball_speed };
-    float current_paddle_speed{ constants::paddle_speed };
-    float current_ball_x{ constants::window_width / 2.0f };
-    float current_ball_y{ constants::window_height - constants::paddle_height };
-    float current_paddle_x{ constants::window_width / 2.0f };
-    float current_paddle_y{ constants::window_height - constants::paddle_height };
+    // Current position and speed of the ball
+    float current_ball_x { constants::window_width / 2.0f };
+    float current_ball_y { constants::window_height - constants::paddle_height };
+    float current_ball_vx{ constants::ball_speed };
+    float current_ball_vy{ constants::ball_speed };
+    
+    // Current position and speed of the paddle
+    float current_paddle_x { constants::window_width / 2.0f };
+    float current_paddle_y { constants::window_height - constants::paddle_height };
+    float current_paddle_vx{ constants::paddle_speed };
+    float current_paddle_vy{ constants::paddle_speed };
 
 public:
 

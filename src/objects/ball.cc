@@ -4,7 +4,7 @@
 // Initialize static data
 sf::Texture ball::texture;
 
-ball::ball(float x, float y, float speed) {
+ball::ball(float x, float y, float vx, float vy) {
 
     // Load the texture
     if (!texture.loadFromFile(constants::ball_path())) {
@@ -23,9 +23,15 @@ ball::ball(float x, float y, float speed) {
     radius = get_bounding_box().size.x / 2.0f;
 
     // Set the velocity of the ball
-    velocity = { speed, -speed };
+    velocity = { vx, -vy };
 }
 
+// Get ball speed
+float ball::get_speed() const noexcept {
+    return std::max(std::abs(velocity.x), std::abs(velocity.y));
+}
+
+// Update velocities
 void ball::move_up() noexcept {
     velocity.y = -std::abs(velocity.y);
 }
@@ -41,7 +47,6 @@ void ball::move_left() noexcept {
 void ball::move_right() noexcept {
     velocity.x = std::abs(velocity.x);
 }
-
 
 // Compute the ball's new position
 void ball::update() {
@@ -108,10 +113,6 @@ void ball::process_player_input() {
     velocity.x *= speed / vx;
     velocity.y *= speed / vy;
 
-}
-
-float ball::get_speed() const noexcept {
-    return std::max(std::abs(velocity.x), std::abs(velocity.y));
 }
 
 // Drawing function

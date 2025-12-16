@@ -60,6 +60,8 @@ public:
     // float x();
     // float y();
 
+    sf::Vector2f get_velocity() const noexcept;
+;
     // Helper functions to change the sprite's direction
     virtual void move_up() noexcept = 0;
     virtual void move_down() noexcept = 0;

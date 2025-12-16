@@ -21,7 +21,10 @@ class paddle : public moving_entity {
      // Interface of the class
 
       // Constructor      
-      paddle(float x, float y);
+      paddle(float x, float y, float vx, float vy);
+
+      // Get paddle speed
+      //float get_speed() const noexcept;
 
       // Required overrides
       void move_up() noexcept override;

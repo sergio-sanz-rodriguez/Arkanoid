@@ -20,7 +20,7 @@ struct constants {
     //static constexpr float paddle_width_by_2{ 37.5f };
     static constexpr float paddle_height{ 40.0f };
     static constexpr float paddle_speed{ 8.0f };
-    static constexpr float paddle_max_speed{ 16.0f };
+    static constexpr float paddle_max_speed{ 21.33f };
     static constexpr float paddle_min_speed{ 8.0f };
     static constexpr float paddle_speed_step{
         ball_speed_step * (paddle_max_speed - paddle_min_speed) / (ball_max_speed - ball_min_speed) 

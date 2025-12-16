@@ -106,9 +106,17 @@ void game::reset() {
 
     // Reset the entities and their positions
     manager.create<background>(0.0f, 0.0f);
-    manager.create<ball>(constants::window_width / 2.0f, constants::window_height - constants::paddle_height, current_ball_speed);
-    manager.create<paddle>(constants::window_width / 2.0f, constants::window_height - constants::paddle_height);
-
+    manager.create<ball>(
+        constants::window_width / 2.0f,
+        constants::window_height - constants::paddle_height,
+        constants::ball_speed,
+        constants::ball_speed);
+    manager.create<paddle>(
+        constants::window_width / 2.0f,
+        constants::window_height - constants::paddle_height,
+        constants::paddle_speed,
+        0.0f);
+    
     // Create random number generator and uniform distribution
     std::uniform_int_distribution<int> color_dist(0, static_cast<int>(vcolor.size()) - 1);
     std::mt19937 rng(std::random_device{}());
@@ -120,8 +128,8 @@ void game::reset() {
             float y = (j + 2) * constants::brick_height;
 
             // Create the brick object
-            //sf::Color c = vcolor[j % vcolor.size()]; // Access the color at the correct index
-            sf::Color c = vcolor[color_dist(rng)]; // Pick a random color
+            sf::Color c = vcolor[j % vcolor.size()]; // Access the color at the correct index
+            //sf::Color c = vcolor[color_dist(rng)]; // Pick a random color
             manager.create<brick>(x, y, c); // Create the brick with the color
         }
     }
@@ -213,12 +221,19 @@ void game::run() {
         if (state != game_state::running) {
             switch (state) {
             case game_state::paused:
-                text_state.setString("   Paused   ");
+                text_state.setPosition({ constants::window_width / 2.0f - 65.0f, constants::window_height / 2.0f - 100.0f });
+                text_state.setString("Paused");
                 break;
             case game_state::game_over:
-                text_state.setString("  Game Over!");
+                text_state.setPosition({ constants::window_width / 16.0f, constants::window_height / 2.0f - 150.0f });
+                text_state.setString(
+                    "  Game Over!\n\n"
+                    "  - Press any key to play again\n"
+                    "  - Press escape to quit\n")
+                    ;
                 break;
             case game_state::player_wins:
+                text_state.setPosition({ constants::window_width / 2.0f - 100.0f, constants::window_height / 2.0f - 100.0f });
                 text_state.setString("Player Wins!");
                 break;
             default:
@@ -235,18 +250,32 @@ void game::run() {
             // If there are no remaining balls on the screen
             if (manager.get_all<ball>().empty()) {
                 // Spawn a new one and reduce the player's remaining lives
-                manager.create<ball>(constants::window_width / 2.0f, constants::window_height / 2.0f, current_ball_speed);
+                manager.create<ball>(
+                    constants::window_width / 2.0f,
+                    constants::window_height / 2.0f,
+                    current_ball_vx,
+                    current_ball_vy
+                );
                 --lives;
-
-                //state = game_state::paused;
             }
 
-            // Remember speed while ball still exists
+            // Remember the speed and position of the ball while ball still exists
             else {
                 manager.apply_all<ball>([this](ball& b) {
-                    current_ball_speed = b.get_speed();
+                    current_ball_x = b.x();
+                    current_ball_y = b.y();
+                    current_ball_vx = b.get_velocity().x;
+                    current_ball_vy = b.get_velocity().y;
                 });
             }
+
+            // Remember speed and position of the paddle
+            manager.apply_all<paddle>([this](paddle& p) {
+                current_paddle_x = p.x();
+                current_paddle_y = p.y();
+                current_paddle_vx = p.get_velocity().x;
+                current_paddle_vy = p.get_velocity().y;
+                });
 
             // If there are no remaining bricks on the screen, the player has won!
             if (manager.get_all<brick>().empty())

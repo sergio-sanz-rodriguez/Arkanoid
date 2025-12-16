@@ -24,7 +24,7 @@ class ball : public moving_entity {
       // x: increases to the right
       // y: increases downwards
       // speed: the current ball speed
-      ball(float x, float y, float speed = constants::ball_speed);
+      ball(float x, float y, float vx = constants::ball_speed, float vy = constants::ball_speed);
 
       // Get ball speed
       float get_speed() const noexcept;

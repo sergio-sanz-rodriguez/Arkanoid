@@ -1,11 +1,11 @@
+#include <iostream>
 #include "paddle.h"
-//#include <SFML/Graphics.hpp>
 
 // Initialize static data
 sf::Texture paddle::texture;
 sf::RenderWindow* paddle::window_ = nullptr;
 
-paddle::paddle(float x, float y) { //: moving_entity() {
+paddle::paddle(float x, float y, float vx, float vy = 0.0f) {
       
     // Load the texture
     if (!texture.loadFromFile(constants::paddle_path())) {
@@ -26,10 +26,15 @@ paddle::paddle(float x, float y) { //: moving_entity() {
     half_width = get_bounding_box().size.x / 2.0f;
 
     // Set the velocity of the paddle
-    velocity = {constants::paddle_speed, 0.0f};
+    velocity = {vx, vy};
 
-    current_speed = constants::paddle_speed;
+    //current_speed = constants::paddle_speed;
 }
+
+// Get paddle speed
+//float paddle::get_speed() const noexcept {
+//    return std::max(std::abs(velocity.x), std::abs(velocity.y));
+//}
 
 // The paddle cannot move up
 void paddle::move_up() noexcept {}
@@ -74,7 +79,9 @@ void paddle::set_window(sf::RenderWindow& w) {
 // Do not allow the paddle to move off the screen
 void paddle::process_player_input() {
 
-    // 0) Speed adjust (Up/Down) - do NOT return
+    //static float current_speed = constants::paddle_speed;
+
+    // Speed adjust (Up/Down) - do NOT return
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
         current_speed += constants::paddle_speed_step;
 
@@ -82,21 +89,19 @@ void paddle::process_player_input() {
         current_speed -= constants::paddle_speed_step;
 
     current_speed = std::clamp(current_speed, constants::paddle_min_speed, constants::paddle_max_speed);
-
-    // 1) Keyboard input
-    const bool leftKey = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left);
-    const bool rightKey = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right);
-
-    if (leftKey) {
+    std::cout << current_speed << std::endl;
+    
+    // Keyboard input
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
         velocity.x = ((x() - half_width) >= 0.f) ? -current_speed : 0.f;
         return;
     }
-    if (rightKey) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
         velocity.x = ((x() + half_width) <= constants::window_width) ? current_speed : 0.f;
         return;
     }
 
-    // 2) Mouse input (ONLY if mouse moved)
+    // Mouse input (ONLY if mouse moved)
     velocity.x = 0.f; // default
 
     if (!window_) return;

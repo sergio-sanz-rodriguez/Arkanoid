@@ -43,3 +43,6 @@ float entity::bottom() const noexcept {
 // Helper functions for the state of the entity
 void entity::destroy() noexcept { destroyed = true; }
 bool entity::is_destroyed() const noexcept { return destroyed; }
+
+// Helper function to get the velocity of the moving entity
+sf::Vector2f moving_entity::get_velocity() const noexcept { return velocity;  }
