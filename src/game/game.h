@@ -114,7 +114,7 @@ class game {
     // and an std::string with the window title
     // The SFML code is in the sf namespace
     sf::RenderWindow game_window{ sf::VideoMode({constants::window_width, constants::window_height}),
-        "Arkanoid by Sergio Sanz"};
+        "Arkanoid by Sergio Sanz" };
 
     // Instead of embedding every entity in the game class, use an entity_manager
     entity_manager manager;
@@ -126,10 +126,10 @@ class game {
     sf::Text text_instructions;
 
     // Member to store the current state of the game
-    game_state state{game_state::start_screen};
+    game_state state{ game_state::start_screen };
 
     // Define a vector with all the possible colors for the bricks
-    std::vector<sf::Color> vcolor{ 
+    std::vector<sf::Color> vcolor{
         constants::red,
         constants::orange,
         constants::green,
@@ -142,9 +142,14 @@ class game {
     // Actual ball and paddle speeds
     float current_ball_speed{ constants::ball_speed };
     float current_paddle_speed{ constants::paddle_speed };
+    float current_ball_x{ constants::window_width / 2.0f };
+    float current_ball_y{ constants::window_height - constants::paddle_height };
+    float current_paddle_x{ constants::window_width / 2.0f };
+    float current_paddle_y{ constants::window_height - constants::paddle_height };
 
 public:
 
+    // Game constructor, initializer
     game();
 
     // Reinitialize the game
