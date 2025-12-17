@@ -89,7 +89,7 @@ void paddle::process_player_input() {
         current_speed -= constants::paddle_speed_step;
 
     current_speed = std::clamp(current_speed, constants::paddle_min_speed, constants::paddle_max_speed);
-    std::cout << current_speed << std::endl;
+    //std::cout << current_speed << std::endl;
     
     // Keyboard input
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {

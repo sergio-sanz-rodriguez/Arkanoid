@@ -27,7 +27,10 @@ class ball : public moving_entity {
       ball(float x, float y, float vx = constants::ball_speed, float vy = constants::ball_speed);
 
       // Get ball speed
-      float get_speed() const noexcept;
+      //float get_speed() const noexcept;
+
+      // Get ball radius
+      float get_radius() const noexcept;
 
       // Required overrides
       void move_up() noexcept override;

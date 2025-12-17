@@ -46,3 +46,20 @@ bool entity::is_destroyed() const noexcept { return destroyed; }
 
 // Helper function to get the velocity of the moving entity
 sf::Vector2f moving_entity::get_velocity() const noexcept { return velocity;  }
+
+// Helper function to rotate the velocity vector
+void moving_entity::rotate(float degrees, bool random) noexcept {
+    if (random) {
+        // Create random number generator and uniform distribution
+        static thread_local std::mt19937 rng{ std::random_device{}() };
+        std::uniform_real_distribution<float> dist(-degrees, degrees);
+        degrees = dist(rng);
+    }
+    const double a = degrees * (constants::pi / 180.0); // degrees -> radians
+    const double c = std::cos(a);
+    const double s = std::sin(a);
+    const double x = velocity.x;
+    const double y = velocity.y;
+    velocity.x = static_cast<float>(x * c - y * s);
+    velocity.y = static_cast<float>(x * s + y * c);
+}

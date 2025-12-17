@@ -5,6 +5,9 @@
 #include <typeinfo>
 #include <vector>
 #include <map>
+#include <random>
+#include <algorithm>
+#include <iostream>
 
 #include "background.h"
 #include "ball.h"

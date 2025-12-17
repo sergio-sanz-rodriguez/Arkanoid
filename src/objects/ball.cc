@@ -27,25 +27,32 @@ ball::ball(float x, float y, float vx, float vy) {
 }
 
 // Get ball speed
-float ball::get_speed() const noexcept {
-    return std::max(std::abs(velocity.x), std::abs(velocity.y));
-}
+//float ball::get_speed() const noexcept {
+//    return std::max(std::abs(velocity.x), std::abs(velocity.y));
+//}
+
+// Get ball radius
+float ball::get_radius() const noexcept { return radius; }
 
 // Update velocities
 void ball::move_up() noexcept {
     velocity.y = -std::abs(velocity.y);
+    rotate(constants::rotation_angle);
 }
 
 void ball::move_down() noexcept {
     velocity.y = std::abs(velocity.y);
+    rotate(constants::rotation_angle);
 }
 
 void ball::move_left() noexcept {
     velocity.x = -std::abs(velocity.x);
+    rotate(constants::rotation_angle);
 }
 
 void ball::move_right() noexcept {
     velocity.x = std::abs(velocity.x);
+    rotate(constants::rotation_angle);
 }
 
 // Compute the ball's new position
@@ -66,12 +73,14 @@ void ball::update() {
         //velocity.x = -velocity.x;
         sprite->setPosition({ radius, y() }); // push inside
         velocity.x = std::abs(velocity.x);    // ensure moving right
+        //rotate(constants::rotation_angle);
     }
     // And similarly for the right hand side of the screen
     else if ((x() + radius) >= constants::window_width) {
         //velocity.x = -velocity.x;
         sprite->setPosition({ constants::window_width - radius, y() });
         velocity.x = -std::abs(velocity.x); // ensure moving left
+        //rotate(constants::rotation_angle);
     }
 
     // We can also do this for the top and botoom of the screen
@@ -79,6 +88,7 @@ void ball::update() {
         //velocity.y = -velocity.y;
         sprite->setPosition({ x(), radius });
         velocity.y = std::abs(velocity.y); // ensure moving down
+        //rotate(constants::rotation_angle);
     }
     else if ((y() + radius) >= constants::window_height) {
         //velocity.y = -velocity.y;

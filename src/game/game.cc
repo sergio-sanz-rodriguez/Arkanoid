@@ -1,7 +1,3 @@
-#include <algorithm>
-#include <iostream>
-#include <random>
-
 #include "game.h"
 #include "interactions.h"
 
@@ -118,8 +114,8 @@ void game::reset() {
         0.0f);
     
     // Create random number generator and uniform distribution
+    thread_local std::mt19937 rng(std::random_device{}());
     std::uniform_int_distribution<int> color_dist(0, static_cast<int>(vcolor.size()) - 1);
-    std::mt19937 rng(std::random_device{}());
 
     for (int i = 0; i < constants::brick_columns; ++i) {
         for (int j = 0; j < constants::brick_rows; ++j) {

@@ -2,6 +2,9 @@
 #define ENTITY_H
 
 #include <SFML/Graphics.hpp>
+#include <cmath>
+#include <random>
+#include "constants.h"
 
 // Abstract base class to represent any graphical entity on the screen
 class entity {
@@ -60,7 +63,11 @@ public:
     // float x();
     // float y();
 
+    // Get velocity of the entity
     sf::Vector2f get_velocity() const noexcept;
+
+    // Helper function to rotate the velocity vector
+    void rotate(float degrees, bool random = true) noexcept;
 ;
     // Helper functions to change the sprite's direction
     virtual void move_up() noexcept = 0;
