@@ -145,19 +145,10 @@ void game::reset() {
 // (Re)start the game
 void game::run() {
 
-    // Was the pause key pressed in the last frame?
-    //bool pause_key_active{ false };
-
-    // Was the F key pressed in the last frame?
-    //bool fireball_key_active{ false };
-    //bool previous_isfireball{ false };
-    //bool fireball_enabled{ false };
-
     while (game_window.isOpen()) {
 
         // Clear the screen
         game_window.clear(sf::Color::Black);
-
 
         // Check for any events since the last loop iteration
         // If the user clicks on "close" or presses "Escape", we close the window program
@@ -211,7 +202,6 @@ void game::run() {
         if (pressed && !fireball_key_active) {
             fireball_enabled = !fireball_enabled;
             manager.apply_all<ball>([&](ball& b) {
-                //b.set_isFireball(!b.get_isFireball());
                 b.set_fireball(fireball_enabled);
             });
         }
@@ -248,7 +238,6 @@ void game::run() {
             }
 
             game_window.draw(text_state);
-            //game_window.draw(text_lives);
         }
 
         // If the game is running
@@ -274,22 +263,7 @@ void game::run() {
                 manager.apply_all<ball>([this](ball& b) {
                     current_ball_position = b.get_position();
                     current_ball_velocity = b.get_velocity();
-                    //current_isfireball = b.get_isFireball();
                 });
-
-                //if (current_isfireball != previous_isfireball) {
-                //    manager.apply_all<ball>([this](ball& b) {
-                //        b.destroy();
-                //    });
-                //    manager.create<ball>(
-                //        current_ball_position,
-                //        current_ball_velocity,
-                //        current_isfireball ? sf::Vector2f{ 1.0f, 1.0f } : sf::Vector2f{ 0.5f, 0.5f },
-                //        current_isfireball? constants::orange: constants::white,
-                //        current_isfireball
-                //    );
-                //}
-                //previous_isfireball = current_isfireball;
             }
 
             // Remember speed and position of the paddle

@@ -22,14 +22,11 @@ class ball : public moving_entity {
      // Arguments are the initial coordinates of the centre of the ball
      // SFML uses the computer graphics convention
      // (0, 0) is the top left corner of the screen
-     // x: increases to the right
-     // y: increases downwards
-     // speed: the current ball speed
-     //ball(
-     //    float x, float y,
-     //    float vx = constants::ball_speed,
-     //    float vy = -constants::ball_speed,
-     //    bool fireball = false);
+     // pos.x: increases to the right
+     // pos.y: increases downwards
+     // vel: current speed of the ball
+     // sca: current scale of the ball
+     // col: current color of the ball
      ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool fireball = false);
  
      // Get ball speed

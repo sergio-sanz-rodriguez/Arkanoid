@@ -32,11 +32,6 @@ paddle::paddle(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color c
 
 }
 
-// Get paddle speed
-//float paddle::get_speed() const noexcept {
-//    return std::max(std::abs(velocity.x), std::abs(velocity.y));
-//}
-
 // The paddle cannot move up
 void paddle::move_up() noexcept {}
 

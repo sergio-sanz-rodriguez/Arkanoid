@@ -75,8 +75,6 @@ protected:
 
 public:
     // Helper functions interited from parent class
-    // float x();
-    // float y();
     // sf::Vector2f position();
 
     // Get velocity of the entity

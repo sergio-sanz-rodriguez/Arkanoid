@@ -24,11 +24,6 @@ ball::ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, 
     radius = get_bounding_box().size.x / 2.0f;
 }
 
-// Get ball speed
-//float ball::get_speed() const noexcept {
-//    return std::max(std::abs(velocity.x), std::abs(velocity.y));
-//}
-
 // Get and set ball radius
 float ball::get_radius() const noexcept { return radius; }
 void ball::set_radius(float r) noexcept { radius = r; }
@@ -71,36 +66,26 @@ void ball::update() {
     // Move the position of the ball
     sprite->move(velocity);
 
-    //std::cout << velocity.x << " " << velocity.y << std::endl;
     // We check if the ball has moved off the left hand side of the window
     // If so, we change sign of the x-component of the velocity
     // This will make it move at the same speed, but to the right
     // The ball will appear to bounce back into the window
     if ((get_position().x - radius) <= 0.0f) {
-        //velocity.x = -velocity.x;
         sprite->setPosition({ radius, get_position().y }); // push inside
         velocity.x = std::abs(velocity.x);    // ensure moving right
-        //rotate(constants::rotation_angle);
     }
     // And similarly for the right hand side of the screen
     else if ((get_position().x + radius) >= constants::window_width) {
-        //velocity.x = -velocity.x;
         sprite->setPosition({ constants::window_width - radius, get_position().y });
         velocity.x = -std::abs(velocity.x); // ensure moving left
-        //rotate(constants::rotation_angle);
     }
 
     // We can also do this for the top and botoom of the screen
     if ((get_position().y - radius) <= 0.0f) {
-        //velocity.y = -velocity.y;
         sprite->setPosition({ get_position().x, radius });
         velocity.y = std::abs(velocity.y); // ensure moving down
-        //rotate(constants::rotation_angle);
     }
     else if ((get_position().y + radius) >= constants::window_height) {
-        //velocity.y = -velocity.y;
-        //sprite->setPosition({ x(), constants::window_height - radius });
-        //velocity.y = -std::abs(velocity.y); // ensure moving up
         destroy();
     }
 }
