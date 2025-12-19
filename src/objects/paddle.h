@@ -20,24 +20,25 @@ class paddle : public moving_entity {
  public:
      // Interface of the class
 
-      // Constructor      
-      paddle(float x, float y, float vx, float vy);
+     // Constructor
+     //paddle(float x, float y, float vx, float vy);
+     paddle(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col);
 
-      // Get paddle speed
-      //float get_speed() const noexcept;
+     // Get paddle speed
+     //float get_speed() const noexcept;
 
-      // Required overrides
-      void move_up() noexcept override;
-      void move_down() noexcept override;
-      void move_left() noexcept override;
-      void move_right() noexcept override;
+     // Required overrides
+     void move_up() noexcept override;
+     void move_down() noexcept override;
+     void move_left() noexcept override;
+     void move_right() noexcept override;
 
-      // Implement the pure virtual functions
-      void update() override;
-      void draw(sf::RenderWindow& window) override;
+     // Implement the pure virtual functions
+     void update() override;
+     void draw(sf::RenderWindow& window) override;
 
-      // Set window, needed for enabling mouse interaction
-      static void set_window(sf::RenderWindow& w);
+     // Set window, needed for enabling mouse interaction
+     static void set_window(sf::RenderWindow& w);
 };
 
 #endif // PADDLE_H

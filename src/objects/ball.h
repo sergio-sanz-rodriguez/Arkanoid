@@ -30,13 +30,7 @@ class ball : public moving_entity {
      //    float vx = constants::ball_speed,
      //    float vy = -constants::ball_speed,
      //    bool fireball = false);
-     ball(
-         sf::Vector2f position,
-         sf::Vector2f velocity,
-         sf::Vector2f scale,
-         sf::Color color,
-         bool fireball = false
-     );
+     ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool fireball = false);
  
      // Get ball speed
      //float get_speed() const noexcept;
@@ -47,7 +41,7 @@ class ball : public moving_entity {
 
      // Get and set the state of the fireball feature
      bool get_isFireball() const noexcept;
-     void set_isFireball(bool b = false) noexcept;
+     void set_fireball(bool on) noexcept;
 
      // Required overrides
      void move_up() noexcept override;

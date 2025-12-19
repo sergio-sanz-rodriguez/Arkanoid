@@ -2,6 +2,7 @@
 #define ENTITY_H
 
 #include <SFML/Graphics.hpp>
+#include <iostream>
 #include <cmath>
 #include <random>
 #include "constants.h"
@@ -13,7 +14,7 @@ protected:
     std::unique_ptr<sf::Sprite> sprite;
 
     // Color of the entity
-    sf::Color color;
+    //sf::Color color;
 
     // Boolean member tracks the entity's status
     bool destroyed{ false };
@@ -40,7 +41,7 @@ public:
     // Helper functions to get the position of the sprite
     //float x() const noexcept;
     //float y() const noexcept;
-    sf::Vector2f position() const noexcept;
+    sf::Vector2f get_position() const noexcept;
 
     // Helper functions to get the edges of the sprite
     float left() const noexcept;
@@ -52,8 +53,12 @@ public:
     void destroy() noexcept;
     bool is_destroyed() const noexcept;
 
+    // Helper functions to get and set more entity properties
     sf::Color get_color() const noexcept;
     void set_color(sf::Color c) noexcept;
+
+    sf::Vector2f get_scale() const noexcept;
+    void set_scale(sf::Vector2f s) noexcept;
 
     // Virtual destructor
     virtual ~entity() {}

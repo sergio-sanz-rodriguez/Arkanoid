@@ -33,6 +33,7 @@ struct constants {
     static constexpr int brick_alpha_hit3{ 80 };  // Dull
     static constexpr int brick_alpha_hit2{ 170 }; // Medium
     static constexpr int brick_alpha_hit1{ 255 }; // Bright
+    static constexpr sf::Color white{ 255, 255, 255, 255 };     // White
     static constexpr sf::Color red{ 205, 92, 92, 255 };     // Light Coral (soft red)
     static constexpr sf::Color orange{ 255, 140, 0, 255 };  // Dark Orange (muted orange)
     static constexpr sf::Color green{ 60, 179, 113, 255 };   // Medium Sea Green (soft green)

@@ -16,7 +16,7 @@ void handle_collision(ball &b, const paddle& p) {
 
         // Make the new direction depend on where the collision occurs on the paddle
         // If the collision is on the left of the paddle, make the ball bounce to the left
-        if (b.x() < p.x())
+        if (b.get_position().x < p.get_position().x)
             b.move_left();
         else
             b.move_right();

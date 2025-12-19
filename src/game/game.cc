@@ -97,21 +97,26 @@ void game::reset() {
     // Reset the number of lives
     lives = constants::player_lives;
 
+    // Remove power-ups
+    fireball_enabled = false;
+
     // Destroy all the entities and re-create them
     manager.clear();
 
     // Reset the entities and their positions
     manager.create<background>(0.0f, 0.0f);
     manager.create<ball>(
-        constants::window_width / 2.0f,
-        constants::window_height - constants::paddle_height,
-        constants::ball_speed,
-        -constants::ball_speed);
+        sf::Vector2f{ constants::window_width / 2.0f, constants::window_height - constants::paddle_height },
+        sf::Vector2f{ constants::ball_speed, -constants::ball_speed },
+        sf::Vector2f{ 0.5f, 0.5f},
+        constants::white
+    );
     manager.create<paddle>(
-        constants::window_width / 2.0f,
-        constants::window_height - constants::paddle_height,
-        constants::paddle_speed,
-        0.0f);
+        sf::Vector2f{ constants::window_width / 2.0f, constants::window_height - constants::paddle_height },
+        sf::Vector2f{ constants::paddle_speed, 0.0f },
+        sf::Vector2f{ 1.0f, 1.0f },
+        constants::white
+    );
     
     // Create random number generator and uniform distribution
     thread_local std::mt19937 rng(std::random_device{}());
@@ -126,7 +131,10 @@ void game::reset() {
             // Create the brick object
             sf::Color c = vcolor[j % vcolor.size()]; // Access the color at the correct index
             //sf::Color c = vcolor[color_dist(rng)]; // Pick a random color
-            manager.create<brick>(x, y, c); // Create the brick with the color
+            manager.create<brick>(
+                sf::Vector2f{ x, y },
+                sf::Vector2f{ 1.0f, 1.0f },
+                c); // Create the brick with the color
         }
     }
 
@@ -138,12 +146,12 @@ void game::reset() {
 void game::run() {
 
     // Was the pause key pressed in the last frame?
-    bool pause_key_active{ false };
+    //bool pause_key_active{ false };
 
     // Was the F key pressed in the last frame?
-    bool fireball_key_active{ false };
-
-    bool key_pressed{ false };
+    //bool fireball_key_active{ false };
+    //bool previous_isfireball{ false };
+    //bool fireball_enabled{ false };
 
     while (game_window.isOpen()) {
 
@@ -187,31 +195,11 @@ void game::run() {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape))
             break;
 
-        // If the user presses "P", we pause/unpause the game
-        // To prevent repeated use, we ignore it if it was pressed on the last iteration
-        //if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::P)) {
-        //
-        //    // If it was not pressed on the last iteration, toggle the status
-        //    if (!pause_key_active) {
-        //        if (state == game_state::paused) {
-        //            state = game_state::running;
-        //        } 
-        //        else {
-        //            state = game_state::paused;
-        //        }
-        //    }
-        //    pause_key_active = true;
-        //}
-        //else {
-        //    pause_key_active = false;
-        //}
-
-        key_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::P);
-        if (key_pressed && !pause_key_active) {
-            state = (state == game_state::paused) ? game_state::running
-                                                  : game_state::paused;
+        bool pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::P);
+        if (pressed && !pause_key_active) {
+            state = (state == game_state::paused) ? game_state::running : game_state::paused;
         }
-        pause_key_active = key_pressed;
+        pause_key_active = pressed;
 
         // If the user presses "R", we reset the game
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R)) {
@@ -219,13 +207,15 @@ void game::run() {
         }
 
         // If the user presses "F", the ball is Fireball
-        key_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F);
-        if (key_pressed && !fireball_key_active) {
-            manager.apply_all<ball>([this](ball& b) {
-                b.set_isFireball(!b.get_isFireball());
-                });
+        pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F);
+        if (pressed && !fireball_key_active) {
+            fireball_enabled = !fireball_enabled;
+            manager.apply_all<ball>([&](ball& b) {
+                //b.set_isFireball(!b.get_isFireball());
+                b.set_fireball(fireball_enabled);
+            });
         }
-        fireball_key_active = key_pressed;
+        fireball_key_active = pressed;
 
         // If the game is not running, the entities are not updated
         // They are redrawn only if the game is paused
@@ -267,11 +257,14 @@ void game::run() {
             // If there are no remaining balls on the screen
             if (manager.get_all<ball>().empty()) {
                 // Spawn a new one and reduce the player's remaining lives
+                auto pos = sf::Vector2f{ constants::window_width / 2.f, constants::window_height / 2.f };
+                auto vel = sf::Vector2f{ std::abs(current_ball_velocity.x), -std::abs(current_ball_velocity.y) };
                 manager.create<ball>(
-                    constants::window_width / 2.0f,
-                    constants::window_height / 2.0f,
-                    current_ball_vx,
-                    -current_ball_vy
+                    pos,
+                    vel,
+                    fireball_enabled ? sf::Vector2f{ 1.0f, 1.0f } : sf::Vector2f{ 0.5f, 0.5f },
+                    fireball_enabled ? constants::orange : constants::white,
+                    fireball_enabled
                 );
                 --lives;
             }
@@ -279,19 +272,30 @@ void game::run() {
             // Remember the speed and position of the ball while ball still exists
             else {
                 manager.apply_all<ball>([this](ball& b) {
-                    current_ball_x = b.x();
-                    current_ball_y = b.y();
-                    current_ball_vx = b.get_velocity().x;
-                    current_ball_vy = b.get_velocity().y;
+                    current_ball_position = b.get_position();
+                    current_ball_velocity = b.get_velocity();
+                    //current_isfireball = b.get_isFireball();
                 });
+
+                //if (current_isfireball != previous_isfireball) {
+                //    manager.apply_all<ball>([this](ball& b) {
+                //        b.destroy();
+                //    });
+                //    manager.create<ball>(
+                //        current_ball_position,
+                //        current_ball_velocity,
+                //        current_isfireball ? sf::Vector2f{ 1.0f, 1.0f } : sf::Vector2f{ 0.5f, 0.5f },
+                //        current_isfireball? constants::orange: constants::white,
+                //        current_isfireball
+                //    );
+                //}
+                //previous_isfireball = current_isfireball;
             }
 
             // Remember speed and position of the paddle
             manager.apply_all<paddle>([this](paddle& p) {
-                current_paddle_x = p.x();
-                current_paddle_y = p.y();
-                current_paddle_vx = p.get_velocity().x;
-                current_paddle_vy = p.get_velocity().y;
+                current_paddle_position = p.get_position();
+                current_paddle_velocity = p.get_velocity();
                 });
 
             // If there are no remaining bricks on the screen, the player has won!

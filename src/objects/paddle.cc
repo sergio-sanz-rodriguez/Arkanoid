@@ -5,12 +5,14 @@
 sf::Texture paddle::texture;
 sf::RenderWindow* paddle::window_ = nullptr;
 
-paddle::paddle(float x, float y, float vx, float vy = 0.0f) {
-      
+//paddle::paddle(float x, float y, float vx, float vy = 0.0f) {
+paddle::paddle(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col) {
+
     // Load the texture
     if (!texture.loadFromFile(constants::paddle_path())) {
         throw std::runtime_error("Failed to load the paddle texture.");
-    }    
+    }
+
     //sprite.setTexture(texture);
     sprite = std::make_unique<sf::Sprite>(texture);
 
@@ -18,17 +20,16 @@ paddle::paddle(float x, float y, float vx, float vy = 0.0f) {
     // Make them relative to the sprite's centre    
     sprite->setOrigin(get_centre());
 
-    // Set the initial position and velocity of the paddle
+    // Set the initial position, velocity, and color of the paddle
     // Use (x, y) for the initial position of the paddle
-    sprite->setPosition({ x, y });
+    sprite->setPosition(pos);
+    sprite->setScale(sca);
+    sprite->setColor(col);
+    velocity = vel; //velocity = { vx, vy };
 
     // Set the width of the paddle divided by 2
     half_width = get_bounding_box().size.x / 2.0f;
 
-    // Set the velocity of the paddle
-    velocity = {vx, vy};
-
-    //current_speed = constants::paddle_speed;
 }
 
 // Get paddle speed
@@ -93,11 +94,11 @@ void paddle::process_player_input() {
     
     // Keyboard input
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
-        velocity.x = ((x() - half_width) >= 0.f) ? -current_speed : 0.f;
+        velocity.x = ((get_position().x - half_width) >= 0.f) ? -current_speed : 0.f;
         return;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
-        velocity.x = ((x() + half_width) <= constants::window_width) ? current_speed : 0.f;
+        velocity.x = ((get_position().x + half_width) <= constants::window_width) ? current_speed : 0.f;
         return;
     }
 
@@ -130,5 +131,5 @@ void paddle::process_player_input() {
     if (mouseX > constants::window_width - half_width)
         mouseX = constants::window_width - half_width;
 
-    sprite->setPosition({ mouseX, y() });
+    sprite->setPosition({ mouseX, get_position().y });
 }

@@ -1,13 +1,9 @@
 #include "ball.h"
-#include <iostream>
 
 // Initialize static data
 sf::Texture ball::texture;
 
-ball::ball(sf::Vector2f position, sf::Vector2f velocity, sf::Vector2f scale, sf::Color color, bool fireball)
-    : velocity(velocity)
-    : color(color)
-    : isFireball(fireball) {
+ball::ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool fireball) : isFireball(fireball) {
 
     // Load the texture
     if (!texture.loadFromFile(constants::ball_path())) {
@@ -16,17 +12,16 @@ ball::ball(sf::Vector2f position, sf::Vector2f velocity, sf::Vector2f scale, sf:
     //sprite.setTexture(texture);
     sprite = std::make_unique<sf::Sprite>(texture);
 
-    // Set the initial position and velocity of the ball
+    // Set the initial position, velocity, and color of the ball
     // Use (x, y) for the initial position of the ball
     sprite->setOrigin(get_centre());
-    sprite->scale({ 0.5f, 0.5f });
-    sprite->setPosition( position );
+    sprite->setPosition(pos);
+    sprite->scale(sca);
+    sprite->setColor(col);
+    velocity = vel; //velocity = { vx, vy };
 
     // Set the radius of the ball
     radius = get_bounding_box().size.x / 2.0f;
-
-    // Set the velocity of the ball
-    //velocity = { vx, vy };
 }
 
 // Get ball speed
@@ -40,7 +35,11 @@ void ball::set_radius(float r) noexcept { radius = r; }
 
 // Get and set the state of the fireball feature
 bool ball::get_isFireball() const noexcept { return isFireball; }
-void ball::set_isFireball(bool b) noexcept { isFireball = b; }
+void ball::set_fireball(bool on) noexcept {
+    isFireball = on;
+    sprite->setColor(on ? constants::orange : constants::white);
+    sprite->setScale(on ? sf::Vector2f{ 1.f, 1.f } : sf::Vector2f{ 0.5f, 0.5f });
+}
 
 // Update velocities
 void ball::move_up() noexcept {
@@ -77,28 +76,28 @@ void ball::update() {
     // If so, we change sign of the x-component of the velocity
     // This will make it move at the same speed, but to the right
     // The ball will appear to bounce back into the window
-    if ((x() - radius) <= 0.0f) {
+    if ((get_position().x - radius) <= 0.0f) {
         //velocity.x = -velocity.x;
-        sprite->setPosition({ radius, y() }); // push inside
+        sprite->setPosition({ radius, get_position().y }); // push inside
         velocity.x = std::abs(velocity.x);    // ensure moving right
         //rotate(constants::rotation_angle);
     }
     // And similarly for the right hand side of the screen
-    else if ((x() + radius) >= constants::window_width) {
+    else if ((get_position().x + radius) >= constants::window_width) {
         //velocity.x = -velocity.x;
-        sprite->setPosition({ constants::window_width - radius, y() });
+        sprite->setPosition({ constants::window_width - radius, get_position().y });
         velocity.x = -std::abs(velocity.x); // ensure moving left
         //rotate(constants::rotation_angle);
     }
 
     // We can also do this for the top and botoom of the screen
-    if ((y() - radius) <= 0.0f) {
+    if ((get_position().y - radius) <= 0.0f) {
         //velocity.y = -velocity.y;
-        sprite->setPosition({ x(), radius });
+        sprite->setPosition({ get_position().x, radius });
         velocity.y = std::abs(velocity.y); // ensure moving down
         //rotate(constants::rotation_angle);
     }
-    else if ((y() + radius) >= constants::window_height) {
+    else if ((get_position().y + radius) >= constants::window_height) {
         //velocity.y = -velocity.y;
         //sprite->setPosition({ x(), constants::window_height - radius });
         //velocity.y = -std::abs(velocity.y); // ensure moving up

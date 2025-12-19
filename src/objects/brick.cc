@@ -10,7 +10,8 @@ void brick::set_strength(int s) noexcept { strength = s; }
 void brick::weaken() noexcept { --strength;  }
 bool brick::is_too_weak() const noexcept { return strength <= 0;  }
 
-brick::brick(float x, float y, sf::Color c) : color(c) {
+//brick::brick(float x, float y, sf::Color c) : color(c) {
+brick::brick(sf::Vector2f pos, sf::Vector2f sca, sf::Color col) {
 
     // Load the texture
     if (!texture.loadFromFile(constants::brick_path())) {
@@ -23,18 +24,18 @@ brick::brick(float x, float y, sf::Color c) : color(c) {
     // Make them relative to the sprite's centre    
     sprite->setOrigin(get_centre());
 
-    // Set the initial position and velocity of the brick
+    // Set the initial position, scale, and color of the brick
     // Use (x, y) for the initial position of the brick
-    sprite->setPosition({ x, y });
-
-    // Set color for the sprite
-    sprite->setColor(c);
+    sprite->setPosition(pos);
+    sprite->scale(sca);
+    sprite->setColor(col);
 }
 
 
 // Compute the brick's new position
 void brick::update() {
     // Change the transparence of the brick based on its weakness
+    sf::Color color = sprite->getColor();
     if (strength == 1) {
         color.a = constants::brick_alpha_hit1;
     }
