@@ -17,9 +17,6 @@ class brick: public entity {
     // How many times the brick can be hit before destroying it
     int strength{ constants::brick_strength };
 
-    // Color of the brick
-    sf::Color color;
-
 public:
     // Interface of the class
 

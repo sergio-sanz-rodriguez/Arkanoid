@@ -11,33 +11,45 @@ sf::Vector2f entity::get_centre() const noexcept {
     return box.getCenter();  
 }
 
-// Helper functions to get the position of the sprite
-float entity::x() const noexcept {
-    return sprite->getPosition().x;
+sf::Color entity::get_color() const noexcept {
+    return color;
 }
-float entity::y() const noexcept {
-    return sprite->getPosition().y;
+
+void entity::set_color(sf::Color c) noexcept {
+    color = c;
+}
+
+// Helper functions to get the position of the sprite
+//float entity::x() const noexcept {
+//    return sprite->getPosition().x;
+//}
+//float entity::y() const noexcept {
+//    return sprite->getPosition().y;
+//}
+
+sf::Vector2f entity::position() const noexcept {
+    return sprite->getPosition();
 }
 
 // Helper functions to get the edges of the sprite
 float entity::left() const noexcept {
     auto box = get_bounding_box();
-    return x() - box.size.x / 2.0f;
+    return position().x - box.size.x / 2.0f;
 }
 
 float entity::right() const noexcept {
     auto box = get_bounding_box();
-    return x() + box.size.x / 2.0f;
+    return position().x + box.size.x / 2.0f;
 }
 
 float entity::top() const noexcept {
     auto box = get_bounding_box();
-    return y() - box.size.y / 2.0f;
+    return position().y - box.size.y / 2.0f;
 }
 
 float entity::bottom() const noexcept {
     auto box = get_bounding_box();
-    return y() + box.size.y / 2.0f;
+    return position().y + box.size.y / 2.0f;
 }
 
 // Helper functions for the state of the entity

@@ -9,9 +9,15 @@
 // Abstract base class to represent any graphical entity on the screen
 class entity {
 protected:
+    // Sprite object
     std::unique_ptr<sf::Sprite> sprite;
+
+    // Color of the entity
+    sf::Color color;
+
     // Boolean member tracks the entity's status
     bool destroyed{ false };
+
 public:
     // Pure virtual functions
     // Concrete graphical entities must implement these functions
@@ -32,8 +38,9 @@ public:
     sf::Vector2f get_centre() const noexcept;
 
     // Helper functions to get the position of the sprite
-    float x() const noexcept;
-    float y() const noexcept;
+    //float x() const noexcept;
+    //float y() const noexcept;
+    sf::Vector2f position() const noexcept;
 
     // Helper functions to get the edges of the sprite
     float left() const noexcept;
@@ -44,6 +51,9 @@ public:
     // Helper functions for the state of the entity
     void destroy() noexcept;
     bool is_destroyed() const noexcept;
+
+    sf::Color get_color() const noexcept;
+    void set_color(sf::Color c) noexcept;
 
     // Virtual destructor
     virtual ~entity() {}
@@ -62,6 +72,7 @@ public:
     // Helper functions interited from parent class
     // float x();
     // float y();
+    // sf::Vector2f position();
 
     // Get velocity of the entity
     sf::Vector2f get_velocity() const noexcept;

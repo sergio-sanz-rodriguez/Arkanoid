@@ -4,7 +4,10 @@
 // Initialize static data
 sf::Texture ball::texture;
 
-ball::ball(float x, float y, float vx, float vy) {
+ball::ball(sf::Vector2f position, sf::Vector2f velocity, sf::Vector2f scale, sf::Color color, bool fireball)
+    : velocity(velocity)
+    : color(color)
+    : isFireball(fireball) {
 
     // Load the texture
     if (!texture.loadFromFile(constants::ball_path())) {
@@ -17,13 +20,13 @@ ball::ball(float x, float y, float vx, float vy) {
     // Use (x, y) for the initial position of the ball
     sprite->setOrigin(get_centre());
     sprite->scale({ 0.5f, 0.5f });
-    sprite->setPosition({ x, y });
+    sprite->setPosition( position );
 
     // Set the radius of the ball
     radius = get_bounding_box().size.x / 2.0f;
 
     // Set the velocity of the ball
-    velocity = { vx, -vy };
+    //velocity = { vx, vy };
 }
 
 // Get ball speed
@@ -31,8 +34,13 @@ ball::ball(float x, float y, float vx, float vy) {
 //    return std::max(std::abs(velocity.x), std::abs(velocity.y));
 //}
 
-// Get ball radius
+// Get and set ball radius
 float ball::get_radius() const noexcept { return radius; }
+void ball::set_radius(float r) noexcept { radius = r; }
+
+// Get and set the state of the fireball feature
+bool ball::get_isFireball() const noexcept { return isFireball; }
+void ball::set_isFireball(bool b) noexcept { isFireball = b; }
 
 // Update velocities
 void ball::move_up() noexcept {

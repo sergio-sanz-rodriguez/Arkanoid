@@ -25,7 +25,7 @@ struct constants {
     static constexpr float paddle_speed_step{
         ball_speed_step * (paddle_max_speed - paddle_min_speed) / (ball_max_speed - ball_min_speed) 
     };
-    static constexpr float rotation_angle{ 0.5f };
+    static constexpr float rotation_angle{ 1.0f };
     static constexpr float pi{ 3.14159265358979323846f };
     static constexpr int brick_strength{ 1 }; // The brick needs to be hit 3 times before it disappears 
     static constexpr int brick_columns{ 12 };

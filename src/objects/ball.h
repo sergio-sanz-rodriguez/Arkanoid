@@ -11,36 +11,53 @@ class ball : public moving_entity {
     // Private data members
     static sf::Texture texture;
     float radius;
+    bool isFireball{ false };
 
     void process_player_input() override;
 
  public:
      // Interface of the class
 
-      // Constructor
-      // Arguments are the initial coordinates of the centre of the ball
-      // SFML uses the computer graphics convention
-      // (0, 0) is the top left corner of the screen
-      // x: increases to the right
-      // y: increases downwards
-      // speed: the current ball speed
-      ball(float x, float y, float vx = constants::ball_speed, float vy = constants::ball_speed);
+     // Constructor
+     // Arguments are the initial coordinates of the centre of the ball
+     // SFML uses the computer graphics convention
+     // (0, 0) is the top left corner of the screen
+     // x: increases to the right
+     // y: increases downwards
+     // speed: the current ball speed
+     //ball(
+     //    float x, float y,
+     //    float vx = constants::ball_speed,
+     //    float vy = -constants::ball_speed,
+     //    bool fireball = false);
+     ball(
+         sf::Vector2f position,
+         sf::Vector2f velocity,
+         sf::Vector2f scale,
+         sf::Color color,
+         bool fireball = false
+     );
+ 
+     // Get ball speed
+     //float get_speed() const noexcept;
 
-      // Get ball speed
-      //float get_speed() const noexcept;
+     // Get ball radius 
+     float get_radius() const noexcept;
+     void set_radius(float r) noexcept;
 
-      // Get ball radius
-      float get_radius() const noexcept;
+     // Get and set the state of the fireball feature
+     bool get_isFireball() const noexcept;
+     void set_isFireball(bool b = false) noexcept;
 
-      // Required overrides
-      void move_up() noexcept override;
-      void move_down() noexcept override;
-      void move_left() noexcept override;
-      void move_right() noexcept override;
+     // Required overrides
+     void move_up() noexcept override;
+     void move_down() noexcept override;
+     void move_left() noexcept override;
+     void move_right() noexcept override;
 
-      // Implement the pure virtual functions
-      void update() override;
-      void draw(sf::RenderWindow& window) override;
+     // Implement the pure virtual functions
+     void update() override;
+     void draw(sf::RenderWindow& window) override;
 
 };
 

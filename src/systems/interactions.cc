@@ -34,43 +34,44 @@ void handle_collision(ball& the_ball, brick& block) {
             // The brick is destroyed
             block.destroy();
         }
+        if (!the_ball.get_isFireball()) {
+            // Make the new direction depend on where the collision occurs on the brick
+            // If the ball collides on the side of the brick, make the ball bounce to the left/right
+            // If the ball collides on the top/bottom of the brick, make the ball bounce upwards/downwards
 
-        // Make the new direction depend on where the collision occurs on the brick
-        // If the ball collides on the side of the brick, make the ball bounce to the left/right
-        // If the ball collides on the top/bottom of the brick, make the ball bounce upwards/downwards
+            // First we find the amount of overlap in each direction
+            // The smaller the left overlap, the closer the ball is to the left side of the brick
+            // And similarly for the other sides of the brick
+            float left_overlap = the_ball.right() - block.left();
+            float right_overlap = block.right() - the_ball.left();
+            float top_overlap = the_ball.bottom() - block.top();
+            float bottom_overlap = block.bottom() - the_ball.top();
 
-        // First we find the amount of overlap in each direction
-        // The smaller the left overlap, the closer the ball is to the left side of the brick
-        // And similarly for the other sides of the brick
-        float left_overlap = the_ball.right() - block.left();
-        float right_overlap = block.right() - the_ball.left();
-        float top_overlap = the_ball.bottom() - block.top();
-        float bottom_overlap = block.bottom() - the_ball.top();
+            // If the left overlap is smaller than the right overlap, the ball hit the left side
+            bool from_left = std::abs(left_overlap) < std::abs(right_overlap);
+            bool from_top = std::abs(top_overlap) < std::abs(bottom_overlap);
 
-        // If the left overlap is smaller than the right overlap, the ball hit the left side
-        bool from_left = std::abs(left_overlap) < std::abs(right_overlap);
-        bool from_top = std::abs(top_overlap) < std::abs(bottom_overlap);
+            // Use the right or left overlap as appropriate
+            float min_x_overlap = from_left ? left_overlap : right_overlap;
+            float min_y_overlap = from_top ? top_overlap : bottom_overlap;
 
-        // Use the right or left overlap as appropriate
-        float min_x_overlap = from_left ? left_overlap : right_overlap;
-        float min_y_overlap = from_top ? top_overlap : bottom_overlap;
-
-        // If the ball hit the left or right side of the brick, change its horizontal direction
-        // If the ball hit the top or bottom of the brick, change its vertical direction
-        if (std::abs(min_x_overlap) < std::abs(min_y_overlap)) {
-            if (from_left) {
-                the_ball.move_left();
+            // If the ball hit the left or right side of the brick, change its horizontal direction
+            // If the ball hit the top or bottom of the brick, change its vertical direction
+            if (std::abs(min_x_overlap) < std::abs(min_y_overlap)) {
+                if (from_left) {
+                    the_ball.move_left();
+                }
+                else {
+                    the_ball.move_right();
+                }
             }
             else {
-                the_ball.move_right();
-            }
-        }
-        else {
-            if (from_top) {
-                the_ball.move_up();
-            }
-            else {
-                the_ball.move_down();
+                if (from_top) {
+                    the_ball.move_up();
+                }
+                else {
+                    the_ball.move_down();
+                }
             }
         }
     }

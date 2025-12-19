@@ -106,7 +106,7 @@ void game::reset() {
         constants::window_width / 2.0f,
         constants::window_height - constants::paddle_height,
         constants::ball_speed,
-        constants::ball_speed);
+        -constants::ball_speed);
     manager.create<paddle>(
         constants::window_width / 2.0f,
         constants::window_height - constants::paddle_height,
@@ -138,7 +138,12 @@ void game::reset() {
 void game::run() {
 
     // Was the pause key pressed in the last frame?
-    bool pause_key_active{false};
+    bool pause_key_active{ false };
+
+    // Was the F key pressed in the last frame?
+    bool fireball_key_active{ false };
+
+    bool key_pressed{ false };
 
     while (game_window.isOpen()) {
 
@@ -184,27 +189,43 @@ void game::run() {
 
         // If the user presses "P", we pause/unpause the game
         // To prevent repeated use, we ignore it if it was pressed on the last iteration
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::P)) {
+        //if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::P)) {
+        //
+        //    // If it was not pressed on the last iteration, toggle the status
+        //    if (!pause_key_active) {
+        //        if (state == game_state::paused) {
+        //            state = game_state::running;
+        //        } 
+        //        else {
+        //            state = game_state::paused;
+        //        }
+        //    }
+        //    pause_key_active = true;
+        //}
+        //else {
+        //    pause_key_active = false;
+        //}
 
-            // If it was not pressed on the last iteration, toggle the status
-            if (!pause_key_active) {
-                if (state == game_state::paused) {
-                    state = game_state::running;
-                } 
-                else {
-                    state = game_state::paused;
-                }
-            }
-            pause_key_active = true;
+        key_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::P);
+        if (key_pressed && !pause_key_active) {
+            state = (state == game_state::paused) ? game_state::running
+                                                  : game_state::paused;
         }
-        else {
-            pause_key_active = false;
-        }
+        pause_key_active = key_pressed;
 
         // If the user presses "R", we reset the game
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R)) {
             reset();
         }
+
+        // If the user presses "F", the ball is Fireball
+        key_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F);
+        if (key_pressed && !fireball_key_active) {
+            manager.apply_all<ball>([this](ball& b) {
+                b.set_isFireball(!b.get_isFireball());
+                });
+        }
+        fireball_key_active = key_pressed;
 
         // If the game is not running, the entities are not updated
         // They are redrawn only if the game is paused
@@ -250,7 +271,7 @@ void game::run() {
                     constants::window_width / 2.0f,
                     constants::window_height / 2.0f,
                     current_ball_vx,
-                    current_ball_vy
+                    -current_ball_vy
                 );
                 --lives;
             }
