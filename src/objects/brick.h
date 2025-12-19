@@ -21,7 +21,6 @@ public:
     // Interface of the class
 
     // Constructors
-    //brick(float x, float y, sf::Color c);
     brick(sf::Vector2f pos, sf::Vector2f sca, sf::Color col);
 
     // Helper functions for brick strength

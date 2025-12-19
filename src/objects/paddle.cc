@@ -5,7 +5,6 @@
 sf::Texture paddle::texture;
 sf::RenderWindow* paddle::window_ = nullptr;
 
-//paddle::paddle(float x, float y, float vx, float vy = 0.0f) {
 paddle::paddle(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col) {
 
     // Load the texture
@@ -25,7 +24,7 @@ paddle::paddle(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color c
     sprite->setPosition(pos);
     sprite->setScale(sca);
     sprite->setColor(col);
-    velocity = vel; //velocity = { vx, vy };
+    velocity = vel;
 
     // Set the width of the paddle divided by 2
     half_width = get_bounding_box().size.x / 2.0f;

@@ -11,7 +11,7 @@ background::background(float x, float y) {
     if (!texture.loadFromFile(constants::background_path())) {
         throw std::runtime_error("Failed to load background.jpg.");
     }    
-    sprite = std::make_unique<sf::Sprite>(texture); //sprite.setTexture(texture);
+    sprite = std::make_unique<sf::Sprite>(texture);
 
     // Set the initial position and velocity of the background
     // Use (x, y) for the initial position of the background

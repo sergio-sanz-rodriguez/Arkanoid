@@ -21,11 +21,7 @@ class paddle : public moving_entity {
      // Interface of the class
 
      // Constructor
-     //paddle(float x, float y, float vx, float vy);
      paddle(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col);
-
-     // Get paddle speed
-     //float get_speed() const noexcept;
 
      // Required overrides
      void move_up() noexcept override;
