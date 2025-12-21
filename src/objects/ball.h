@@ -11,7 +11,7 @@ class ball : public moving_entity {
     // Private data members
     static sf::Texture texture;
     float radius;
-    bool isFireball{ false };
+    bool fireball{ false };
 
     void process_player_input() override;
 
@@ -37,8 +37,8 @@ class ball : public moving_entity {
      void set_radius(float r) noexcept;
 
      // Get and set the state of the fireball feature
-     bool get_isFireball() const noexcept;
-     void set_fireball(bool on) noexcept;
+     bool get_fireball() const noexcept;
+     void set_fireball(bool on, float factor) noexcept;
 
      // Required overrides
      void move_up() noexcept override;

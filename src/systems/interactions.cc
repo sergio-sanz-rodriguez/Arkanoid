@@ -34,7 +34,7 @@ void handle_collision(ball& the_ball, brick& block) {
             // The brick is destroyed
             block.destroy();
         }
-        if (!the_ball.get_isFireball()) {
+        if (!the_ball.get_fireball()) {
             // Make the new direction depend on where the collision occurs on the brick
             // If the ball collides on the side of the brick, make the ball bounce to the left/right
             // If the ball collides on the top/bottom of the brick, make the ball bounce upwards/downwards

@@ -67,6 +67,16 @@ void paddle::set_window(sf::RenderWindow& w) {
     window_ = &w;
 }
 
+// Get and set the scale of the paddle
+bool paddle::get_scale() const noexcept { return scaleup; }
+void paddle::set_scale(bool on, float factor) noexcept {
+    //scaleup = on;
+    //sprite->setScale(on ? sf::Vector2f{ 2.0f, 1.0f } : sf::Vector2f{ 1.0f, 1.0f });
+    sprite->setScale(on ? sf::Vector2f{ factor * constants::paddle_scale_width, constants::paddle_scale_height } 
+                        : sf::Vector2f{ constants::paddle_scale_width, constants::paddle_scale_height });
+    half_width = get_bounding_box().size.x / 2.0f;
+}
+
 // Respond to input from the player
 // If the player presses the left arrow key, move to the left (negative velocity)
 // If the player presses the right arrow key, move to the right (positive velocity)

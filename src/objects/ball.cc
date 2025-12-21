@@ -3,7 +3,7 @@
 // Initialize static data
 sf::Texture ball::texture;
 
-ball::ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool fireball) : isFireball(fireball) {
+ball::ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool fireball) : fireball(fireball) {
 
     // Load the texture
     if (!texture.loadFromFile(constants::ball_path())) {
@@ -29,11 +29,12 @@ float ball::get_radius() const noexcept { return radius; }
 void ball::set_radius(float r) noexcept { radius = r; }
 
 // Get and set the state of the fireball feature
-bool ball::get_isFireball() const noexcept { return isFireball; }
-void ball::set_fireball(bool on) noexcept {
-    isFireball = on;
-    sprite->setColor(on ? constants::orange : constants::white);
-    sprite->setScale(on ? sf::Vector2f{ 1.f, 1.f } : sf::Vector2f{ 0.5f, 0.5f });
+bool ball::get_fireball() const noexcept { return fireball; }
+void ball::set_fireball(bool on, float factor) noexcept {
+    fireball = on;
+    sprite->setColor(on ? constants::orange : constants::steel);
+    sprite->setScale(on ? factor * sf::Vector2f{ 0.5f, 0.5f } : sf::Vector2f{ 0.5f, 0.5f });
+    radius = get_bounding_box().size.x / 2.0f;
 }
 
 // Update velocities

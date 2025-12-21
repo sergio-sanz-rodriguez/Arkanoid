@@ -109,12 +109,12 @@ void game::reset() {
         sf::Vector2f{ constants::window_width / 2.0f, constants::window_height - constants::paddle_height },
         sf::Vector2f{ constants::ball_speed, -constants::ball_speed },
         sf::Vector2f{ 0.5f, 0.5f},
-        constants::white
+        constants::steel
     );
     manager.create<paddle>(
         sf::Vector2f{ constants::window_width / 2.0f, constants::window_height - constants::paddle_height },
         sf::Vector2f{ constants::paddle_speed, 0.0f },
-        sf::Vector2f{ 1.0f, 1.0f },
+        sf::Vector2f{ constants::paddle_scale_width, constants::paddle_scale_height },
         constants::white
     );
     
@@ -174,7 +174,6 @@ void game::run() {
 
         // Start screen draw
         if (state == game_state::start_screen) {
-           // manager.draw(game_window);
             game_window.draw(text_instructions);
             game_window.display();
             continue;
@@ -202,10 +201,20 @@ void game::run() {
         if (pressed && !fireball_key_active) {
             fireball_enabled = !fireball_enabled;
             manager.apply_all<ball>([&](ball& b) {
-                b.set_fireball(fireball_enabled);
+                b.set_fireball(fireball_enabled, 1.0f);
             });
         }
         fireball_key_active = pressed;
+
+        // If the user presses "S", the ball is Fireball
+        pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S);
+        if (pressed && !paddle_scaleup_key_active) {
+            paddle_scaleup_enabled = !paddle_scaleup_enabled;
+            manager.apply_all<paddle>([&](paddle& b) {
+                b.set_scale(paddle_scaleup_enabled, 2.0f);
+            });
+        }
+        paddle_scaleup_key_active = pressed;
 
         // If the game is not running, the entities are not updated
         // They are redrawn only if the game is paused
@@ -251,8 +260,8 @@ void game::run() {
                 manager.create<ball>(
                     pos,
                     vel,
-                    fireball_enabled ? sf::Vector2f{ 1.0f, 1.0f } : sf::Vector2f{ 0.5f, 0.5f },
-                    fireball_enabled ? constants::orange : constants::white,
+                    fireball_enabled ? sf::Vector2f{ 0.5f, 0.5f } : sf::Vector2f{ 0.5f, 0.5f },
+                    fireball_enabled ? constants::orange : constants::steel,
                     fireball_enabled
                 );
                 --lives;

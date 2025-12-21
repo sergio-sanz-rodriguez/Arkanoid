@@ -25,6 +25,8 @@ struct constants {
     static constexpr float paddle_speed_step{
         ball_speed_step * (paddle_max_speed - paddle_min_speed) / (ball_max_speed - ball_min_speed) 
     };
+    static constexpr float paddle_scale_width{ 0.411f };
+    static constexpr float paddle_scale_height{ 0.25f };
     static constexpr float rotation_angle{ 1.0f };
     static constexpr float pi{ 3.14159265358979323846f };
     static constexpr int brick_strength{ 1 }; // The brick needs to be hit 3 times before it disappears 
@@ -35,10 +37,11 @@ struct constants {
     static constexpr int brick_alpha_hit1{ 255 }; // Bright
     static constexpr sf::Color white{ 255, 255, 255, 255 };     // White
     static constexpr sf::Color red{ 205, 92, 92, 255 };     // Light Coral (soft red)
-    static constexpr sf::Color orange{ 255, 140, 0, 255 };  // Dark Orange (muted orange)
+    static constexpr sf::Color orange{ 255, 129, 24, 255 }; // 140, 0, 255};  // Dark Orange (muted orange)
     static constexpr sf::Color green{ 60, 179, 113, 255 };   // Medium Sea Green (soft green)
     static constexpr sf::Color cyan{ 0, 206, 209, 255 };    // Dark Turquoise (gentle cyan)
     static constexpr sf::Color blue{ 70, 130, 180, 255 };   // Steel Blue (calming blue)
+    static constexpr sf::Color steel{ 156, 208, 255, 255 };   // Steel Blue
     static constexpr float brick_width{ 43.0f };
     static constexpr float brick_height{ 20.0f };
     static constexpr float brick_offset{ brick_width * 0.8f };
@@ -46,8 +49,8 @@ struct constants {
     //static constexpr std::string_view image_dir{ "D:\\Courses\\Arkanoid\\Arkanoid\\assets\\images\\" };
     static constexpr std::string_view image_dir{ "..\\..\\assets\\images\\" };
     static constexpr std::string_view background_filename{ "background_stars.jpg" };
-    static constexpr std::string_view ball_filename{ "ball_llblue.png" };
-    static constexpr std::string_view paddle_filename{ "paddle.png" };
+    static constexpr std::string_view ball_filename{ "ball_llwhite.png" };
+    static constexpr std::string_view paddle_filename{ "paddle4.png" };
     static constexpr std::string_view brick_filename{ "brick_s.png" };
     //static constexpr std::string_view font_filename{ "/usr/local/share/fonts/webfonts/verdana.ttf" };
     static constexpr std::string_view font_verdana{ "C:\\Windows\\fonts\\verdana.ttf" };
