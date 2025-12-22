@@ -40,13 +40,13 @@ struct constants {
     static constexpr float live_min_speed{ 6.0f };
     static constexpr float live_speed_step{ 0.5f };
     static constexpr float live_scale{ 1.0f };
-    static constexpr sf::Color white{ 255, 255, 255, 255 };     // White
-    static constexpr sf::Color red{ 205, 92, 92, 255 };     // Light Coral (soft red)
-    static constexpr sf::Color orange{ 255, 129, 24, 255 }; // 140, 0, 255};  // Dark Orange (muted orange)
-    static constexpr sf::Color green{ 60, 179, 113, 255 };   // Medium Sea Green (soft green)
-    static constexpr sf::Color cyan{ 0, 206, 209, 255 };    // Dark Turquoise (gentle cyan)
-    static constexpr sf::Color blue{ 70, 130, 180, 255 };   // Steel Blue (calming blue)
-    static constexpr sf::Color steel{ 156, 208, 255, 255 };   // Steel Blue
+    static constexpr sf::Color white{ 255, 255, 255, 255 }; // White
+    static constexpr sf::Color red{ 205, 92, 92, 255 };     // Light Coral
+    static constexpr sf::Color orange{ 255, 129, 24, 255 }; // Dark Orange
+    static constexpr sf::Color green{ 60, 179, 113, 255 };  // Medium Sea Green
+    static constexpr sf::Color cyan{ 0, 206, 209, 255 };    // Dark Turquoise
+    static constexpr sf::Color blue{ 70, 130, 180, 255 };   // Calming Blue
+    static constexpr sf::Color steel{ 156, 208, 255, 255 }; // Steel Blue
     static constexpr float brick_width{ 43.0f };
     static constexpr float brick_height{ 20.0f };
     static constexpr float brick_offset{ brick_width * 0.8f };
