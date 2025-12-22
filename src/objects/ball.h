@@ -28,13 +28,6 @@ class ball : public moving_entity {
      // sca: current scale of the ball
      // col: current color of the ball
      ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool fireball = false);
- 
-     // Get ball speed
-     //float get_speed() const noexcept;
-
-     // Get ball radius 
-     float get_radius() const noexcept;
-     void set_radius(float r) noexcept;
 
      // Get and set the state of the fireball feature
      bool get_fireball() const noexcept;

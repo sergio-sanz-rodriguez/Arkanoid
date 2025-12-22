@@ -39,6 +39,9 @@
     <ClCompile Include="src\game\game.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\objects\live.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\core\constants.h">
@@ -66,6 +69,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\game\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objects\live.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

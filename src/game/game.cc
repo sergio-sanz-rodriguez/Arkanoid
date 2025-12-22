@@ -104,20 +104,25 @@ void game::reset() {
     manager.clear();
 
     // Reset the entities and their positions
+    // Background picture
     manager.create<background>(0.0f, 0.0f);
+
+    // Ball object
     manager.create<ball>(
         sf::Vector2f{ constants::window_width / 2.0f, constants::window_height - constants::paddle_height },
         sf::Vector2f{ constants::ball_speed, -constants::ball_speed },
         sf::Vector2f{ 0.5f, 0.5f},
         constants::steel
     );
+
+    // Paddle object
     manager.create<paddle>(
         sf::Vector2f{ constants::window_width / 2.0f, constants::window_height - constants::paddle_height },
         sf::Vector2f{ constants::paddle_speed, 0.0f },
         sf::Vector2f{ constants::paddle_scale_width, constants::paddle_scale_height },
         constants::white
     );
-    
+
     // Create random number generator and uniform distribution
     thread_local std::mt19937 rng(std::random_device{}());
     std::uniform_int_distribution<int> color_dist(0, static_cast<int>(vcolor.size()) - 1);
@@ -137,6 +142,14 @@ void game::reset() {
                 c); // Create the brick with the color
         }
     }
+
+    //Extra live object
+    manager.create<live>(
+        sf::Vector2f{ constants::window_width / 2.0f, 0.0f },
+        sf::Vector2f{ 0.0f, constants::live_speed },
+        sf::Vector2f{ constants::live_scale, constants::live_scale },
+        constants::white
+    );
 
     // Limit the framerate
     game_window.setFramerateLimit(60); // Max rate is 60 frames per second
@@ -179,9 +192,7 @@ void game::run() {
             continue;
         }
 
-        // Check for user input
-        // If the user presses "Escape", we jump out of the loop
-        // This will terminate the program
+        // If the user presses "Escape", we jump out of the loop and terminate the program
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape))
             break;
 
@@ -308,6 +319,13 @@ void game::run() {
             manager.apply_all<ball>([this](auto& the_ball) {
                 manager.apply_all<paddle>([&the_ball](auto& the_paddle) {
                     handle_collision(the_ball, the_paddle);
+                });
+            });
+            
+            // Live interaction
+            manager.apply_all<live>([this](auto& the_live_obj) {
+                manager.apply_all<paddle>([this, &the_live_obj](auto& the_paddle) {
+                    handle_collision(the_live_obj, the_paddle, lives);
                 });
             });
             manager.refresh();

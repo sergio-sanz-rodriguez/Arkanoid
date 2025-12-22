@@ -76,3 +76,11 @@ void handle_collision(ball& the_ball, brick& block) {
         }
     }
 }
+
+// Resolve potential collision between the live object and the paddle
+void handle_collision(live& l, const paddle& p, int& lives) {
+    if (is_interacting(l, p)) {
+        ++lives;
+        l.destroy();
+    }
+}

@@ -24,10 +24,6 @@ ball::ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, 
     radius = get_bounding_box().size.x / 2.0f;
 }
 
-// Get and set ball radius
-float ball::get_radius() const noexcept { return radius; }
-void ball::set_radius(float r) noexcept { radius = r; }
-
 // Get and set the state of the fireball feature
 bool ball::get_fireball() const noexcept { return fireball; }
 void ball::set_fireball(bool on, float factor) noexcept {
@@ -91,6 +87,7 @@ void ball::update() {
     }
 }
 
+// Logic when the user speed ups or down the speed
 void ball::process_player_input() {
 
     // Up key increases the velocity of the ball, and down key decreases it
