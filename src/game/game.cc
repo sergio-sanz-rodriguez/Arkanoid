@@ -328,6 +328,8 @@ void game::run() {
                     handle_collision(the_live_obj, the_paddle, lives);
                 });
             });
+
+            // And refresh
             manager.refresh();
 
             // Display the updated graphics

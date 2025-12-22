@@ -54,7 +54,7 @@ struct constants {
     static constexpr std::string_view image_dir{ "..\\..\\assets\\images\\" };
     static constexpr std::string_view background_filename{ "background_stars.jpg" };
     static constexpr std::string_view ball_filename{ "ball_llwhite.png" };
-    static constexpr std::string_view paddle_filename{ "paddle4.png" };
+    static constexpr std::string_view paddle_filename{ "paddle_dark_orange.png" };
     static constexpr std::string_view brick_filename{ "brick_s.png" };
     static constexpr std::string_view live_filename{ "extra_live_s.png" };
     //static constexpr std::string_view font_filename{ "/usr/local/share/fonts/webfonts/verdana.ttf" };
