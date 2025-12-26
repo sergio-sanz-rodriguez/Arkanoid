@@ -38,6 +38,7 @@ struct constants {
     static constexpr float bonus_speed{ 6.0f };
     static constexpr float bonus_max_speed{ 16.0f };
     static constexpr float bonus_min_speed{ 6.0f };
+    static constexpr float bonus_speed_jitter{ 0.9f }; // a jitter better 0.9 * speed and (1/0.9) * speed.
     static constexpr float bonus_speed_step{ 0.5f };
     static constexpr float bonus_scale{ 1.0f };
     static constexpr int max_active_bonuses{ 2 };

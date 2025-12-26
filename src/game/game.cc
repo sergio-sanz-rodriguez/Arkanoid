@@ -147,7 +147,6 @@ void game::reset() {
     bonus_clock.restart();
     next_bonus_time = bonus_delay_dist(rng);
 
-
     // Limit the framerate
     game_window.setFramerateLimit(60); // Max rate is 60 frames per second
 }
@@ -304,9 +303,15 @@ void game::run() {
 
                 // Spawn LIFE bonus if none exists
                 if (life_count == 0 && std::bernoulli_distribution(0.5)(rng)) {
+
+                    float x = std::uniform_real_distribution<float>(
+                        bonus::half_width_for(bonus_type::life),
+                        constants::window_width - bonus::half_width_for(bonus_type::life)
+                    )(rng);
+
                     manager.create<bonus>(
                         bonus_type::life,
-                        sf::Vector2f{ bonus_x_dist(rng), 0.f },
+                        sf::Vector2f{ x, 0.f },
                         sf::Vector2f{ 0.f, constants::bonus_speed * life_jitter(rng) },
                         sf::Vector2f{ constants::bonus_scale, constants::bonus_scale },
                         constants::white
@@ -315,9 +320,15 @@ void game::run() {
 
                 // Spawn POWERUP bonus if none exists
                 if (powerup_count == 0 && std::bernoulli_distribution(0.5)(rng)) {
+
+                    float x = std::uniform_real_distribution<float>(
+                        bonus::half_width_for(bonus_type::powerup),
+                        constants::window_width - bonus::half_width_for(bonus_type::powerup)
+                    )(rng);
+
                     manager.create<bonus>(
                         bonus_type::powerup,
-                        sf::Vector2f{ bonus_x_dist(rng), 0.f },
+                        sf::Vector2f{ x, 0.f },
                         sf::Vector2f{ 0.f, constants::bonus_speed * powerup_jitter(rng) },
                         sf::Vector2f{ constants::bonus_scale, constants::bonus_scale },
                         constants::white

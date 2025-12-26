@@ -6,20 +6,19 @@ sf::Texture bonus::powerup_texture;
 
 bonus::bonus(bonus_type type, sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col) : type(type) {
 
-    // Load the texture
-    if (type == bonus_type::life) {
+    // Load static texture only once
+    static bool loaded = false;
+    if (!loaded) {
         if (!life_texture.loadFromFile(constants::life_path())) {
             throw std::runtime_error("Failed to load the life texture.");
         }
-    }
-    else if (type == bonus_type::powerup) {
         if (!powerup_texture.loadFromFile(constants::powerup_path())) {
             throw std::runtime_error("Failed to load the powerup texture.");
         }
+        loaded = true;
     }
-    else {
-        throw std::runtime_error("Failed to load the texture. bonus_type does not exist.");
-    }   
+
+    // Create sprite using the correct textrue
     sprite = std::make_unique<sf::Sprite>((type == bonus_type::life) ? life_texture : powerup_texture);
 
     // Set the initial position, velocity, and color of the live object
@@ -74,7 +73,7 @@ void bonus::process_player_input() {
 
     if (velocity.y <= 0.f) return; // safety
 
-    // new desired speed
+    // New desired speed
     if (upKey)   velocity.y += constants::bonus_speed_step;
     if (downKey) velocity.y -= constants::bonus_speed_step;
 
@@ -88,4 +87,11 @@ void bonus::draw(sf::RenderWindow& window) {
     window.draw(*sprite);
 }
 
+// Helper function to get the type of texture
 bonus_type bonus::get_type() const { return type; }
+
+// Helper function to get half width of a bonus type
+float bonus::half_width_for(bonus_type type) {
+    const sf::Texture& tex = (type == bonus_type::life) ? life_texture : powerup_texture;
+    return tex.getSize().x * constants::bonus_scale * 0.5f;
+}

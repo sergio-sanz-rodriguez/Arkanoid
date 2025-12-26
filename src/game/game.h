@@ -189,12 +189,15 @@ class game {
         constants::window_width - (constants::window_width / 16.0f)
     };
 
-    // Bonus type: 0 = life, 1 = powerup
-    std::uniform_int_distribution<int> bonus_type_dist{ 0, 1 };
-
     // Speed jitter for each bonus type
-    std::uniform_real_distribution<float> life_jitter{ 0.9f, 1.111f };
-    std::uniform_real_distribution<float> powerup_jitter{ 0.9f, 1.111f };
+    std::uniform_real_distribution<float> life_jitter{ 
+        constants::bonus_speed_jitter,
+        1.0f / constants::bonus_speed_jitter
+    };
+    std::uniform_real_distribution<float> powerup_jitter{
+        constants::bonus_speed_jitter,
+        1.0f / constants::bonus_speed_jitter
+    };
 
 public:
 

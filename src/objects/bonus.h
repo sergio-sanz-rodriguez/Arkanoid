@@ -40,7 +40,11 @@ public:
     void update() override;
     void draw(sf::RenderWindow& window) override;
 
+    // Helper function to get the type of texture
     bonus_type get_type() const;
+
+    // Helper function to get half width of a bonus type
+    static float half_width_for(bonus_type type);
 
 };
 
