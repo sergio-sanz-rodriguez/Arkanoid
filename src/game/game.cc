@@ -260,6 +260,16 @@ void game::run() {
         // If the game is running
         else {
 
+            // Count active bonuses by type 
+            size_t life_count = 0;
+            size_t powerup_count = 0;
+            manager.apply_all<bonus>([&](bonus& b) {
+                if (b.get_type() == bonus_type::life)
+                    ++life_count;
+                else if (b.get_type() == bonus_type::powerup)
+                    ++powerup_count;
+            });
+
             // If there are no remaining balls on the screen
             if (manager.get_all<ball>().empty()) {
                 // Spawn a new one and reduce the player's remaining lives
@@ -292,34 +302,28 @@ void game::run() {
             // Bonus spawning logic
             if (bonus_clock.getElapsedTime().asSeconds() >= next_bonus_time) {
 
-                // Allow up to 2 bonuses at the same time
-                size_t active_bonuses = manager.get_all<bonus_life>().size() + manager.get_all<bonus_powerup>().size();
-                if (active_bonuses < constants::max_active_bonuses) {
-
-                    float x = bonus_x_dist(rng);
-                    int type = bonus_type_dist(rng);
-
-                    if (type == 0) {
-                        manager.create<bonus_life>(
-                            constants::life_path(),
-                            sf::Vector2f{ x, 0.f },
-                            sf::Vector2f{ 0.f, constants::bonus_speed * life_jitter(rng)},
-                            sf::Vector2f{ constants::bonus_scale, constants::bonus_scale },
-                            constants::white
-                        );
-                    }
-                    else {
-                        manager.create<bonus_powerup>(
-                            constants::powerup_path(),
-                            sf::Vector2f{ x, 0.f },
-                            sf::Vector2f{ 0.f, constants::bonus_speed * powerup_jitter(rng) },
-                            sf::Vector2f{ constants::bonus_scale, constants::bonus_scale },
-                            constants::white
-                        );
-                    }
+                // Spawn LIFE bonus if none exists
+                if (life_count == 0 && std::bernoulli_distribution(0.5)(rng)) {
+                    manager.create<bonus>(
+                        bonus_type::life,
+                        sf::Vector2f{ bonus_x_dist(rng), 0.f },
+                        sf::Vector2f{ 0.f, constants::bonus_speed * life_jitter(rng) },
+                        sf::Vector2f{ constants::bonus_scale, constants::bonus_scale },
+                        constants::white
+                    );
                 }
 
-                // Reset timer and choose next random delay
+                // Spawn POWERUP bonus if none exists
+                if (powerup_count == 0 && std::bernoulli_distribution(0.5)(rng)) {
+                    manager.create<bonus>(
+                        bonus_type::powerup,
+                        sf::Vector2f{ bonus_x_dist(rng), 0.f },
+                        sf::Vector2f{ 0.f, constants::bonus_speed * powerup_jitter(rng) },
+                        sf::Vector2f{ constants::bonus_scale, constants::bonus_scale },
+                        constants::white
+                    );
+                }
+
                 bonus_clock.restart();
                 next_bonus_time = bonus_delay_dist(rng);
             }

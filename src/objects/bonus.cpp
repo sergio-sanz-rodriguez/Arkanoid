@@ -1,16 +1,26 @@
 #include "bonus.h"
 
 // Initialize static data
-sf::Texture bonus::texture;
+sf::Texture bonus::life_texture;
+sf::Texture bonus::powerup_texture;
 
-bonus::bonus(const std::string& path, sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col) {
+bonus::bonus(bonus_type type, sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col) : type(type) {
 
     // Load the texture
-    if (!texture.loadFromFile(path)) {
-        throw std::runtime_error("Failed to load the live texture.");
+    if (type == bonus_type::life) {
+        if (!life_texture.loadFromFile(constants::life_path())) {
+            throw std::runtime_error("Failed to load the life texture.");
+        }
     }
-    //sprite.setTexture(texture);
-    sprite = std::make_unique<sf::Sprite>(texture);
+    else if (type == bonus_type::powerup) {
+        if (!powerup_texture.loadFromFile(constants::powerup_path())) {
+            throw std::runtime_error("Failed to load the powerup texture.");
+        }
+    }
+    else {
+        throw std::runtime_error("Failed to load the texture. bonus_type does not exist.");
+    }   
+    sprite = std::make_unique<sf::Sprite>((type == bonus_type::life) ? life_texture : powerup_texture);
 
     // Set the initial position, velocity, and color of the live object
     // Use (x, y) for the initial position of the live object
@@ -77,3 +87,5 @@ void bonus::draw(sf::RenderWindow& window) {
     // Ask the window to draw the sprite for us
     window.draw(*sprite);
 }
+
+bonus_type bonus::get_type() const { return type; }

@@ -80,11 +80,15 @@ void handle_collision(ball& the_ball, brick& block) {
 // Resolve potential collision between the bonus object and the paddle
 void handle_collision(bonus& n, const paddle& p, int& lives) {
     if (is_interacting(n, p)) {
-        if (n.get_type() == bonus::type::life) {
+        switch (n.get_type()) {
+        case bonus_type::life:
             ++lives;
+            break;
+
+        case bonus_type::powerup:
+            ++lives; // testing
+            break;
         }
-        else if (n.get_type() == bonus::type::powerup) {
-            // Activate powerup
-        }
+        n.destroy();
     }
 }

@@ -4,22 +4,31 @@
 #include "constants.h"
 #include "entity.h"
 
+// Define the two types of bonuses for the dame
+enum class bonus_type {
+    life,
+    powerup
+};
+
 // Class to represent a bonus object
 // Inherits from moving_entity
 class bonus : public moving_entity {
 
+private:
+
     // Private data members
-    static sf::Texture texture;
+    static sf::Texture life_texture;
+    static sf::Texture powerup_texture;
+    bonus_type type;
     float half_width;
     float half_height;
 
     void process_player_input() override;
 
 public:
-    // Interface of the class
 
     // Constructor
-    bonus(const std::string& path, sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col);
+    bonus(bonus_type type, sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col);
 
     // Required overrides
     void move_up() noexcept override;
@@ -31,31 +40,9 @@ public:
     void update() override;
     void draw(sf::RenderWindow& window) override;
 
-    enum class type { life, powerup };
-    virtual type get_type() const = 0;
+    bonus_type get_type() const;
 
 };
-
-// Define bonus life subclass
-class bonus_life : public bonus {
-public:
-
-    bonus_life(const std::string& path, sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col)
-        : bonus(path, pos, vel, sca, col) {}
-
-    type get_type() const override { return type::life; }
-};
-
-// -Define bonus powerup subclass
-class bonus_powerup : public bonus {
-public:
-
-    bonus_powerup(const std::string& path, sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col)
-        : bonus(path, pos, vel, sca, col) {}
-
-    type get_type() const override { return type::powerup; }
-};
-
 
 #endif // BONUS_H
 #pragma once
