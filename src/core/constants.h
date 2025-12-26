@@ -35,11 +35,12 @@ struct constants {
     static constexpr int brick_alpha_hit3{ 80 };  // Dull
     static constexpr int brick_alpha_hit2{ 170 }; // Medium
     static constexpr int brick_alpha_hit1{ 255 }; // Bright
-    static constexpr float live_speed{ 6.0f };
-    static constexpr float live_max_speed{ 16.0f };
-    static constexpr float live_min_speed{ 6.0f };
-    static constexpr float live_speed_step{ 0.5f };
-    static constexpr float live_scale{ 1.0f };
+    static constexpr float bonus_speed{ 6.0f };
+    static constexpr float bonus_max_speed{ 16.0f };
+    static constexpr float bonus_min_speed{ 6.0f };
+    static constexpr float bonus_speed_step{ 0.5f };
+    static constexpr float bonus_scale{ 1.0f };
+    static constexpr int max_active_bonuses{ 2 };
     static constexpr sf::Color white{ 255, 255, 255, 255 }; // White
     static constexpr sf::Color red{ 205, 92, 92, 255 };     // Light Coral
     static constexpr sf::Color orange{ 255, 129, 24, 255 }; // Dark Orange
@@ -56,14 +57,16 @@ struct constants {
     static constexpr std::string_view ball_filename{ "ball_llwhite.png" };
     static constexpr std::string_view paddle_filename{ "paddle_dark_orange.png" };
     static constexpr std::string_view brick_filename{ "brick_s.png" };
-    static constexpr std::string_view live_filename{ "extra_live_s.png" };
+    static constexpr std::string_view life_filename{ "extra_life_s.png" };
+    static constexpr std::string_view powerup_filename{ "powerup_s.png" };
     //static constexpr std::string_view font_filename{ "/usr/local/share/fonts/webfonts/verdana.ttf" };
     static constexpr std::string_view font_verdana{ "C:\\Windows\\fonts\\verdana.ttf" };
     static std::string background_path() { return std::string(image_dir) + std::string(background_filename); }
     static std::string ball_path() { return std::string(image_dir) + std::string(ball_filename); }
     static std::string paddle_path() { return std::string(image_dir) + std::string(paddle_filename); }
     static std::string brick_path() { return std::string(image_dir) + std::string(brick_filename); }
-    static std::string live_path() { return std::string(image_dir) + std::string(live_filename); }
+    static std::string life_path() { return std::string(image_dir) + std::string(life_filename); }
+    static std::string powerup_path() { return std::string(image_dir) + std::string(powerup_filename); }
 };
 
 #endif // CONSTANTS_H

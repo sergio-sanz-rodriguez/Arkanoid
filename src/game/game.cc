@@ -143,13 +143,10 @@ void game::reset() {
         }
     }
 
-    //Extra live object
-    manager.create<live>(
-        sf::Vector2f{ constants::window_width / 2.0f, 0.0f },
-        sf::Vector2f{ 0.0f, constants::live_speed },
-        sf::Vector2f{ constants::live_scale, constants::live_scale },
-        constants::white
-    );
+    // Initialize bonus spawn
+    bonus_clock.restart();
+    next_bonus_time = bonus_delay_dist(rng);
+
 
     // Limit the framerate
     game_window.setFramerateLimit(60); // Max rate is 60 frames per second
@@ -292,6 +289,41 @@ void game::run() {
                 current_paddle_velocity = p.get_velocity();
                 });
 
+            // Bonus spawning logic
+            if (bonus_clock.getElapsedTime().asSeconds() >= next_bonus_time) {
+
+                // Allow up to 2 bonuses at the same time
+                size_t active_bonuses = manager.get_all<bonus_life>().size() + manager.get_all<bonus_powerup>().size();
+                if (active_bonuses < constants::max_active_bonuses) {
+
+                    float x = bonus_x_dist(rng);
+                    int type = bonus_type_dist(rng);
+
+                    if (type == 0) {
+                        manager.create<bonus_life>(
+                            constants::life_path(),
+                            sf::Vector2f{ x, 0.f },
+                            sf::Vector2f{ 0.f, constants::bonus_speed * life_jitter(rng)},
+                            sf::Vector2f{ constants::bonus_scale, constants::bonus_scale },
+                            constants::white
+                        );
+                    }
+                    else {
+                        manager.create<bonus_powerup>(
+                            constants::powerup_path(),
+                            sf::Vector2f{ x, 0.f },
+                            sf::Vector2f{ 0.f, constants::bonus_speed * powerup_jitter(rng) },
+                            sf::Vector2f{ constants::bonus_scale, constants::bonus_scale },
+                            constants::white
+                        );
+                    }
+                }
+
+                // Reset timer and choose next random delay
+                bonus_clock.restart();
+                next_bonus_time = bonus_delay_dist(rng);
+            }
+
             // If there are no remaining bricks on the screen, the player has won!
             if (manager.get_all<brick>().empty())
                 state = game_state::player_wins;
@@ -322,10 +354,10 @@ void game::run() {
                 });
             });
             
-            // Live interaction
-            manager.apply_all<live>([this](auto& the_live_obj) {
-                manager.apply_all<paddle>([this, &the_live_obj](auto& the_paddle) {
-                    handle_collision(the_live_obj, the_paddle, lives);
+            // Apply to all bonuses (life or powerup)
+            manager.apply_all<bonus>([this](auto& the_bonus) {
+                manager.apply_all<paddle>([this, &the_bonus](auto& the_paddle) {
+                    handle_collision(the_bonus, the_paddle, lives);
                 });
             });
 

@@ -8,13 +8,15 @@
 #include <random>
 #include <algorithm>
 #include <iostream>
+#include <chrono>
 
+#include "constants.h"
 #include "background.h"
 #include "ball.h"
 #include "brick.h"
-#include "constants.h"
 #include "entity.h"
 #include "paddle.h"
+#include "bonus.h"
 
 // A class to manage the entities in the game
 // It stores the entities in a vector of std::unique_ptr
@@ -172,6 +174,27 @@ class game {
     bool fireball_key_active{ false };
     bool paddle_scaleup_enabled{ false };
     bool paddle_scaleup_key_active{ false };
+
+    // Bonus spawn control
+    sf::Clock bonus_clock;
+    float next_bonus_time = 0.0f;
+    std::mt19937 rng{ std::random_device{}() };
+
+    // Timing
+    std::uniform_real_distribution<float> bonus_delay_dist{ 5.0f, 15.0f };
+
+    // X position
+    std::uniform_real_distribution<float> bonus_x_dist{
+        constants::window_width / 16.0f,
+        constants::window_width - (constants::window_width / 16.0f)
+    };
+
+    // Bonus type: 0 = life, 1 = powerup
+    std::uniform_int_distribution<int> bonus_type_dist{ 0, 1 };
+
+    // Speed jitter for each bonus type
+    std::uniform_real_distribution<float> life_jitter{ 0.9f, 1.111f };
+    std::uniform_real_distribution<float> powerup_jitter{ 0.9f, 1.111f };
 
 public:
 
