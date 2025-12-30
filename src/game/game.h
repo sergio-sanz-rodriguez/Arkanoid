@@ -36,21 +36,6 @@
 using entity_vector = std::vector<std::unique_ptr<entity>>;
 using entity_alias_vector = std::vector<entity *>;
 
-struct powerups {
-
-    // Ball
-    bool fireball = false;
-    bool ball_slower = false;
-    bool ball_faster = false;
-
-    // Paddle
-    bool paddle_wider = false;
-    bool paddle_narrower = false;
-
-    // Reset
-    bool reset_powerups = true;
-};
-
 class entity_manager {
 
     // A vector to store all the entities in the game (all brick objects, background, ball, paddle)
@@ -143,6 +128,7 @@ class game {
     sf::Font verdana;
     sf::Text text_state;
     sf::Text text_lives;
+    sf::Text text_powerup;
     sf::Text text_instructions;
 
     // Member to store the current state of the game
@@ -161,12 +147,24 @@ class game {
     int lives{ constants::player_lives };
 
     // Current position and speed of the ball
-    sf::Vector2f current_ball_position{ constants::window_width / 2.0f, constants::window_height - constants::paddle_height };
-    sf::Vector2f current_ball_velocity{ constants::ball_speed, constants::ball_speed };
+    sf::Vector2f current_ball_position{ 
+        constants::window_width / 2.0f,
+        constants::window_height - constants::paddle_height
+    };
+    sf::Vector2f current_ball_velocity{
+        constants::ball_speed,
+        constants::ball_speed
+    };
 
     // Current position and speed of the paddle
-    sf::Vector2f current_paddle_position{ constants::window_width / 2.0f, constants::window_height - constants::paddle_height };
-    sf::Vector2f current_paddle_velocity{ constants::paddle_speed, constants::paddle_speed };
+    sf::Vector2f current_paddle_position{
+        constants::window_width / 2.0f,
+        constants::window_height - constants::paddle_height
+    };
+    sf::Vector2f current_paddle_velocity{
+        constants::paddle_speed,
+        constants::paddle_speed
+    };
 
     // Declare some control flags
     bool pause_key_active{ false };
@@ -174,6 +172,11 @@ class game {
     bool fireball_key_active{ false };
     bool paddle_scaleup_enabled{ false };
     bool paddle_scaleup_key_active{ false };
+
+    // Handle powerups
+    powerups active_powerups;
+    void apply_powerups_to_entities();
+    powerup_type random_powerup();
 
     // Bonus spawn control
     sf::Clock bonus_clock;

@@ -11,6 +11,7 @@ class ball : public moving_entity {
     // Private data members
     static sf::Texture texture;
     float radius;
+    //float speed_multiplier{ 1.0f };
     bool fireball{ false };
 
     void process_player_input() override;
@@ -32,6 +33,11 @@ class ball : public moving_entity {
      // Get and set the state of the fireball feature
      bool get_fireball() const noexcept;
      void set_fireball(bool on, float factor) noexcept;
+
+     // Speed multiplier
+     //bool get_speed_multiplier() const noexcept;
+     //void set_speed_multiplier(float factor = 1.0f) noexcept;
+     //void update_velocity() noexcept;
 
      // Required overrides
      void move_up() noexcept override;

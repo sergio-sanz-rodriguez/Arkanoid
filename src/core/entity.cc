@@ -58,8 +58,19 @@ float entity::bottom() const noexcept {
 void entity::destroy() noexcept { destroyed = true; }
 bool entity::is_destroyed() const noexcept { return destroyed; }
 
-// Helper function to get the velocity of the moving entity
-sf::Vector2f moving_entity::get_velocity() const noexcept { return velocity;  }
+// Helper function to get and set the velocity of the moving entity
+sf::Vector2f moving_entity::get_velocity() const noexcept { return velocity; }
+void moving_entity::set_velocity(float vel) noexcept { 
+    float vx = velocity.x;
+    float vy = velocity.y;
+
+    float mag = std::sqrt(vx * vx + vy * vy);
+    if (mag <= 0.0001f) return;
+
+    float factor = vel / mag;
+    velocity.x *= factor;
+    velocity.y *= factor;
+}
 
 // Helper function to rotate the velocity vector
 void moving_entity::rotate(float degrees, bool random) noexcept {

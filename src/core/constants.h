@@ -12,16 +12,16 @@
 struct constants {
     static constexpr int window_width{ 638 };
     static constexpr int window_height{ 860 }; // { 960 };
-    static constexpr float ball_speed{ 6.0f };
+    static constexpr float ball_speed{ 8.0f };
     static constexpr float ball_max_speed{ 16.0f };
     static constexpr float ball_min_speed{ 6.0f };
     static constexpr float ball_speed_step{ 0.5f };
     static constexpr float paddle_width{ 75.0f };
     //static constexpr float paddle_width_by_2{ 37.5f };
     static constexpr float paddle_height{ 40.0f };
-    static constexpr float paddle_speed{ 8.0f };
-    static constexpr float paddle_max_speed{ 21.33f };
-    static constexpr float paddle_min_speed{ 8.0f };
+    static constexpr float paddle_speed{ 10.0f };
+    static constexpr float paddle_max_speed{ 20.0f }; // { 21.33f };
+    static constexpr float paddle_min_speed{ 6.0f };
     static constexpr float paddle_speed_step{
         ball_speed_step * (paddle_max_speed - paddle_min_speed) / (ball_max_speed - ball_min_speed) 
     };
@@ -41,6 +41,7 @@ struct constants {
     static constexpr float bonus_speed_jitter{ 0.9f }; // a jitter better 0.9 * speed and (1/0.9) * speed.
     static constexpr float bonus_speed_step{ 0.5f };
     static constexpr float bonus_scale{ 1.0f };
+    static constexpr float powerup_prob{ 0.7f };
     static constexpr int max_active_bonuses{ 2 };
     static constexpr sf::Color white{ 255, 255, 255, 255 }; // White
     static constexpr sf::Color red{ 205, 92, 92, 255 };     // Light Coral
@@ -58,8 +59,8 @@ struct constants {
     static constexpr std::string_view ball_filename{ "ball_llwhite.png" };
     static constexpr std::string_view paddle_filename{ "paddle_dark_orange.png" };
     static constexpr std::string_view brick_filename{ "brick_s.png" };
-    static constexpr std::string_view life_filename{ "extra_life_s.png" };
-    static constexpr std::string_view powerup_filename{ "powerup_s.png" };
+    static constexpr std::string_view life_filename{ "ball_green.png" }; // { "extra_life_s.png" }; //
+    static constexpr std::string_view powerup_filename{ "ball_blue.png" }; //  { "powerup_s.png" }; //
     //static constexpr std::string_view font_filename{ "/usr/local/share/fonts/webfonts/verdana.ttf" };
     static constexpr std::string_view font_verdana{ "C:\\Windows\\fonts\\verdana.ttf" };
     static std::string background_path() { return std::string(image_dir) + std::string(background_filename); }

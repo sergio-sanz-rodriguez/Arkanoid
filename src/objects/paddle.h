@@ -13,6 +13,7 @@ class paddle : public moving_entity {
     float half_width;
     static sf::RenderWindow* window_;
     float current_speed = constants::paddle_speed;
+    //bool speed_multiplier{ 1.0f };
     bool scaleup{ false };
 
     // Respond to input from the player
@@ -23,6 +24,14 @@ class paddle : public moving_entity {
 
      // Constructor
      paddle(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col);
+
+     // Get and set the the scale of the paddle
+     bool get_scale() const noexcept;
+     void set_scale(bool on, float factor) noexcept;
+
+     // Speed multiplier
+     //bool get_speed_multiplier() const noexcept;
+     //void set_speed_multiplier(float factor = 1.0f) noexcept;
 
      // Required overrides
      void move_up() noexcept override;
@@ -37,9 +46,6 @@ class paddle : public moving_entity {
      // Set window, needed for enabling mouse interaction
      static void set_window(sf::RenderWindow& w);
 
-     // Get and set the the scale of the paddle
-     bool get_scale() const noexcept;
-     void set_scale(bool on, float factor) noexcept;
 };
 
 #endif // PADDLE_H

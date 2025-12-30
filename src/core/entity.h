@@ -79,6 +79,7 @@ public:
 
     // Get velocity of the entity
     sf::Vector2f get_velocity() const noexcept;
+    void set_velocity(float vel) noexcept;
 
     // Helper function to rotate the velocity vector
     void rotate(float degrees, bool random = true) noexcept;
