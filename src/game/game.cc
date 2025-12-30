@@ -128,12 +128,20 @@ void game::apply_powerups_to_entities() {
 }
 
 powerup_type game::random_powerup() {
-    std::uniform_int_distribution<size_t> dist(0, powerup_candidates.size() - 1);
-    return powerup_candidates[dist(rng)];
+    std::uniform_int_distribution<int> dist(0, static_cast<int>(powerup_candidates.size()) - 1);
+    powerup_type chosen = powerup_candidates[static_cast<size_t>(dist(rng))];
+    // Avoid same powerup twice in a row (try a few times)
+    for (int tries = 0; tries < 5 && last_powerup && chosen == *last_powerup; ++tries) {
+        chosen = powerup_candidates[static_cast<size_t>(dist(rng))];
+    }
+    last_powerup = chosen;
+    return chosen;
 }
 
 game::game() :
+    rng(std::random_device{}()),
     text_state(verdana),
+    text_fireball(verdana),
     text_lives(verdana),
     text_powerup(verdana),
     text_instructions(verdana) {
@@ -152,25 +160,31 @@ game::game() :
 
     // Configure our text objects
     text_state.setFont(verdana);
-    text_state.setPosition({ constants::window_width / 2.0f - 125.0f, constants::window_height / 2.0f - 100.0f });
+    text_state.setPosition({ constants::window_width / 2.0f - std::ceilf(constants::window_width / 5.1f), (constants::window_height / 2.0f) - std::ceilf(constants::window_height / 8.6f) });
     text_state.setCharacterSize(35);
     text_state.setFillColor(constants::white);
     text_state.setString("Paused");
 
+    text_fireball.setFont(verdana);
+    text_fireball.setPosition({ (constants::window_width / 2.0f) - std::ceilf(constants::window_width / 32.0f), constants::window_height - std::ceilf(constants::window_height / 31.8f)});
+    text_fireball.setCharacterSize(12);
+    text_fireball.setFillColor(constants::orange);
+    text_fireball.setString("");
+
     text_lives.setFont(verdana);
-    text_lives.setPosition({ constants::window_width - 75.0f, constants::window_height - std::ceilf(constants::window_width / 17.0f) });
+    text_lives.setPosition({ constants::window_width - std::ceilf(constants::window_width / 8.5f), constants::window_height - std::ceilf(constants::window_height / 31.8f) });
     text_lives.setCharacterSize(12);
     text_lives.setFillColor(constants::true_green);
     text_lives.setString("Lives: " + std::to_string(lives));
 
     text_powerup.setFont(verdana);
-    text_powerup.setPosition({ std::ceilf(constants::window_width / 25.0f), constants::window_height - std::ceilf(constants::window_width / 17.0f) });
+    text_powerup.setPosition({ std::ceilf(constants::window_width / 25.0f), constants::window_height - std::ceilf(constants::window_height / 31.8f) });
     text_powerup.setCharacterSize(12);
     text_powerup.setFillColor(constants::true_blue);
     text_powerup.setString("");
 
     text_instructions.setFont(verdana);
-    text_instructions.setPosition({ constants::window_width / 16.0f, constants::window_height / 4 });
+    text_instructions.setPosition({ constants::window_width / 16.0f, constants::window_height / 4.0f });
     text_instructions.setCharacterSize(20);
     text_instructions.setFillColor(constants::white);
     text_instructions.setString(
@@ -198,6 +212,7 @@ void game::reset() {
 
     // Reset powerups
     active_powerups.reset();
+    text_fireball.setString("");
     text_powerup.setString("");
 
     // Reset the entities and their positions
@@ -221,7 +236,7 @@ void game::reset() {
     );
 
     // Create random number generator and uniform distribution
-    thread_local std::mt19937 rng(std::random_device{}());
+    //thread_local std::mt19937 rng(std::random_device{}());
     std::uniform_int_distribution<int> color_dist(0, static_cast<int>(vcolor.size()) - 1);
 
     for (int i = 0; i < constants::brick_columns; ++i) {
@@ -360,6 +375,7 @@ void game::run() {
                     false
                 );
                 active_powerups.reset();
+                text_fireball.setString("");
                 text_powerup.setString("");
                 --lives;
             }
@@ -465,8 +481,6 @@ void game::run() {
                     // FIREBALL bonus: set fireball powerup and change the message color
                     if (the_bonus.get_type() == bonus_type::fireball) {
                         active_powerups.apply(powerup_type::fireball);
-                        text_powerup.setFillColor(constants::orange);
-                        powerup_msg = "Fireball!";
                         return;
                     }
 
@@ -476,18 +490,15 @@ void game::run() {
                     // Update the active powerups state
                     active_powerups.apply(chosen);
 
-                    // Set color to blue
-                    text_powerup.setFillColor(constants::true_blue);
-
                     // Choose a user-friendly message for the UI based on the chosen powerup
                     switch (chosen) {
-                    case powerup_type::fireball:        powerup_msg = "Fireball!"; break;
-                    case powerup_type::multiball:       powerup_msg = "Multiball!"; break;
-                    case powerup_type::ball_faster:     powerup_msg = "Faster ball!"; break;
-                    case powerup_type::ball_slower:     powerup_msg = "Slower ball!"; break;
-                    case powerup_type::paddle_wider:    powerup_msg = "Wider paddle!"; break;
-                    case powerup_type::paddle_narrower: powerup_msg = "Narrower paddle!"; break;
-                    case powerup_type::reset_powerups:  powerup_msg = "No powerup applied!"; break;
+                    //case powerup_type::fireball:        powerup_msg = "Fireball!"; break;
+                    case powerup_type::multiball:       powerup_msg = "Multiball"; break;
+                    case powerup_type::ball_faster:     powerup_msg = "Faster ball"; break;
+                    case powerup_type::ball_slower:     powerup_msg = "Slower ball"; break;
+                    case powerup_type::paddle_wider:    powerup_msg = "Wider paddle"; break;
+                    case powerup_type::paddle_narrower: powerup_msg = "Narrower paddle"; break;
+                    case powerup_type::reset_powerups:  powerup_msg = "Reset powerups"; break;
                     default:
                         // If we ever add a new powerup and forget to handle it here,
                         // we won’t crash; but this helps avoid uninitialized messages.
@@ -497,7 +508,9 @@ void game::run() {
                 });
             });
 
-            // Only update if we actually collected something this frame
+            // Update lives, fireball, and powerup texts
+            text_lives.setString("Lives: " + std::to_string(lives));
+            text_fireball.setString(active_powerups.fireball ? "Fireball" : "");
             if (!powerup_msg.empty())
                 text_powerup.setString(powerup_msg);
 
@@ -507,9 +520,6 @@ void game::run() {
             // It should modify speed/scale while keeping movement logic intact.
             apply_powerups_to_entities();
 
-            // Update lives
-            text_lives.setString("Lives: " + std::to_string(lives));
-
             // And refresh
             manager.refresh();
 
@@ -517,8 +527,9 @@ void game::run() {
             manager.draw(game_window);
         }
 
-        game_window.draw(text_powerup);
         game_window.draw(text_lives);
+        game_window.draw(text_fireball);
+        game_window.draw(text_powerup);
         game_window.display();
     }
 }

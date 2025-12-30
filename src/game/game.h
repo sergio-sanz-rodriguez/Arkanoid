@@ -148,6 +148,7 @@ class game {
     // Use SFML text and font classes to communicate with text with the player
     sf::Font verdana;
     sf::Text text_state;
+    sf::Text text_fireball;
     sf::Text text_lives;
     sf::Text text_powerup;
     sf::Text text_instructions;
@@ -185,6 +186,7 @@ class game {
     void apply_powerups_to_entities();
     void spawn_extra_balls_up_to();
     powerup_type random_powerup();
+    std::optional<powerup_type> last_powerup;
 
     // Bonus spawn control
     sf::Clock bonus_clock;

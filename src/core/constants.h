@@ -47,7 +47,7 @@ struct constants {
     static constexpr int max_active_bonuses{ 2 };
     static constexpr float brick_width{ 43.0f };
     static constexpr float brick_height{ 20.0f };
-    static constexpr float brick_offset{ brick_width * 0.8f };
+    static constexpr float brick_offset{ brick_width * 0.9f };
     static constexpr int player_lives{ 3 };
     static constexpr sf::Color white{ 255, 255, 255, 255 }; // White
     static constexpr sf::Color red{ 205, 92, 92, 255 };     // Light Coral
