@@ -34,11 +34,6 @@ class ball : public moving_entity {
      bool get_fireball() const noexcept;
      void set_fireball(bool on, float factor) noexcept;
 
-     // Speed multiplier
-     //bool get_speed_multiplier() const noexcept;
-     //void set_speed_multiplier(float factor = 1.0f) noexcept;
-     //void update_velocity() noexcept;
-
      // Required overrides
      void move_up() noexcept override;
      void move_down() noexcept override;

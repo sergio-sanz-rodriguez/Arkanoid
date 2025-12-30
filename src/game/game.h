@@ -177,22 +177,8 @@ class game {
         constants::ball_speed
     };
 
-    // Current position and speed of the paddle
-    //sf::Vector2f current_paddle_position{
-    //    constants::window_width / 2.0f,
-    //    constants::window_height - constants::paddle_height
-    //};
-    //sf::Vector2f current_paddle_velocity{
-    //    constants::paddle_speed,
-    //    constants::paddle_speed
-    //};
-
     // Declare some control flags
     bool pause_key_active{ false };
-    //bool fireball_enabled{ false };
-    //bool fireball_key_active{ false };
-    //bool paddle_scaleup_enabled{ false };
-    //bool paddle_scaleup_key_active{ false };
 
     // Handle powerups
     powerups active_powerups;

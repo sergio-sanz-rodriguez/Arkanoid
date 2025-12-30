@@ -29,10 +29,6 @@ class paddle : public moving_entity {
      bool get_scale() const noexcept;
      void set_scale(bool on, float factor) noexcept;
 
-     // Speed multiplier
-     //bool get_speed_multiplier() const noexcept;
-     //void set_speed_multiplier(float factor = 1.0f) noexcept;
-
      // Required overrides
      void move_up() noexcept override;
      void move_down() noexcept override;

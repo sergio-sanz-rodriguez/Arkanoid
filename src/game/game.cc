@@ -84,59 +84,13 @@ void game::spawn_extra_balls_up_to() {
 // Helper functions to handle powerups in the game
 void game::apply_powerups_to_entities() {
 
-    // Ball x3 (one-shot effect)
+    // Multiball (one-shot effect)
     if (active_powerups.multiball) {
-
-//        const size_t ball_count = manager.get_all<ball>().size();
-
-//        // If we already have 3 or more balls, do nothing
-//        if (ball_count >= 3) {
-//            active_powerups.ball_x3 = false; // consume it anyway, optional
-//            // return; // but then it stays true until a ball is lost
-//        }
-//        else {
-//            // We need a reference ball to copy position + velocity
-//            if (auto* ref = manager.get_first<ball>()) {
-
-//                const sf::Vector2f pos = ref->get_position();
-//                const sf::Vector2f vel = ref->get_velocity();
-
-//                // Spawn as many as needed to reach three balls
-//                const size_t needed = 3 - ball_count;
-
-//                // 1st additional ball (+rotation)
-//                if (needed >= 1) {
-//                    auto& b1 = manager.create<ball>(
-//                        pos,
-//                        vel,
-//                        sf::Vector2f{ 0.5f, 0.5f },
-//                        active_powerups.fireball? constants::orange : constants::steel,
-//                        active_powerups.fireball
-//                    );
-//                    b1.rotate(+constants::rotation_angle, false);
-//                }
-
-//                // 2nd additional ball (-rotation)
-//                if (needed >= 2) {
-//                    auto& b2 = manager.create<ball>(
-//                        pos,
-//                        vel,
-//                        sf::Vector2f{ 0.5f, 0.5f },
-//                        active_powerups.fireball ? constants::orange : constants::steel,
-//                        active_powerups.fireball
-//                    );
-//                    b2.rotate(-constants::rotation_angle, false);
-//                }
-
-//                // Consume powerup (only after spawning)
-//                active_powerups.ball_x3 = false;
-//            }
-//        }
         spawn_extra_balls_up_to();
         active_powerups.multiball = false;
     }
 
-    // Ball  
+    // Ball effects
     manager.apply_all<ball>([this](ball& b) {
 
         // Fireball
@@ -224,8 +178,6 @@ game::game() :
         "Instructions:\n\n"
         "- Left arrow / Move mouse left, to move paddle left\n"
         "- Right Arrow / Move mouse right to move paddle right\n"
-        //"- Up arrow to increase ball speed\n"
-        //"- Down arrow to decrease ball speed\n"
         "- P button to pause and resume the game\n"
         "- R button to reset the game\n"
         "- Catch the blue and oragnge balls to apply a powerup\n"
@@ -240,9 +192,6 @@ void game::reset() {
 
     // Reset the number of lives
     lives = constants::player_lives;
-
-    // Remove power-ups
-    //fireball_enabled = false;
 
     // Destroy all the entities and re-create them
     manager.clear();
@@ -352,26 +301,6 @@ void game::run() {
             reset();
         }
 
-        // If the user presses "F", the ball is Fireball
-        //pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F);
-        //if (pressed && !fireball_key_active) {
-        //    fireball_enabled = !fireball_enabled;
-        //    manager.apply_all<ball>([&](ball& b) {
-        //        b.set_fireball(fireball_enabled, 1.0f);
-        //    });
-        //}
-        //fireball_key_active = pressed;
-
-        // If the user presses "S", the ball is Fireball
-        //pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S);
-        //if (pressed && !paddle_scaleup_key_active) {
-        //    paddle_scaleup_enabled = !paddle_scaleup_enabled;
-        //    manager.apply_all<paddle>([&](paddle& b) {
-        //        b.set_scale(paddle_scaleup_enabled, 2.0f);
-        //    });
-        //}
-        //paddle_scaleup_key_active = pressed;
-
         // If the game is not running, the entities are not updated
         // They are redrawn only if the game is paused
         if (state == game_state::paused) {
@@ -426,28 +355,14 @@ void game::run() {
                 manager.create<ball>(
                     pos,
                     vel,
-                    sf::Vector2f{ 0.5f, 0.5f }, //fireball_enabled ? sf::Vector2f{ 0.5f, 0.5f } : sf::Vector2f{ 0.5f, 0.5f },
-                    constants::steel, // fireball_enabled ? constants::orange : constants::steel,
-                    false // fireball_enabled
+                    sf::Vector2f{ 0.5f, 0.5f },
+                    constants::steel,
+                    false
                 );
                 active_powerups.reset();
                 text_powerup.setString("");
                 --lives;
             }
-
-            // Remember the speed and position of the ball while ball still exists
-            //else {
-            //    manager.apply_all<ball>([this](ball& b) {
-            //        current_ball_position = b.get_position();
-            //        current_ball_velocity = b.get_velocity();
-            //    });
-            //}
-
-            // Remember speed and position of the paddle
-            //manager.apply_all<paddle>([this](paddle& p) {
-            //    current_paddle_position = p.get_position();
-            //    current_paddle_velocity = p.get_velocity();
-            //    });
 
             // Bonus spawning logic
             if (bonus_clock.getElapsedTime().asSeconds() >= next_bonus_time) {

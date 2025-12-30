@@ -33,20 +33,6 @@ void ball::set_fireball(bool on, float factor) noexcept {
     radius = get_bounding_box().size.x / 2.0f;
 }
 
-// Get and set the speed multiplier
-//bool ball::get_speed_multiplier() const noexcept { return speed_multiplier; }
-//void ball::set_speed_multiplier(float factor) noexcept { speed_multiplier = factor; }
-//void ball::update_velocity() noexcept{
-//
-//    float vx = std::abs(velocity.x);
-//    float vy = std::abs(velocity.y);
-//    float speed = std::max(vx, vy) * speed_multiplier;
-//    speed = std::clamp(speed, constants::ball_min_speed, constants::ball_max_speed);
-
-//    velocity.x *= speed / vx;
-//    velocity.y *= speed / vy;
-//}
-
 // Drawing function
 void ball::draw(sf::RenderWindow& window) {
     // Ask the window to draw the sprite for us

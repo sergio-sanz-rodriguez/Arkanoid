@@ -16,7 +16,6 @@ void handle_collision(ball& b, const paddle& p);
 void handle_collision(ball& b, brick& p);
 
 // Resolve potential collision between the live object and the paddle
-//void handle_collision(bonus& n, const paddle& p, int& lives);
 bool handle_collision(bonus& n, const paddle& p);
 
 #endif //INTERACTIONS_H

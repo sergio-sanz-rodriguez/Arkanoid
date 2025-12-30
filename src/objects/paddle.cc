@@ -77,10 +77,6 @@ void paddle::set_scale(bool on, float factor) noexcept {
     half_width = get_bounding_box().size.x / 2.0f;
 }
 
-// Get and set the speed multiplier
-//bool paddle::get_speed_multiplier() const noexcept { return speed_multiplier; }
-//void paddle::set_speed_multiplier(float factor) noexcept { speed_multiplier = factor; }
-
 // Respond to input from the player
 // If the player presses the left arrow key, move to the left (negative velocity)
 // If the player presses the right arrow key, move to the right (positive velocity)
