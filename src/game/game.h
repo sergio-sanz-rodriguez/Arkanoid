@@ -93,6 +93,27 @@ public:
         return grouped_entities[typeid(T).hash_code()];
     }
 
+    // Functions to retrieve the first object
+    // This version is used when you have a normal manager, like:
+    // entity_manager manager;
+    // auto* p = manager.get_first<paddle>();
+    template <typename T>
+    T* get_first() {
+        auto& group = get_all<T>();
+        if (group.empty()) return nullptr;
+        return dynamic_cast<T*>(group.front());
+    }
+    // This version is used when the manager is const, like:
+    // const entity_manager& manager_ref = manager;
+    // auto* p = manager_ref.get_first<paddle>();
+    template <typename T>
+    const T* get_first() const {
+        auto it = grouped_entities.find(typeid(T).hash_code());
+        if (it == grouped_entities.end() || it->second.empty()) return nullptr;
+        return dynamic_cast<const T*>(it->second.front());
+    }
+
+
     // Apply a function to all entities of a given type
     template <typename T, typename Func>
     void apply_all(const Func& func) {
@@ -157,25 +178,26 @@ class game {
     };
 
     // Current position and speed of the paddle
-    sf::Vector2f current_paddle_position{
-        constants::window_width / 2.0f,
-        constants::window_height - constants::paddle_height
-    };
-    sf::Vector2f current_paddle_velocity{
-        constants::paddle_speed,
-        constants::paddle_speed
-    };
+    //sf::Vector2f current_paddle_position{
+    //    constants::window_width / 2.0f,
+    //    constants::window_height - constants::paddle_height
+    //};
+    //sf::Vector2f current_paddle_velocity{
+    //    constants::paddle_speed,
+    //    constants::paddle_speed
+    //};
 
     // Declare some control flags
     bool pause_key_active{ false };
-    bool fireball_enabled{ false };
-    bool fireball_key_active{ false };
-    bool paddle_scaleup_enabled{ false };
-    bool paddle_scaleup_key_active{ false };
+    //bool fireball_enabled{ false };
+    //bool fireball_key_active{ false };
+    //bool paddle_scaleup_enabled{ false };
+    //bool paddle_scaleup_key_active{ false };
 
     // Handle powerups
     powerups active_powerups;
     void apply_powerups_to_entities();
+    void spawn_extra_balls_up_to();
     powerup_type random_powerup();
 
     // Bonus spawn control
@@ -193,6 +215,10 @@ class game {
     };
 
     // Speed jitter for each bonus type
+    std::uniform_real_distribution<float> fireball_jitter{
+       constants::bonus_speed_jitter,
+       1.0f / constants::bonus_speed_jitter
+    };
     std::uniform_real_distribution<float> life_jitter{ 
         constants::bonus_speed_jitter,
         1.0f / constants::bonus_speed_jitter

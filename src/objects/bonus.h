@@ -6,6 +6,7 @@
 
 // Define the two types of bonuses for the dame
 enum class bonus_type {
+    fireball,
     life,
     powerup
 };
@@ -13,7 +14,7 @@ enum class bonus_type {
 enum class powerup_type {
     life,
     fireball,
-    ball_x3,
+    multiball,
     ball_slower,
     ball_faster,
     paddle_wider,
@@ -24,7 +25,7 @@ enum class powerup_type {
 struct powerups {
 
     bool fireball = false;
-    bool ball_x3 = false;
+    bool multiball = false;
     bool ball_slower = false;
     bool ball_faster = false;
     bool paddle_wider = false;
@@ -36,7 +37,7 @@ struct powerups {
     void apply(powerup_type bonus) {
         switch (bonus) {
             case powerup_type::fireball:        fireball = true; break;
-            case powerup_type::ball_x3:         ball_x3 = true; break;
+            case powerup_type::multiball:       multiball = true; break;
             case powerup_type::ball_slower:     ball_slower = true; ball_faster = false; break;
             case powerup_type::ball_faster:     ball_faster = true; ball_slower = false; break;
             case powerup_type::paddle_wider:    paddle_wider = true; paddle_narrower = false; break;
@@ -48,8 +49,7 @@ struct powerups {
 };
 
 inline constexpr std::array<powerup_type, 6> powerup_candidates = {
-    powerup_type::fireball,
-    //powerup_type::ball_x3,
+    powerup_type::multiball,
     powerup_type::ball_slower,
     powerup_type::ball_faster,
     powerup_type::paddle_wider,
@@ -64,6 +64,7 @@ class bonus : public moving_entity {
 private:
 
     // Private data members
+    static sf::Texture fireball_texture;
     static sf::Texture life_texture;
     static sf::Texture powerup_texture;
     float half_width;
