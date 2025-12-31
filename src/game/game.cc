@@ -388,10 +388,9 @@ void game::run() {
 
                     static std::bernoulli_distribution spawn_fireball(0.5); // 50% fireball, 50% life
                     const bonus_type type = spawn_fireball(rng) ? bonus_type::fireball : bonus_type::life;
-
                     float x = std::uniform_real_distribution<float>(
                         bonus::half_width_for(type),
-                        constants::window_width - bonus::half_width_for(bonus_type::life)
+                        constants::window_width - bonus::half_width_for(type)
                     )(rng);
 
                     manager.create<bonus>(

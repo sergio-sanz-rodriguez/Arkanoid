@@ -37,6 +37,7 @@ struct constants {
     static constexpr int brick_alpha_hit3{ 80 };  // Dull
     static constexpr int brick_alpha_hit2{ 170 }; // Medium
     static constexpr int brick_alpha_hit1{ 255 }; // Bright
+    static constexpr int max_active_bonuses{ 2 };
     static constexpr float bonus_speed{ 6.0f };
     static constexpr float bonus_max_speed{ 16.0f };
     static constexpr float bonus_min_speed{ 6.0f };
@@ -44,7 +45,6 @@ struct constants {
     static constexpr float bonus_speed_step{ 0.5f };
     static constexpr float bonus_scale{ 1.0f };
     static constexpr float powerup_prob{ 0.7f };
-    static constexpr int max_active_bonuses{ 2 };
     static constexpr float brick_width{ 43.0f };
     static constexpr float brick_height{ 20.0f };
     static constexpr float brick_offset{ brick_width * 0.9f };
