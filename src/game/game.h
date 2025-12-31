@@ -219,30 +219,30 @@ class game {
     std::optional<powerup_type> last_powerup;
 
     // Globals
-    //void handle_window_events();
-    //void handle_global_inputs();
-    //void update_state_text();
+    void handle_window_events();
+    void handle_global_inputs();
+    void update_state_text();
 
     // Update everything when running
-    //void update_running_frame();
+    void update_running_frame();
 
     // Respawn ball if none
-    //void ensure_ball_exists();
+    void ensure_ball_exists();
 
     // Spawn bonus entities
-    //void spawn_bonuses();
+    void spawn_bonuses();
 
     // Ball-brick, ball-paddle, bonus-paddle
-    //void resolve_collisions();
+    void resolve_collisions();
 
     // Powerup logic + message
-    //void handle_bonus_pickups();
+    void handle_bonus_pickups();
 
     // Lives, fireball, powerup msg
-    //void update_ui_texts(const std::string& powerup_msg);
+    void update_ui_texts(const std::string& powerup_msg);
 
     // Draw entities + UI
-    //void draw_frame();
+    void draw_frame();
 
 public:
 
