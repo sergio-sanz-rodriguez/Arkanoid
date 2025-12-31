@@ -181,13 +181,6 @@ class game {
     // Declare some control flags
     bool pause_key_active{ false };
 
-    // Handle powerups
-    powerups active_powerups;
-    void apply_powerups_to_entities();
-    void spawn_extra_balls_up_to();
-    powerup_type random_powerup();
-    std::optional<powerup_type> last_powerup;
-
     // Bonus spawn control
     sf::Clock bonus_clock;
     float next_bonus_time = 0.0f;
@@ -215,6 +208,41 @@ class game {
         constants::bonus_speed_jitter,
         1.0f / constants::bonus_speed_jitter
     };
+
+    // --- Helper functions --- //
+
+    // Handle powerups
+    powerups active_powerups;
+    void apply_powerups_to_entities();
+    void spawn_extra_balls_up_to();
+    powerup_type random_powerup();
+    std::optional<powerup_type> last_powerup;
+
+    // Globals
+    //void handle_window_events();
+    //void handle_global_inputs();
+    //void update_state_text();
+
+    // Update everything when running
+    //void update_running_frame();
+
+    // Respawn ball if none
+    //void ensure_ball_exists();
+
+    // Spawn bonus entities
+    //void spawn_bonuses();
+
+    // Ball-brick, ball-paddle, bonus-paddle
+    //void resolve_collisions();
+
+    // Powerup logic + message
+    //void handle_bonus_pickups();
+
+    // Lives, fireball, powerup msg
+    //void update_ui_texts(const std::string& powerup_msg);
+
+    // Draw entities + UI
+    //void draw_frame();
 
 public:
 
