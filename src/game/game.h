@@ -87,10 +87,21 @@ public:
     // Function to destroy all entities
     void clear();
 
-    // Function to retrieve all the objects of a given type
+    // Functions to retrieve all the objects of a given type
+    //template <typename T>
+    //auto& get_all() {
+    //    return grouped_entities[typeid(T).hash_code()];
+    //}
     template <typename T>
-    auto& get_all() {
+    entity_alias_vector& get_all() {
         return grouped_entities[typeid(T).hash_code()];
+    }
+    template <typename T>
+    const entity_alias_vector& get_all() const {
+        static const entity_alias_vector empty;
+        auto it = grouped_entities.find(typeid(T).hash_code());
+        if (it == grouped_entities.end()) return empty;
+        return it->second;
     }
 
     // Functions to retrieve the first object
@@ -112,6 +123,23 @@ public:
         if (it == grouped_entities.end() || it->second.empty()) return nullptr;
         return dynamic_cast<const T*>(it->second.front());
     }
+
+    // True if there is at least one entity of type T
+    template <typename T>
+    bool has_any() const {
+        auto it = grouped_entities.find(typeid(T).hash_code());
+        if (it == grouped_entities.end()) return false;
+        return !it->second.empty();
+    }
+
+    // Return number of entities of type T
+    template <typename T>
+    size_t count() const {
+        auto it = grouped_entities.find(typeid(T).hash_code());
+        if (it == grouped_entities.end()) return 0;
+        return it->second.size();
+    }
+
 
 
     // Apply a function to all entities of a given type
@@ -180,6 +208,7 @@ class game {
 
     // Declare some control flags
     bool pause_key_active{ false };
+    bool reset_key_active{ false };
 
     // Bonus spawn control
     sf::Clock bonus_clock;
@@ -213,14 +242,19 @@ class game {
 
     // Handle powerups
     powerups active_powerups;
-    void apply_powerups_to_entities();
-    void spawn_extra_balls_up_to();
+    void sync_powerups_to_entities();
+    void apply_one_shot_powerups();
+    void spawn_extra_balls();
     powerup_type random_powerup();
     std::optional<powerup_type> last_powerup;
 
-    // Globals
+    // Check for any events since the last loop iteration: start, close
     void handle_window_events();
-    void handle_global_inputs();
+
+    // Function to handle scape, pause, and reset inputs
+    bool handle_global_inputs();
+
+    // Update state text for the state of the game: paused, game over, player wins
     void update_state_text();
 
     // Update everything when running
@@ -233,13 +267,16 @@ class game {
     void spawn_bonuses();
 
     // Ball-brick, ball-paddle, bonus-paddle
-    void resolve_collisions();
+    std::string resolve_collisions();
 
     // Powerup logic + message
-    void handle_bonus_pickups();
+    std::string handle_bonus_pickups(paddle& the_paddle);
 
     // Lives, fireball, powerup msg
     void update_ui_texts(const std::string& powerup_msg);
+
+    // Checks if the player wins, when all bricks are destroyed
+    void check_win_condition();
 
     // Draw entities + UI
     void draw_frame();

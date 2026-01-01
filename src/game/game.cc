@@ -167,10 +167,17 @@ void game::reset() {
     game_window.setFramerateLimit(60); // Max rate is 60 frames per second
 }
 
-void game::spawn_extra_balls_up_to() {
+void game::spawn_extra_balls() {
 
-    const size_t ball_count = manager.get_all<ball>().size();
-    if (ball_count >= constants::multiball_extra_balls) return;
+    // How many balls are allowed in total after multiball?
+    const size_t target_total = constants::multiball_extra_balls;
+
+    // Safety: if target_total is 0 or 1, multiball makes no sense
+    if (target_total < 2) return;
+    
+    // Check if the maximum allowed balls is greated than the current count
+    const size_t ball_count = manager.count<ball>();
+    if (ball_count >= target_total) return;
 
     // Reference ball
     auto* ref = manager.get_first<ball>();
@@ -180,10 +187,14 @@ void game::spawn_extra_balls_up_to() {
     const sf::Vector2f vel = ref->get_velocity();
 
     // How many new balls we need
-    const size_t needed = constants::multiball_extra_balls - ball_count;
+    const size_t needed = target_total - ball_count;
 
-    // Angle step (you can tune this!)
-    const float step = 2.0f * constants::multiball_angle / (constants::multiball_extra_balls - 1.0f);
+    // Angle step
+    const float divisor = static_cast<float>(target_total - 1);
+    const float step = 2.0f * constants::multiball_angle / divisor;
+
+    // Center offset for symmetric distribution (-... 0 ... +)
+    const float center = (static_cast<float>(needed) - 1.f) / 2.f;
 
     // Spawn needed balls with symmetric angle offsets around 0°
     for (size_t i = 0; i < needed; ++i) {
@@ -196,31 +207,35 @@ void game::spawn_extra_balls_up_to() {
             active_powerups.fireball
         );
 
-        // Compute symmetric offset
-        const float center = (static_cast<float>(needed) - 1.f) / 2.f;
+        // Compute symmetric offset around 0°
         const float offset = static_cast<float>(i) - center;
-
         const float angle = offset * step;
         b.rotate(angle, false);
     }
 }
 
-// Helper functions to handle powerups in the game
-void game::apply_powerups_to_entities() {
+// Helper function to handle powerups in the game
+void game::apply_one_shot_powerups() {
 
-    // Multiball (one-shot effect)
+    // Multiball: spawn extra balls only once when collected
     if (active_powerups.multiball) {
-        spawn_extra_balls_up_to();
-        active_powerups.multiball = false;
+        spawn_extra_balls();
+        active_powerups.multiball = false;   // consume the powerup
     }
+
+    // Later, add here other "one-time" actions:
+    // Example: if (active_powerups.reset_powerups) { ... }
+}
+
+void game::sync_powerups_to_entities() {
 
     // Ball effects
     manager.apply_all<ball>([this](ball& b) {
 
-        // Fireball
+        // Fireball flag controls color + scale internally
         b.set_fireball(active_powerups.fireball, 1.0f);
 
-        // Speed change
+        // Adjust speed WITHOUT changing direction
         float target_ball_speed = constants::ball_speed;
         if (active_powerups.ball_faster)      target_ball_speed = constants::ball_max_speed;
         else if (active_powerups.ball_slower) target_ball_speed = constants::ball_min_speed;
@@ -231,7 +246,7 @@ void game::apply_powerups_to_entities() {
     // Paddle effects
     manager.apply_all<paddle>([this](paddle& p) {
 
-        // Scale change
+        // Paddle scale (mutually exclusive)
         if (active_powerups.paddle_wider) {
             p.set_scale(true, 2.0f);
         }
@@ -242,13 +257,14 @@ void game::apply_powerups_to_entities() {
             p.set_scale(false, 1.0f); // or reset to default
         }
 
-        // Speed change (the paddle speed changes according to the ball speed)
+        // Paddle speed depends on ball speed powerups
         float target_paddle_speed = constants::paddle_speed;
         if (active_powerups.ball_faster)      target_paddle_speed = constants::paddle_max_speed;
         else if (active_powerups.ball_slower) target_paddle_speed = constants::paddle_min_speed;
         p.set_velocity(target_paddle_speed);
 
     });
+
 }
 
 powerup_type game::random_powerup() {
@@ -264,8 +280,7 @@ powerup_type game::random_powerup() {
 
 void game::handle_window_events() {
 
-    // Check for any events since the last loop iteration
-    // If the user clicks on "close" or presses "Escape", we close the window program
+    // Handle window events (close button, key presses for start/restart screens).
     while (auto event = game_window.pollEvent()) {
         if (event->is<sf::Event::Closed>()) {
             game_window.close();
@@ -287,22 +302,28 @@ void game::handle_window_events() {
     }
 }
 
-void game::handle_global_inputs() {
+// Function to handle scape, pause, and reset inputs
+bool game::handle_global_inputs() {
 
-    // If the user presses "Escape", we jump out of the loop and terminate the program
+    // If the user presses "Escape", notify it and get out of the while loop
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape))
-        return;
+        return true;
 
-    bool pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::P);
-    if (pressed && !pause_key_active) {
+    bool ppressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::P);
+    if (ppressed && !pause_key_active) {
         state = (state == game_state::paused) ? game_state::running : game_state::paused;
     }
-    pause_key_active = pressed;
+    pause_key_active = ppressed;
 
     // If the user presses "R", we reset the game
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R)) {
+    bool rpressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R);
+    if (rpressed && !reset_key_active) {
         reset();
+        state = game_state::running;
     }
+    reset_key_active = rpressed;
+
+    return false;
 
     // If the game is not running, the entities are not updated
     // They are redrawn only if the game is paused
@@ -332,25 +353,58 @@ void game::update_state_text() {
         text_state.setString("Player Wins!");
         break;
     default:
+        text_state.setString("");
         break;
     }
 }
 // Draw entities + UI
 void game::draw_frame() {
+
+    // Always draw on a clean black background
+    game_window.clear(sf::Color::Black);
+
+    // START SCREEN: show only instructions
+    if (state == game_state::start_screen) {
+        game_window.draw(text_instructions);
+        game_window.display();
+        return;
+    }
+
+    // GAME OVER / PLAYER WINS: show only the end-screen text
+    if (state == game_state::game_over || state == game_state::player_wins) {
+        game_window.draw(text_state);
+        game_window.display();
+        return;
+    }
+
+    // RUNNING / PAUSED: draw the game world
+    manager.draw(game_window);
+
+    // PAUSED: draw paused overlay on top
+    if (state == game_state::paused) {
+        game_window.draw(text_state);
+    }
+
+    // UI texts are always visible
     game_window.draw(text_lives);
     game_window.draw(text_fireball);
     game_window.draw(text_powerup);
+
+    // Present the frame
     game_window.display();
 }
 
+// Respawn ball if none
 void game::ensure_ball_exists() {
 
-    if (!manager.get_all<ball>().empty())
+    if (manager.has_any<ball>())
         return;
 
+    // Spawn one ball, so we need to set the position and velocity
     auto pos = sf::Vector2f{ constants::window_width / 2.f, constants::window_height / 2.f };
     auto vel = sf::Vector2f{ std::abs(current_ball_velocity.x), -std::abs(current_ball_velocity.y) };
 
+    // And create it
     manager.create<ball>(
         pos,
         vel,
@@ -433,6 +487,93 @@ void game::spawn_bonuses() {
 
 }
 
+// Powerup logic + message
+std::string game::handle_bonus_pickups(paddle& the_paddle) {
+
+    std::string powerup_msg;
+
+    // There is only one paddle
+    // manager.apply_all<paddle>([this, &the_bonus, &powerup_msg](paddle& the_paddle) {
+    manager.apply_all<bonus>([this, &powerup_msg, &the_paddle](bonus& the_bonus) {
+
+        // If bonus and paddle are not interacting, do nothing
+        if (!handle_collision(the_bonus, the_paddle))
+            return;
+
+        // LIFE bonus: increase lives
+        if (the_bonus.get_type() == bonus_type::life) {
+            ++lives;
+            return;
+        }
+
+        // FIREBALL bonus: set fireball powerup and change the message color
+        if (the_bonus.get_type() == bonus_type::fireball) {
+            active_powerups.apply(powerup_type::fireball);
+            return;
+        }
+
+        // POWERUP bonus :apply a random powerup type and choose a user-friendly message for the UI
+        powerup_type chosen = random_powerup();
+        active_powerups.apply(chosen);
+
+        switch (chosen) {
+        case powerup_type::multiball:       powerup_msg = "Multiball"; break;
+        case powerup_type::ball_faster:     powerup_msg = "Faster ball"; break;
+        case powerup_type::ball_slower:     powerup_msg = "Slower ball"; break;
+        case powerup_type::paddle_wider:    powerup_msg = "Wider paddle"; break;
+        case powerup_type::paddle_narrower: powerup_msg = "Narrower paddle"; break;
+        case powerup_type::reset_powerups:  powerup_msg = "Reset powerups"; break;
+        default:                            powerup_msg.clear(); break;
+        }
+    });
+
+    return powerup_msg;
+}
+
+// Lives, fireball, powerup msg
+void game::update_ui_texts(const std::string& powerup_msg) {
+
+    text_lives.setString("Lives: " + std::to_string(lives));
+
+    // persistent state
+    text_fireball.setString(active_powerups.fireball ? "Fireball" : "");
+
+    // last pickup message (event)
+    if (!powerup_msg.empty())
+        text_powerup.setString(powerup_msg);
+}
+
+// Ball-brick, ball-paddle, bonus-paddle
+std::string game::resolve_collisions() {
+
+    // Ball vs brick
+    manager.apply_all<ball>([this](ball& the_ball) {
+        manager.apply_all<brick>([&the_ball](brick& the_brick) {
+            handle_collision(the_ball, the_brick);
+        });
+    });
+
+    // We assume exactly one paddle exists
+    paddle* the_paddle = manager.get_first<paddle>();
+    if (!the_paddle) return {}; // Something went wrong
+
+    // Ball vs paddle
+    // manager.apply_all<paddle>([&the_ball](paddle& the_paddle) {
+    manager.apply_all<ball>([the_paddle](ball& the_ball) {
+        handle_collision(the_ball, *the_paddle);
+    });
+
+    // Bonus vs paddle (returns the powerup message)
+    return handle_bonus_pickups(*the_paddle);
+
+}
+
+// Checks if the player wins, that is, when all bricks are destroyed
+void game::check_win_condition() {
+    if (!manager.has_any<brick>())
+        state = game_state::player_wins;
+}
+
 // Running game function
 void game::update_running_frame() {
 
@@ -446,13 +587,20 @@ void game::update_running_frame() {
     manager.update();
 
     // Resolve all collisions
-    resolve_collisions();
+    const std::string msg = resolve_collisions();
+    
+    // Update UI strings once per frame
+    update_ui_texts(msg);
 
-    // Apply powerups based on active_powerups flags
-    apply_powerups_to_entities();
+    // Apply the current active powerup state to entities.
+    apply_one_shot_powerups();     // Spawns extra balls if needed
+    sync_powerups_to_entities();   // Updates ball/paddle properties
 
     // Cleanup destroyed entities
     manager.refresh();
+
+    // If all bricks are destroyed, then the player wins
+    check_win_condition();
 }
 
 // (Re)start the game
@@ -461,218 +609,36 @@ void game::run() {
     while (game_window.isOpen()) {
 
         // Clear the screen
-        game_window.clear(sf::Color::Black);
+        //game_window.clear(sf::Color::Black);
 
         // Check for any events since the last loop iteration: start, close
         handle_window_events();
 
+        // If the window was closed from events, stop
+        if (!game_window.isOpen()) break;
+
         // Start screen draw
-        if (state == game_state::start_screen) {
-            game_window.draw(text_instructions);
-            game_window.display();
-            continue;
-        }
+        //if (state == game_state::start_screen) {
+        //    game_window.draw(text_instructions);
+        //    game_window.display();
+        //    continue;
+        //}
 
         // Handle global inputs
-        handle_global_inputs();
+        if (handle_global_inputs()) break;
 
-        // Choose and draw the text for the state of the game
-        if (state != game_state::running) {
-            manager.draw(game_window);
+        // Update gameplay only when the game is running
+        if (state == game_state::running) {
+            update_running_frame();
+        }
+
+        // Otherwise, update the state overlay text (Paused / Game Over / Win screen)
+        else {
             update_state_text();
-            game_window.draw(text_state);
-            draw_frame();
-            continue;
         }
 
-        // Normal running frame
-        update_running_frame();
-
-        // And draw the frame
+        // Draw frame: entities and UI
         draw_frame();
-
-
-
-        // If the game is running
-//        else {
-
-//            // Count active bonuses by type 
-//            size_t life_fireball_count = 0;
-//            size_t powerup_count = 0;
-//            manager.apply_all<bonus>([&](bonus& b) {
-//                if (b.get_type() == bonus_type::powerup)
-//                    ++powerup_count;
-//                else
-//                    ++life_fireball_count;
-//            });
-
-//            // If there are no remaining balls on the screen
-//            if (manager.get_all<ball>().empty()) {
-//                // Spawn a new one and reduce the player's remaining lives
-//                auto pos = sf::Vector2f{ constants::window_width / 2.f, constants::window_height / 2.f };
-//                auto vel = sf::Vector2f{ std::abs(current_ball_velocity.x), -std::abs(current_ball_velocity.y) };
-//                manager.create<ball>(
-//                    pos,
-//                    vel,
-//                    sf::Vector2f{ 0.5f, 0.5f },
-//                    constants::steel,
-//                    false
-//                );
-//                active_powerups.reset();
-//                text_fireball.setString("");
-//                text_powerup.setString("");
-//                --lives;
-//            }
-
-//            // Bonus spawning logic
-//            if (bonus_clock.getElapsedTime().asSeconds() >= next_bonus_time) {
-
-//                // Spawn either FIREBALL or LIFE bonus if none exists
-//                if (life_fireball_count == 0 && std::bernoulli_distribution(1.0f - constants::powerup_prob)(rng)) {
-
-//                    static std::bernoulli_distribution spawn_fireball(0.5); // 50% fireball, 50% life
-//                    const bonus_type type = spawn_fireball(rng) ? bonus_type::fireball : bonus_type::life;
-//                    float x = std::uniform_real_distribution<float>(
-//                        bonus::half_width_for(type),
-//                        constants::window_width - bonus::half_width_for(type)
-//                    )(rng);
-
-//                    manager.create<bonus>(
-//                        type,
-//                        sf::Vector2f{ x, 0.f },
-//                        sf::Vector2f{ 0.f, constants::bonus_speed * life_jitter(rng) },
-//                        sf::Vector2f{ constants::bonus_scale, constants::bonus_scale },
-//                        constants::white
-//                    );
-//                }
-
-//                // Spawn POWERUP bonus if none exists
-//                if (powerup_count == 0 && std::bernoulli_distribution(constants::powerup_prob)(rng)) {
-
-//                    float x = std::uniform_real_distribution<float>(
-//                        bonus::half_width_for(bonus_type::powerup),
-//                        constants::window_width - bonus::half_width_for(bonus_type::powerup)
-//                    )(rng);
-
-//                    manager.create<bonus>(
-//                        bonus_type::powerup,
-//                        sf::Vector2f{ x, 0.f },
-//                        sf::Vector2f{ 0.f, constants::bonus_speed * powerup_jitter(rng) },
-//                        sf::Vector2f{ constants::bonus_scale, constants::bonus_scale },
-//                        constants::white
-//                    );
-//                }
-
-//                bonus_clock.restart();
-//                next_bonus_time = bonus_delay_dist(rng);
-//            }
-
-            // If there are no remaining bricks on the screen, the player has won!
-            if (manager.get_all<brick>().empty())
-                state = game_state::player_wins;
-
-//            // If the player has used up all their lives, the game is over!
-//            if (lives <= 0)
-//                state = game_state::game_over;
-
-//            // Calculate the updated graphics
-//            manager.update();
-
-            // For every ball, call a function which
-            //    For every brick, call a function which
-            //         Calls handle_collision with the ball and the brick as arguments
-            manager.apply_all<ball>([this](auto& the_ball) {
-                manager.apply_all<brick>([&the_ball](auto& the_brick) {
-                    handle_collision(the_ball, the_brick);
-                });
-            });
-
-            // Paddle interaction
-            // For every ball, call a function which
-            //    For every paddle, call a function which
-            //         Calls handle_collision with the ball and the paddle as arguments
-            manager.apply_all<ball>([this](auto& the_ball) {
-                manager.apply_all<paddle>([&the_ball](auto& the_paddle) {
-                    handle_collision(the_ball, the_paddle);
-                });
-            });
-            
-            // We will store the message for the last collected bonus / powerup here.
-            // Important: we update the text only once per frame (outside loops),
-            // instead of setting it multiple times inside apply_all lambdas.
-            std::string powerup_msg;
-
-            // Iterate over all bonus entities
-            manager.apply_all<bonus>([this, &powerup_msg](bonus& the_bonus) {
-                // Iterate over paddles(usually only one paddle exists)
-                manager.apply_all<paddle>([this, &the_bonus, &powerup_msg](paddle& the_paddle) {
-
-                    // If bonus and paddle are not interacting, do nothing
-                    if (!handle_collision(the_bonus, the_paddle))
-                        return;
-
-                    // At this point, a collision happened.
-                    // handle_collision() should have destroyed the bonus,
-                    // and we now apply the effect (life or powerup).
-
-                    // LIFE bonus: immediately increase lives
-                    if (the_bonus.get_type() == bonus_type::life) {
-                        ++lives;
-                        return;
-                    }
-
-                    // FIREBALL bonus: set fireball powerup and change the message color
-                    if (the_bonus.get_type() == bonus_type::fireball) {
-                        active_powerups.apply(powerup_type::fireball);
-                        return;
-                    }
-
-                    // POWERUP bonus : pick a random powerup type
-                    powerup_type chosen = random_powerup();
-
-                    // Update the active powerups state
-                    active_powerups.apply(chosen);
-
-                    // Choose a user-friendly message for the UI based on the chosen powerup
-                    switch (chosen) {
-                    //case powerup_type::fireball:        powerup_msg = "Fireball!"; break;
-                    case powerup_type::multiball:       powerup_msg = "Multiball"; break;
-                    case powerup_type::ball_faster:     powerup_msg = "Faster ball"; break;
-                    case powerup_type::ball_slower:     powerup_msg = "Slower ball"; break;
-                    case powerup_type::paddle_wider:    powerup_msg = "Wider paddle"; break;
-                    case powerup_type::paddle_narrower: powerup_msg = "Narrower paddle"; break;
-                    case powerup_type::reset_powerups:  powerup_msg = "Reset powerups"; break;
-                    default:
-                        // If we ever add a new powerup and forget to handle it here,
-                        // we won’t crash; but this helps avoid uninitialized messages.
-                        powerup_msg.clear();
-                        break;
-                    }
-                });
-            });
-
-            // Update lives, fireball, and powerup texts
-            text_lives.setString("Lives: " + std::to_string(lives));
-            text_fireball.setString(active_powerups.fireball ? "Fireball" : "");
-            if (!powerup_msg.empty())
-                text_powerup.setString(powerup_msg);
-
-            // Apply the currently active powerup state to entities
-            // (e.g. fireball state, ball speed multiplier, paddle scale, etc.)
-            // NOTE: apply_powerups_to_entities() should NOT overwrite raw velocity direction.
-            // It should modify speed/scale while keeping movement logic intact.
-            apply_powerups_to_entities();
-
-            // And refresh
-            manager.refresh();
-
-            // Display the updated graphics
-            manager.draw(game_window);
-        }
-
-        game_window.draw(text_lives);
-        game_window.draw(text_fireball);
-        game_window.draw(text_powerup);
-        game_window.display();
     }
+
 }
