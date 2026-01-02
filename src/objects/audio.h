@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include "constants.h"
 
 enum class sfx_id {
     none,
@@ -26,47 +27,26 @@ struct sfx_id_hash {
     }
 };
 
+//Class that handles the sound effects
 class audio_manager {
-public:
-    audio_manager() = default;
-
-    bool load(sfx_id id, const std::string& path) {
-        auto& buf = buffers[id];
-        return buf.loadFromFile(path);
-    }
-
-    void play(sfx_id id) {
-
-        // Remove old finished sounds so the vector doesn't grow forever
-        cleanup();
-
-        // If we are at capacity, just skip playing the new sound
-        if (active_sounds.size() >= constants::max_sounds)
-            return;
-
-        auto it = buffers.find(id);
-        if (it == buffers.end())
-            return;
-
-        // Sound must be constructed with a buffer
-        active_sounds.emplace_back(it->second);
-        active_sounds.back().play();
-    }
-
-    void cleanup() {
-        // Remove all sounds that finished playing
-        active_sounds.erase(
-            std::remove_if(active_sounds.begin(), active_sounds.end(),
-                [](const sf::Sound& s) {
-            return s.getStatus() == sf::Sound::Status::Stopped;
-        }),
-            active_sounds.end()
-        );
-    }
-
 private:
+
     std::unordered_map<sfx_id, sf::SoundBuffer, sfx_id_hash> buffers;
     std::vector<sf::Sound> active_sounds;
+
+public:
+
+    audio_manager() = default;
+
+    // Load audio file
+    bool load(sfx_id id, const std::string& path);
+
+    // Play audio
+    void play(sfx_id id);
+
+    //Clean up buffers
+    void cleanup();
+
 };
 
 #endif // AUDIO_H

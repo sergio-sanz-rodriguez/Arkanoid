@@ -7,7 +7,9 @@
 // Class to represent the bouncing ball
 // Inherits from moving_entity
 class paddle : public moving_entity {
-    
+
+private:
+
     // Private data members
     static sf::Texture texture;
     float half_width;
@@ -20,6 +22,7 @@ class paddle : public moving_entity {
     void process_player_input() override;
 
  public:
+
      // Interface of the class
 
      // Constructor

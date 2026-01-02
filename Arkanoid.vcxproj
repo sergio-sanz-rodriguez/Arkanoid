@@ -22,6 +22,7 @@
     <ClCompile Include="src\core\entity.cc" />
     <ClCompile Include="src\game\game.cc" />
     <ClCompile Include="src\main.cc" />
+    <ClCompile Include="src\objects\audio.cc" />
     <ClCompile Include="src\objects\background.cc" />
     <ClCompile Include="src\objects\ball.cc" />
     <ClCompile Include="src\objects\brick.cc" />
