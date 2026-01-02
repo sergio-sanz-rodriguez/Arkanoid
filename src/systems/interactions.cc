@@ -10,7 +10,9 @@ bool is_interacting(const entity& entity1, const entity& entity2) {
 
 // Resolve potential collision between the ball and the paddle
 sfx_id handle_collision(ball &the_ball, const paddle& the_paddle) {
+
     if (is_interacting(the_paddle, the_ball)) {
+
         // Make the ball bounce upwards
         the_ball.move_up();
 
@@ -20,7 +22,6 @@ sfx_id handle_collision(ball &the_ball, const paddle& the_paddle) {
             the_ball.move_left();
         else
             the_ball.move_right();
-
         return sfx_id::ball_paddle;
     }
     else {
@@ -30,6 +31,7 @@ sfx_id handle_collision(ball &the_ball, const paddle& the_paddle) {
 
 // Resolve potential collision between the ball and a brick
 sfx_id handle_collision(ball& the_ball, brick& the_brick) {
+
     if (is_interacting(the_brick, the_ball)) {
 
         // Update the brick's strength
