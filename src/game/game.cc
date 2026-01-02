@@ -98,7 +98,7 @@ game::game() :
         "- Right Arrow / Move mouse right to move paddle right\n"
         "- P button to pause and resume the game\n"
         "- R button to reset the game\n"
-        "- Catch the blue and oragnge balls to apply a powerup\n"
+        "- Catch the blue and orange balls to apply a powerup\n"
         "- Catch the green ball to get an extra life\n\n"
         "Press any key to start."
     );
