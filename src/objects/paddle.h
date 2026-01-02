@@ -45,3 +45,4 @@ class paddle : public moving_entity {
 };
 
 #endif // PADDLE_H
+#pragma once

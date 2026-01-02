@@ -10,13 +10,13 @@ bonus::bonus(bonus_type type, sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f s
     // Load static texture only once
     static bool loaded = false;
     if (!loaded) {
-        if (!fireball_texture.loadFromFile(constants::fireball_path())) {
+        if (!fireball_texture.loadFromFile(constants::img_fireball_path())) {
             throw std::runtime_error("Failed to load the fireball texture.");
         }
-        if (!life_texture.loadFromFile(constants::life_path())) {
+        if (!life_texture.loadFromFile(constants::img_life_path())) {
             throw std::runtime_error("Failed to load the life texture.");
         }
-        if (!powerup_texture.loadFromFile(constants::powerup_path())) {
+        if (!powerup_texture.loadFromFile(constants::img_powerup_path())) {
             throw std::runtime_error("Failed to load the powerup texture.");
         }
         loaded = true;

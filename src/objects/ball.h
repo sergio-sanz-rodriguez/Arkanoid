@@ -11,8 +11,8 @@ class ball : public moving_entity {
     // Private data members
     static sf::Texture texture;
     float radius;
-    //float speed_multiplier{ 1.0f };
     bool fireball{ false };
+    bool hit_wall_this_frame = false;
 
     void process_player_input() override;
 
@@ -34,6 +34,9 @@ class ball : public moving_entity {
      bool get_fireball() const noexcept;
      void set_fireball(bool on, float factor) noexcept;
 
+     //Detecting the hit with the wall
+     bool consumed_wall_hit() noexcept;
+
      // Required overrides
      void move_up() noexcept override;
      void move_down() noexcept override;
@@ -47,3 +50,4 @@ class ball : public moving_entity {
 };
 
 #endif // BALL_H
+#pragma once

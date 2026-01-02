@@ -14,7 +14,7 @@ bool brick::is_too_weak() const noexcept { return strength <= 0;  }
 brick::brick(sf::Vector2f pos, sf::Vector2f sca, sf::Color col) {
 
     // Load the texture
-    if (!texture.loadFromFile(constants::brick_path())) {
+    if (!texture.loadFromFile(constants::img_brick_path())) {
         throw std::runtime_error("Failed to load the brick texture.");
     }
     // Set sprite

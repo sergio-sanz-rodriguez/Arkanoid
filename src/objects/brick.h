@@ -34,3 +34,4 @@ public:
 };
 
 #endif // BRICK_H
+#pragma once

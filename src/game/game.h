@@ -17,6 +17,7 @@
 #include "entity.h"
 #include "paddle.h"
 #include "bonus.h"
+#include "audio.h"
 
 // A class to manage the entities in the game
 // It stores the entities in a vector of std::unique_ptr
@@ -183,6 +184,7 @@ class game {
 
     // Member to store the current state of the game
     game_state state{ game_state::start_screen };
+    game_state previous_state{ game_state::start_screen };
 
     // Define a vector with all the possible colors for the bricks
     std::vector<sf::Color> vcolor{
@@ -237,6 +239,9 @@ class game {
         constants::bonus_speed_jitter,
         1.0f / constants::bonus_speed_jitter
     };
+
+    // Audio manager
+    audio_manager audio;
 
     // --- Helper functions --- //
 
@@ -294,3 +299,4 @@ public:
 };
 
 #endif // GAME_H
+#pragma once

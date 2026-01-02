@@ -28,3 +28,4 @@ public:
 };
 
 #endif // BACKGROUND_H
+#pragma once

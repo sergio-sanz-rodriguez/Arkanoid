@@ -6,7 +6,7 @@ sf::Texture ball::texture;
 ball::ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool fireball) : fireball(fireball) {
 
     // Load the texture
-    if (!texture.loadFromFile(constants::ball_path())) {
+    if (!texture.loadFromFile(constants::img_ball_path())) {
         throw std::runtime_error("Failed to load the ball texture.");
     }
     //sprite.setTexture(texture);
@@ -31,6 +31,13 @@ void ball::set_fireball(bool on, float factor) noexcept {
     sprite->setColor(on ? constants::orange : constants::steel);
     sprite->setScale(on ? factor * sf::Vector2f{ 0.5f, 0.5f } : sf::Vector2f{ 0.5f, 0.5f });
     radius = get_bounding_box().size.x / 2.0f;
+}
+
+// Function to detect if the ball hits the any wall
+bool ball::consumed_wall_hit() noexcept {
+    bool r = hit_wall_this_frame;
+    hit_wall_this_frame = false;   // consume it
+    return r;
 }
 
 // Drawing function
@@ -66,6 +73,9 @@ void ball::update() {
     // Respond to user input as this will affect how the ball moves
     //process_player_input();
 
+    // Reset at start of frame
+    hit_wall_this_frame = false;
+
     // Move the position of the ball
     sprite->move(velocity);
 
@@ -76,17 +86,20 @@ void ball::update() {
     if ((get_position().x - radius) <= 0.0f) {
         sprite->setPosition({ radius, get_position().y }); // push inside
         velocity.x = std::abs(velocity.x);    // ensure moving right
+        hit_wall_this_frame = true;
     }
     // And similarly for the right hand side of the screen
     else if ((get_position().x + radius) >= constants::window_width) {
         sprite->setPosition({ constants::window_width - radius, get_position().y });
         velocity.x = -std::abs(velocity.x); // ensure moving left
+        hit_wall_this_frame = true;
     }
 
     // We can also do this for the top and botoom of the screen
     if ((get_position().y - radius) <= 0.0f) {
         sprite->setPosition({ get_position().x, radius });
         velocity.y = std::abs(velocity.y); // ensure moving down
+        hit_wall_this_frame = true;
     }
     else if ((get_position().y + radius) >= constants::window_height) {
         destroy();

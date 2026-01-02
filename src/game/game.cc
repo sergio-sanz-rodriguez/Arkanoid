@@ -103,6 +103,19 @@ game::game() :
         "Press any key to start."
     );
 
+    // Load sound effects
+    audio.load(sfx_id::ball_brick, constants::sfx_ball_brick_path());
+    audio.load(sfx_id::ball_paddle, constants::sfx_ball_paddle_path());
+    audio.load(sfx_id::ball_wall, constants::sfx_ball_wall_path());
+    audio.load(sfx_id::game_over, constants::sfx_game_over_path());
+    audio.load(sfx_id::life_minus, constants::sfx_life_minus_path());
+    audio.load(sfx_id::player_wins, constants::sfx_player_wins_path());
+    audio.load(sfx_id::powerdown, constants::sfx_powerdown_path());
+    audio.load(sfx_id::powerup, constants::sfx_powerup_path());
+    audio.load(sfx_id::welcome, constants::sfx_welcome_path());
+
+    // Play the welcome audio
+    //audio.play(sfx_id::welcome);
 }
 
 // (Re)initialize the game
@@ -165,6 +178,7 @@ void game::reset() {
 
     // Limit the framerate
     game_window.setFramerateLimit(60); // Max rate is 60 frames per second
+
 }
 
 void game::spawn_extra_balls() {
@@ -287,7 +301,6 @@ void game::handle_window_events() {
         }
 
         if (event->is<sf::Event::KeyPressed>()) {
-
             // Start screen: any key starts
             if (state == game_state::start_screen) {
                 state = game_state::running;
@@ -298,6 +311,9 @@ void game::handle_window_events() {
                 reset();
                 state = game_state::running;
             }
+
+            // Reinitialize previous state
+            previous_state = game_state::start_screen;
         }
     }
 }
@@ -309,13 +325,14 @@ bool game::handle_global_inputs() {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape))
         return true;
 
+    // If the user pressees "P", pause the game
     bool ppressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::P);
     if (ppressed && !pause_key_active) {
         state = (state == game_state::paused) ? game_state::running : game_state::paused;
     }
     pause_key_active = ppressed;
 
-    // If the user presses "R", we reset the game
+    // If the user presses "R", reset the game
     bool rpressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R);
     if (rpressed && !reset_key_active) {
         reset();
@@ -325,12 +342,6 @@ bool game::handle_global_inputs() {
 
     return false;
 
-    // If the game is not running, the entities are not updated
-    // They are redrawn only if the game is paused
-    //if (state == game_state::paused) {
-    //    // Display the graphics
-    //    manager.draw(game_window);
-    //}
 }
 
 // Update state text for the state of the game: paused, game over, player wins
@@ -365,6 +376,10 @@ void game::draw_frame() {
 
     // START SCREEN: show only instructions
     if (state == game_state::start_screen) {
+        if (previous_state == state) {
+            audio.play(sfx_id::welcome);
+            previous_state = game_state::running;
+        }
         game_window.draw(text_instructions);
         game_window.display();
         return;
@@ -372,6 +387,14 @@ void game::draw_frame() {
 
     // GAME OVER / PLAYER WINS: show only the end-screen text
     if (state == game_state::game_over || state == game_state::player_wins) {
+        if (previous_state != state) {
+            switch (state) {
+            case game_state::game_over:   audio.play(sfx_id::game_over); break;
+            case game_state::player_wins: audio.play(sfx_id::player_wins); break;
+            default:                      break;
+            }
+            previous_state = state;
+        }
         game_window.draw(text_state);
         game_window.display();
         return;
@@ -420,6 +443,7 @@ void game::ensure_ball_exists() {
 
     // Decrease the number of lives
     --lives;
+    audio.play(sfx_id::life_minus);
 
     // And finish the game if the player runs out of lives
     if (lives <= 0)
@@ -503,12 +527,14 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
         // LIFE bonus: increase lives
         if (the_bonus.get_type() == bonus_type::life) {
             ++lives;
+            audio.play(sfx_id::powerup);
             return;
         }
 
         // FIREBALL bonus: set fireball powerup and change the message color
         if (the_bonus.get_type() == bonus_type::fireball) {
             active_powerups.apply(powerup_type::fireball);
+            audio.play(sfx_id::powerup);
             return;
         }
 
@@ -517,12 +543,12 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
         active_powerups.apply(chosen);
 
         switch (chosen) {
-        case powerup_type::multiball:       powerup_msg = "Multiball"; break;
-        case powerup_type::ball_faster:     powerup_msg = "Faster ball"; break;
-        case powerup_type::ball_slower:     powerup_msg = "Slower ball"; break;
-        case powerup_type::paddle_wider:    powerup_msg = "Wider paddle"; break;
-        case powerup_type::paddle_narrower: powerup_msg = "Narrower paddle"; break;
-        case powerup_type::reset_powerups:  powerup_msg = "Reset powerups"; break;
+        case powerup_type::multiball:       powerup_msg = "Multiball";       audio.play(sfx_id::powerup); break;
+        case powerup_type::ball_faster:     powerup_msg = "Faster ball";     audio.play(sfx_id::powerup); break;
+        case powerup_type::ball_slower:     powerup_msg = "Slower ball";     audio.play(sfx_id::powerup); break;
+        case powerup_type::paddle_wider:    powerup_msg = "Wider paddle";    audio.play(sfx_id::powerup); break;
+        case powerup_type::paddle_narrower: powerup_msg = "Narrower paddle"; audio.play(sfx_id::powerdown); break;
+        case powerup_type::reset_powerups:  powerup_msg = "Reset powerups";  audio.play(sfx_id::powerdown); break;
         default:                            powerup_msg.clear(); break;
         }
     });
@@ -548,8 +574,10 @@ std::string game::resolve_collisions() {
 
     // Ball vs brick
     manager.apply_all<ball>([this](ball& the_ball) {
-        manager.apply_all<brick>([&the_ball](brick& the_brick) {
-            handle_collision(the_ball, the_brick);
+        manager.apply_all<brick>([&](brick& the_brick) {
+            if (handle_collision(the_ball, the_brick) == sfx_id::ball_brick) {
+                audio.play(sfx_id::ball_brick);
+            }
         });
     });
 
@@ -559,8 +587,16 @@ std::string game::resolve_collisions() {
 
     // Ball vs paddle
     // manager.apply_all<paddle>([&the_ball](paddle& the_paddle) {
-    manager.apply_all<ball>([the_paddle](ball& the_ball) {
-        handle_collision(the_ball, *the_paddle);
+    manager.apply_all<ball>([this, the_paddle](ball& the_ball) {
+        if (handle_collision(the_ball, *the_paddle) == sfx_id::ball_paddle) {
+            audio.play(sfx_id::ball_paddle);
+        }
+    });
+
+    // Ball vs wall
+    manager.apply_all<ball>([this](ball& b) {
+        if (b.consumed_wall_hit())
+            audio.play(sfx_id::ball_wall);
     });
 
     // Bonus vs paddle (returns the powerup message)
@@ -640,5 +676,7 @@ void game::run() {
         // Draw frame: entities and UI
         draw_frame();
     }
+
+    audio.play(sfx_id::ball_brick);
 
 }

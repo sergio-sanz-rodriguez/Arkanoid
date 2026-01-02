@@ -97,3 +97,4 @@ public:
 };
 
 #endif // ENTITY_H
+#pragma once

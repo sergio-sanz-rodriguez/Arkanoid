@@ -34,6 +34,7 @@
     <ClInclude Include="src\core\entity.h" />
     <ClInclude Include="src\game\game.h" />
     <ClInclude Include="src\game\resource.h" />
+    <ClInclude Include="src\objects\audio.h" />
     <ClInclude Include="src\objects\background.h" />
     <ClInclude Include="src\objects\ball.h" />
     <ClInclude Include="src\objects\brick.h" />
@@ -112,7 +113,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)SFML-3.0.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-graphics-s.lib;sfml-window-s.lib;sfml-system-s.lib;opengl32.lib;winmm.lib;gdi32.lib;%(AdditionalDependencies); freetype.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-audio-s.lib; sfml-graphics-s.lib;sfml-window-s.lib;sfml-system-s.lib;opengl32.lib;winmm.lib;gdi32.lib;%(AdditionalDependencies); freetype.lib; flac.lib;ogg.lib;vorbis.lib;vorbisfile.lib;ws2_32.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)src\game</AdditionalIncludeDirectories>
@@ -135,7 +136,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)SFML-3.0.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-graphics-s.lib;sfml-window-s.lib;sfml-system-s.lib;opengl32.lib;winmm.lib;gdi32.lib;%(AdditionalDependencies); freetype.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-audio-s.lib; sfml-graphics-s.lib;sfml-window-s.lib;sfml-system-s.lib;opengl32.lib;winmm.lib;gdi32.lib;%(AdditionalDependencies); freetype.lib; flac.lib;ogg.lib;vorbis.lib;vorbisfile.lib;ws2_32.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)src\game</AdditionalIncludeDirectories>
@@ -154,7 +155,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)SFML-3.0.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-graphics-s.lib;sfml-window-s.lib;sfml-system-s.lib;opengl32.lib;winmm.lib;gdi32.lib;%(AdditionalDependencies); freetype.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-audio-s.lib; sfml-graphics-s.lib;sfml-window-s.lib;sfml-system-s.lib;opengl32.lib;winmm.lib;gdi32.lib;%(AdditionalDependencies); freetype.lib; flac.lib;ogg.lib;vorbis.lib;vorbisfile.lib;ws2_32.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)src\game</AdditionalIncludeDirectories>
@@ -177,7 +178,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)SFML-3.0.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-graphics-s.lib;sfml-window-s.lib;sfml-system-s.lib;opengl32.lib;winmm.lib;gdi32.lib;%(AdditionalDependencies); freetype.lib</AdditionalDependencies>
+      <AdditionalDependencies>sfml-audio-s.lib; sfml-graphics-s.lib;sfml-window-s.lib;sfml-system-s.lib;opengl32.lib;winmm.lib;gdi32.lib;%(AdditionalDependencies); freetype.lib; flac.lib;ogg.lib;vorbis.lib;vorbisfile.lib;ws2_32.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)src\game</AdditionalIncludeDirectories>
