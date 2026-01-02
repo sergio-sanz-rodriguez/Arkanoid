@@ -88,20 +88,52 @@ game::game() :
     text_powerup.setString("");
 
     text_instructions.setFont(verdana);
-    text_instructions.setPosition({ constants::window_width / 16.0f, constants::window_height / 4.0f });
-    text_instructions.setCharacterSize(20);
+    text_instructions.setPosition({ constants::window_width / 16.0f, constants::window_height / 7.0f });
+    text_instructions.setCharacterSize(18);
     text_instructions.setFillColor(constants::white);
+//    text_instructions.setString(
+//        "Welcome to Arkanoid: Reclaiming the Solar System\n\n"
+//        "Year 3056.\n"
+//        "Cosmic bricks have invaded the Solar System.\n"
+//        "Planet after planet has fallen.\n"
+//        "The Sun itself is under threat.\n\n"
+//        "You control the last defense:\n"
+//        "a paddle and energy balls.\n\n"
+//        "Break the bricks.\n"
+//        "Reclaim the planets.\n"
+//        "Save the Sun.\n\n"
+//        "Instructions:\n\n"
+//        "- Left Arrow / Move mouse left: move paddle left\n"
+//        "- Right Arrow / Move mouse right: move paddle right\n"
+//        "- P: pause/resume\n"
+//        "- R: reset\n"
+//        "- Catch blue and orange balls to get a powerup\n"
+//        "- Catch the green ball to gain an extra life\n\n"
+//        "Press any key to start."
+//    );
     text_instructions.setString(
-        "Welcome to Arkanoid!\n\n"
-        "Instructions:\n\n"
-        "- Left arrow / Move mouse left, to move paddle left\n"
-        "- Right Arrow / Move mouse right to move paddle right\n"
-        "- P button to pause and resume the game\n"
-        "- R button to reset the game\n"
-        "- Catch the blue and orange balls to apply a powerup\n"
-        "- Catch the green ball to get an extra life\n\n"
-        "Press any key to start."
+        "WELCOME TO ARKANOID: RECLAIMING THE SOLAR SYSTEM\n\n"
+        "YEAR 3056.\n"
+        "COSMIC BRICKS HAVE INVADED THE SOLAR SYSTEM.\n"
+        "PLANET AFTER PLANET HAS FALLEN.\n"
+        "THE SUN ITSELF IS UNDER THREAT.\n\n"
+        "YOU ARE A HERO FROM THE ALPHA CENTAURI SYSTEM,\n"
+        "SENT TO SAVE YOUR NEIGHBORS.\n\n"
+        "YOU CONTROL THE LAST DEFENSE:\n"
+        "A PADDLE AND ENERGY BALLS.\n\n"
+        "BREAK THE BRICKS.\n"
+        "RECLAIM THE PLANETS.\n"
+        "SAVE THE SUN.\n\n"
+        "INSTRUCTIONS:\n\n"
+        "- LEFT ARROW / MOVE MOUSE LEFT: MOVE PADDLE LEFT\n"
+        "- RIGHT ARROW / MOVE MOUSE RIGHT: MOVE PADDLE RIGHT\n"
+        "- P: PAUSE / RESUME GAME\n"
+        "- R: RESET GAME\n"
+        "- CATCH BLUE AND ORANGE BALLS TO GET A POWER-UP\n"
+        "- CATCH THE GREEN BALL TO GAIN AN EXTRA LIFE\n\n"
+        "PRESS ANY KEY TO START."
     );
+
 
     // Load sound effects
     audio.load(sfx_id::ball_brick, constants::sfx_ball_brick_path());

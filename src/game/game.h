@@ -169,7 +169,7 @@ class game {
     // and an std::string with the window title
     // The SFML code is in the sf namespace
     sf::RenderWindow game_window{ sf::VideoMode({constants::window_width, constants::window_height}),
-        "Arkanoid by Sergio Sanz" };
+        "Arkanoid: Reclaiming the Solar System" };
 
     // Instead of embedding every entity in the game class, use an entity_manager
     entity_manager manager;
