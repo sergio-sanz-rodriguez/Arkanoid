@@ -65,7 +65,7 @@ struct constants {
     static constexpr std::string_view sfx_dir{ "..\\..\\assets\\sfx\\" };
     static constexpr std::string_view img_background_filename{ "background_stars.jpg" };
     static constexpr std::string_view img_ball_filename{ "ball_llwhite.png" };
-    static constexpr std::string_view img_paddle_filename{ "paddle_dark_orange.png" };
+    static constexpr std::string_view img_paddle_filename{ "paddle_gray.png" };
     static constexpr std::string_view img_brick_filename{ "brick_s.png" };
     static constexpr std::string_view img_fireball_filename{ "ball_orange.png" };
     static constexpr std::string_view img_life_filename{ "ball_green.png" };

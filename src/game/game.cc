@@ -114,8 +114,6 @@ game::game() :
     audio.load(sfx_id::powerup, constants::sfx_powerup_path());
     audio.load(sfx_id::welcome, constants::sfx_welcome_path());
 
-    // Play the welcome audio
-    //audio.play(sfx_id::welcome);
 }
 
 // (Re)initialize the game
@@ -132,11 +130,10 @@ void game::reset() {
     text_fireball.setString("");
     text_powerup.setString("");
 
-    // Reset the entities and their positions
-    // Background picture
+    // Create background picture
     manager.create<background>(0.0f, 0.0f);
 
-    // Ball object
+    // Create ball object
     manager.create<ball>(
         sf::Vector2f{ constants::window_width / 2.0f, constants::window_height - constants::paddle_height },
         sf::Vector2f{ constants::ball_speed, -constants::ball_speed },
@@ -144,7 +141,7 @@ void game::reset() {
         constants::steel
     );
 
-    // Paddle object
+    // Create paddle object
     manager.create<paddle>(
         sf::Vector2f{ constants::window_width / 2.0f, constants::window_height - constants::paddle_height },
         sf::Vector2f{ constants::paddle_speed, 0.0f },
@@ -517,7 +514,6 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
     std::string powerup_msg;
 
     // There is only one paddle
-    // manager.apply_all<paddle>([this, &the_bonus, &powerup_msg](paddle& the_paddle) {
     manager.apply_all<bonus>([this, &powerup_msg, &the_paddle](bonus& the_bonus) {
 
         // If bonus and paddle are not interacting, do nothing
@@ -653,13 +649,6 @@ void game::run() {
         // If the window was closed from events, stop
         if (!game_window.isOpen()) break;
 
-        // Start screen draw
-        //if (state == game_state::start_screen) {
-        //    game_window.draw(text_instructions);
-        //    game_window.display();
-        //    continue;
-        //}
-
         // Handle global inputs
         if (handle_global_inputs()) break;
 
@@ -676,7 +665,5 @@ void game::run() {
         // Draw frame: entities and UI
         draw_frame();
     }
-
-    audio.play(sfx_id::ball_brick);
 
 }
