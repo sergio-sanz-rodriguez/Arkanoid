@@ -29,8 +29,9 @@ struct constants {
     static constexpr float paddle_scale_width{ 0.411f };
     static constexpr float paddle_scale_height{ 0.25f };
     static constexpr float rotation_angle{ 1.0f };
+    static constexpr float max_angle{ 60.0f };
     static constexpr float multiball_angle{ 2.0f };
-    static constexpr int   multiball_extra_balls{ 3 };
+    static constexpr int multiball_extra_balls{ 3 };
     static constexpr float pi{ 3.14159265358979323846f };
     static constexpr int brick_strength{ 1 }; // The brick needs to be hit X times before it disappears 
     static constexpr int brick_columns{ 12 };
@@ -80,7 +81,8 @@ struct constants {
     static constexpr std::string_view sfx_powerup_filename{ "powerup.wav" };
     static constexpr std::string_view sfx_welcome_filename{ "welcome.wav" };
     //static constexpr std::string_view font_filename{ "/usr/local/share/fonts/webfonts/verdana.ttf" };
-    static constexpr std::string_view font_verdana{ "C:\\Windows\\fonts\\verdana.ttf" };
+    static constexpr std::string_view font_verdana{ "..\\..\\assets\\fonts\\verdana.ttf" };
+    static constexpr std::string_view font_consola{ "..\\..\\assets\\fonts\\consola.ttf" };
     static std::string img_background_path() { return std::string(image_dir) + std::string(img_background_filename); }
     static std::string img_ball_path() { return std::string(image_dir) + std::string(img_ball_filename); }
     static std::string img_paddle_path() { return std::string(image_dir) + std::string(img_paddle_filename); }

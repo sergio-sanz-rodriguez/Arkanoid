@@ -25,6 +25,9 @@ class paddle : public moving_entity {
      // Constructor
      paddle(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col);
 
+     // Get the (half) width of the paddle
+     float get_half_width() const noexcept;
+
      // Get and set the the scale of the paddle
      bool get_scale() const noexcept;
      void set_scale(bool on, float factor) noexcept;

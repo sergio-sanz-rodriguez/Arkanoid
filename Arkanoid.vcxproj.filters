@@ -74,6 +74,9 @@
     <ClInclude Include="src\objects\bonus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\objects\audio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\ico\arkanoid.ico">

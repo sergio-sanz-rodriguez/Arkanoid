@@ -44,11 +44,11 @@ void entity_manager::draw(sf::RenderWindow& window) {
 
 game::game() :
     rng(std::random_device{}()),
-    text_state(verdana),
-    text_fireball(verdana),
-    text_lives(verdana),
-    text_powerup(verdana),
-    text_instructions(verdana) {
+    text_state(font),
+    text_fireball(font),
+    text_lives(font),
+    text_powerup(font),
+    text_instructions(font) {
 
     // Limit the framerate
     game_window.setFramerateLimit(60);      // Max rate is 60 frames per second
@@ -57,39 +57,39 @@ game::game() :
     paddle::set_window(game_window);
 
     // Load a font from file
-    if (!verdana.openFromFile(constants::font_verdana)) {
+    if (!font.openFromFile(constants::font_consola)) {
         std::cerr << "Failed to load font!" << std::endl;
         // Handle font loading failure (could exit, use default font, etc.)
     }
 
     // Configure our text objects
-    text_state.setFont(verdana);
+    text_state.setFont(font);
     text_state.setPosition({ constants::window_width / 2.0f - std::ceilf(constants::window_width / 5.1f), (constants::window_height / 2.0f) - std::ceilf(constants::window_height / 8.6f) });
     text_state.setCharacterSize(35);
     text_state.setFillColor(constants::white);
     text_state.setString("PAUSED");
 
-    text_fireball.setFont(verdana);
+    text_fireball.setFont(font);
     text_fireball.setPosition({ (constants::window_width / 2.0f) - std::ceilf(constants::window_width / 32.0f), constants::window_height - std::ceilf(constants::window_height / 31.8f)});
-    text_fireball.setCharacterSize(12);
+    text_fireball.setCharacterSize(13);
     text_fireball.setFillColor(constants::orange);
     text_fireball.setString("");
 
-    text_lives.setFont(verdana);
+    text_lives.setFont(font);
     text_lives.setPosition({ constants::window_width - std::ceilf(constants::window_width / 8.5f), constants::window_height - std::ceilf(constants::window_height / 31.8f) });
-    text_lives.setCharacterSize(12);
+    text_lives.setCharacterSize(13);
     text_lives.setFillColor(constants::true_green);
     text_lives.setString("Lives: " + std::to_string(lives));
 
-    text_powerup.setFont(verdana);
+    text_powerup.setFont(font);
     text_powerup.setPosition({ std::ceilf(constants::window_width / 25.0f), constants::window_height - std::ceilf(constants::window_height / 31.8f) });
-    text_powerup.setCharacterSize(12);
+    text_powerup.setCharacterSize(13);
     text_powerup.setFillColor(constants::true_blue);
     text_powerup.setString("");
 
-    text_instructions.setFont(verdana);
+    text_instructions.setFont(font);
     text_instructions.setPosition({ constants::window_width / 16.0f, constants::window_height / 7.0f });
-    text_instructions.setCharacterSize(18);
+    text_instructions.setCharacterSize(20);
     text_instructions.setFillColor(constants::white);
     text_instructions.setString(
         "WELCOME TO ARKANOID: RECLAIMING THE SOLAR SYSTEM\n\n"
@@ -357,13 +357,13 @@ bool game::handle_global_inputs() {
 void game::update_state_text() {
     switch (state) {
     case game_state::paused:
-        text_state.setPosition({ constants::window_width / 2.0f - 65.0f, constants::window_height / 2.0f - 100.0f });
+        text_state.setPosition({ constants::window_width / 2.0f - 65.0f, (constants::window_height / 2.0f) - (constants::window_height / 8.6f) });
         text_state.setCharacterSize(30);
         text_state.setString("PAUSED");
         break;
     case game_state::game_over:
-        text_state.setPosition({ constants::window_width / 16.0f, constants::window_height / 2.0f - 150.0f });
-        text_state.setCharacterSize(18);
+        text_state.setPosition({ constants::window_width / 16.0f, (constants::window_height / 2.0f) - (constants::window_height / 5.7f) });
+        text_state.setCharacterSize(20);
         text_state.setString(
             "  GAME OVER!\n\n"
             "  YOUR MISSION TO RECLAIM THE SOLAR SYSTEM FAILED.\n"
@@ -373,14 +373,16 @@ void game::update_state_text() {
         );
         break;
     case game_state::player_wins:
-        text_state.setPosition({ constants::window_width / 2.0f - 100.0f, constants::window_height / 2.0f - 100.0f });
-        text_state.setCharacterSize(18);
+        //text_state.setPosition({ constants::window_width / 2.0f - 100.0f, constants::window_height / 2.0f - 100.0f });
+        text_state.setPosition({ constants::window_width / 10.0f, (constants::window_height / 2.0f) - (constants::window_height / 5.7f) });
+        text_state.setCharacterSize(22);
         text_state.setString(
             "  CONGRATULATIONS!\n\n"
             "  YOU HAVE DEFEATED THE COSMIC BRICKS.\n"
             "  ALL PLANETS HAVE BEEN RECLAIMED,\n"
             "  AND THE SUN IS SAFE AGAIN.\n\n"
-            "  THE SOLAR SYSTEM THANKS YOU, HERO FROM ALPHA CENTAURI!\n\n"
+            "  THE SOLAR SYSTEM THANKS YOU,\n"
+            "  HERO FROM ALPHA CENTAURI!\n\n"
             "  - PRESS ANY KEY TO PLAY AGAIN\n"
             "  - PRESS ESCAPE TO QUIT\n"
         );

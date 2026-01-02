@@ -1,4 +1,4 @@
-#include "interactions.h"
+﻿#include "interactions.h"
 
 // Determine whether two entities overlap
 bool is_interacting(const entity& entity1, const entity& entity2) {
@@ -9,25 +9,64 @@ bool is_interacting(const entity& entity1, const entity& entity2) {
 }
 
 // Resolve potential collision between the ball and the paddle
-sfx_id handle_collision(ball &the_ball, const paddle& the_paddle) {
+//sfx_id handle_collision(ball &the_ball, const paddle& the_paddle) {
 
-    if (is_interacting(the_paddle, the_ball)) {
+//    if (is_interacting(the_paddle, the_ball)) {
 
-        // Make the ball bounce upwards
-        the_ball.move_up();
+//        // Make the ball bounce upwards
+//        the_ball.move_up();
 
-        // Make the new direction depend on where the collision occurs on the paddle
-        // If the collision is on the left of the paddle, make the ball bounce to the left
-        if (the_ball.get_position().x < the_paddle.get_position().x)
-            the_ball.move_left();
-        else
-            the_ball.move_right();
-        return sfx_id::ball_paddle;
-    }
-    else {
+//        // Make the new direction depend on where the collision occurs on the paddle
+//        // If the collision is on the left of the paddle, make the ball bounce to the left
+//        float dist = std::clamp((the_ball.get_position().x - the_paddle.get_position().x) / the_paddle.get_half_width(), -1.0f, 1.0f);
+//        std::cout << dist << std::endl;
+//        if (dist < 0.0f)
+//            the_ball.move_left(constants::max_angle * dist);
+//        else
+//            the_ball.move_right(constants::max_angle * dist);
+//        return sfx_id::ball_paddle;
+//    }
+//    else {
+//        return sfx_id::none;
+//    }
+//}
+
+sfx_id handle_collision(ball& the_ball, const paddle& the_paddle) {
+
+    if (!is_interacting(the_paddle, the_ball))
         return sfx_id::none;
-    }
+
+    // Always bounce up first (no random rotation!)
+    //the_ball.move_up();
+
+    // How far from paddle center did we hit? [-1, 1]
+    const float dist = std::clamp(
+        (the_ball.get_position().x - the_paddle.get_position().x) / the_paddle.get_half_width(),
+        -1.0f, 1.0f
+    );
+
+    // Convert hit position to angle (degrees)
+    //const float angle = constants::max_angle * dist;
+
+    // Perfect center → straight up
+    //if (std::abs(dist) < 0.01f) {
+    //    the_ball.set_velocity_x(0.f);
+    //    return sfx_id::ball_paddle;
+    //}
+
+    // Otherwise rotate based on sign
+    //if (dist < 0.0f)
+    //    the_ball.move_left(angle);   // angle is negative
+    //else
+    //    the_ball.move_right(angle);  // angle is positive
+
+    //return sfx_id::ball_paddle;
+
+    the_ball.bounce_from_paddle(dist);
+
+    return sfx_id::ball_paddle;
 }
+
 
 // Resolve potential collision between the ball and a brick
 sfx_id handle_collision(ball& the_ball, brick& the_brick) {

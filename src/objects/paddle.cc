@@ -67,6 +67,9 @@ void paddle::set_window(sf::RenderWindow& w) {
     window_ = &w;
 }
 
+// Get the (half) width of the paddle
+float paddle::get_half_width() const noexcept { return half_width; }
+
 // Get and set the scale of the paddle
 bool paddle::get_scale() const noexcept { return scaleup; }
 void paddle::set_scale(bool on, float factor) noexcept {

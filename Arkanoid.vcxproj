@@ -107,7 +107,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);SFML_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)assets\; $(ProjectDir)assets\images;$(ProjectDir)SFML-3.0.2\include;$(ProjectDir)src\objects;$(ProjectDir)src\core;$(ProjectDir)src\systems;$(ProjectDir)src\game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)assets\;$(ProjectDir)assets\fonts;$(ProjectDir)assets\images;$(ProjectDir)SFML-3.0.2\include;$(ProjectDir)src\objects;$(ProjectDir)src\core;$(ProjectDir)src\systems;$(ProjectDir)src\game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,7 +128,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);SFML_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)assets\; $(ProjectDir)assets\images;$(ProjectDir)SFML-3.0.2\include;$(ProjectDir)src\objects;$(ProjectDir)src\core;$(ProjectDir)src\systems;$(ProjectDir)src\game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)assets\;$(ProjectDir)assets\fonts;$(ProjectDir)assets\images;$(ProjectDir)SFML-3.0.2\include;$(ProjectDir)src\objects;$(ProjectDir)src\core;$(ProjectDir)src\systems;$(ProjectDir)src\game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,7 +149,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);SFML_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)assets\; $(ProjectDir)assets\images;$(ProjectDir)SFML-3.0.2\include;$(ProjectDir)src\objects;$(ProjectDir)src\core;$(ProjectDir)src\systems;$(ProjectDir)src\game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)assets\;$(ProjectDir)assets\fonts;$(ProjectDir)assets\images;$(ProjectDir)SFML-3.0.2\include;$(ProjectDir)src\objects;$(ProjectDir)src\core;$(ProjectDir)src\systems;$(ProjectDir)src\game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -170,7 +170,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);SFML_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)assets\; $(ProjectDir)assets\images;$(ProjectDir)SFML-3.0.2\include;$(ProjectDir)src\objects;$(ProjectDir)src\core;$(ProjectDir)src\systems;$(ProjectDir)src\game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)assets\;$(ProjectDir)assets\fonts;$(ProjectDir)assets\images;$(ProjectDir)SFML-3.0.2\include;$(ProjectDir)src\objects;$(ProjectDir)src\core;$(ProjectDir)src\systems;$(ProjectDir)src\game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

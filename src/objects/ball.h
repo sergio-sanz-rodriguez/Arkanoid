@@ -37,11 +37,17 @@ class ball : public moving_entity {
      //Detecting the hit with the wall
      bool consumed_wall_hit() noexcept;
 
+     // Set the x component of the velocity vector
+     void bounce_from_paddle(float dist) noexcept;
+     void set_velocity_x(float x) noexcept;
+
      // Required overrides
      void move_up() noexcept override;
      void move_down() noexcept override;
      void move_left() noexcept override;
      void move_right() noexcept override;
+     void move_left(float angle) noexcept;
+     void move_right(float angle) noexcept;
 
      // Implement the pure virtual functions
      void update() override;

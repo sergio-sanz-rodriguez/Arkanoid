@@ -175,7 +175,7 @@ class game {
     entity_manager manager;
 
     // Use SFML text and font classes to communicate with text with the player
-    sf::Font verdana;
+    sf::Font font;
     sf::Text text_state;
     sf::Text text_fireball;
     sf::Text text_lives;
