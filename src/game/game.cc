@@ -119,6 +119,7 @@ game::game() :
     audio.load(sfx_id::ball_brick, constants::sfx_ball_brick_path());
     audio.load(sfx_id::ball_paddle, constants::sfx_ball_paddle_path());
     audio.load(sfx_id::ball_wall, constants::sfx_ball_wall_path());
+    audio.load(sfx_id::ball_burst, constants::sfx_ball_burst_path());
     audio.load(sfx_id::game_over, constants::sfx_game_over_path());
     audio.load(sfx_id::life_minus, constants::sfx_life_minus_path());
     audio.load(sfx_id::player_wins, constants::sfx_player_wins_path());
@@ -146,7 +147,7 @@ void game::reset() {
     manager.create<background>(0.0f, 0.0f);
 
     // Create ball object
-    manager.create<ball>(
+    manager.create<bouncing_ball>(
         sf::Vector2f{ constants::window_width / 2.0f, constants::window_height - constants::paddle_height },
         sf::Vector2f{ constants::ball_speed, -constants::ball_speed },
         sf::Vector2f{ 0.5f, 0.5f},
@@ -190,7 +191,7 @@ void game::reset() {
 
 }
 
-void game::spawn_extra_balls() {
+void game::spawn_multiball() {
 
     // How many balls are allowed in total after multiball?
     const size_t target_total = constants::multiball_extra_balls;
@@ -199,11 +200,11 @@ void game::spawn_extra_balls() {
     if (target_total < 2) return;
     
     // Check if the maximum allowed balls is greated than the current count
-    const size_t ball_count = manager.count<ball>();
+    const size_t ball_count = manager.count<bouncing_ball>();
     if (ball_count >= target_total) return;
 
     // Reference ball
-    auto* ref = manager.get_first<ball>();
+    auto* ref = manager.get_first<bouncing_ball>();
     if (!ref) return;
 
     const sf::Vector2f pos = ref->get_position();
@@ -222,7 +223,7 @@ void game::spawn_extra_balls() {
     // Spawn needed balls with symmetric angle offsets around 0°
     for (size_t i = 0; i < needed; ++i) {
 
-        auto& b = manager.create<ball>(
+        auto& b = manager.create<bouncing_ball>(
             pos,
             vel,
             sf::Vector2f{ 0.5f, 0.5f },
@@ -237,23 +238,63 @@ void game::spawn_extra_balls() {
     }
 }
 
-// Helper function to handle powerups in the game
+void game::spawn_ball_burst() {
+
+    // We assume exactly one paddle exists
+    paddle* p = manager.get_first<paddle>();
+    if (!p) return;
+
+    const sf::Vector2f pos = p->get_position();
+
+    // Spawn slightly above the paddle so it doesn't instantly collide
+    const sf::Vector2f spawn_pos = { pos.x, pos.y - constants::paddle_height };
+
+    // Straight up projectile velocity
+    const sf::Vector2f vel = { 0.f, -constants::burst_speed }; // tune speed
+
+    manager.create<burst_ball>(
+        spawn_pos,
+        vel,
+        sf::Vector2f{ 0.25f, 0.25f },
+        constants::white // that is, default
+    );
+
+    // Play the sound effect
+    audio.play(sfx_id::ball_burst);
+
+}
+
+
+// Helper functions to handle powerups in the game
+// One-shot powerups trigger a single, immediate effect and then end
 void game::apply_one_shot_powerups() {
 
     // Multiball: spawn extra balls only once when collected
     if (active_powerups.multiball) {
-        spawn_extra_balls();
+        spawn_multiball();
         active_powerups.multiball = false;   // consume the powerup
     }
 
-    // Later, add here other "one-time" actions:
-    // Example: if (active_powerups.reset_powerups) { ... }
+    // Ball burst: spawn a projectile periodically while active
+    if (active_powerups.ball_burst) {
+
+        if (burst_clock.getElapsedTime().asSeconds() >= constants::burst_interval) {
+            spawn_ball_burst();
+            burst_clock.restart();
+        }
+
+        // OPTIONAL: expire burst after N seconds
+        if (burst_duration_clock.getElapsedTime().asSeconds() >= constants::burst_duration_in_sec) {
+             active_powerups.ball_burst = false;
+        }
+    }
 }
 
+// Sync powerups modify entities continuously and remain active until they are deactivated or replaced
 void game::sync_powerups_to_entities() {
 
     // Ball effects
-    manager.apply_all<ball>([this](ball& b) {
+    manager.apply_all<bouncing_ball>([this](bouncing_ball& b) {
 
         // Fireball flag controls color + scale internally
         b.set_fireball(active_powerups.fireball, 1.0f);
@@ -290,6 +331,7 @@ void game::sync_powerups_to_entities() {
 
 }
 
+// Randomly choose one of the available powerups when the bonus object is picked up
 powerup_type game::random_powerup() {
     std::uniform_int_distribution<int> dist(0, static_cast<int>(powerup_candidates.size()) - 1);
     powerup_type chosen = powerup_candidates[static_cast<size_t>(dist(rng))];
@@ -301,6 +343,7 @@ powerup_type game::random_powerup() {
     return chosen;
 }
 
+// Check for any events since the last loop iteration: start, close
 void game::handle_window_events() {
 
     // Handle window events (close button, key presses for start/restart screens).
@@ -444,7 +487,7 @@ void game::draw_frame() {
 // Respawn ball if none
 void game::ensure_ball_exists() {
 
-    if (manager.has_any<ball>())
+    if (manager.has_any<bouncing_ball>())
         return;
 
     // Spawn one ball, so we need to set the position and velocity
@@ -452,7 +495,7 @@ void game::ensure_ball_exists() {
     auto vel = sf::Vector2f{ std::abs(current_ball_velocity.x), -std::abs(current_ball_velocity.y) };
 
     // And create it
-    manager.create<ball>(
+    manager.create<bouncing_ball>(
         pos,
         vel,
         sf::Vector2f{ 0.5f, 0.5f },
@@ -460,10 +503,12 @@ void game::ensure_ball_exists() {
         false
     );
 
-    // Losing a ball resets powerups
+    // Losing a ball resets powerups and clocks
     active_powerups.reset();
     text_fireball.setString("");
     text_powerup.setString("");
+    burst_clock.restart();
+    // fireball_clock.restart();
 
     // Decrease the number of lives
     --lives;
@@ -557,6 +602,8 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
         // FIREBALL bonus: set fireball powerup and change the message color
         if (the_bonus.get_type() == bonus_type::fireball) {
             active_powerups.apply(powerup_type::fireball);
+            // Optional: restart a fireball timer
+            // fireball_clock.restart();
             audio.play(sfx_id::powerup);
             return;
         }
@@ -565,14 +612,58 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
         powerup_type chosen = random_powerup();
         active_powerups.apply(chosen);
 
+        // Set game mesages and play sound effects
         switch (chosen) {
-        case powerup_type::multiball:       powerup_msg = "Multiball";       audio.play(sfx_id::powerup); break;
-        case powerup_type::ball_faster:     powerup_msg = "Faster ball";     audio.play(sfx_id::powerup); break;
-        case powerup_type::ball_slower:     powerup_msg = "Slower ball";     audio.play(sfx_id::powerup); break;
-        case powerup_type::paddle_wider:    powerup_msg = "Wider paddle";    audio.play(sfx_id::powerup); break;
-        case powerup_type::paddle_narrower: powerup_msg = "Narrower paddle"; audio.play(sfx_id::powerdown); break;
-        case powerup_type::reset_powerups:  powerup_msg = "Reset powerups";  audio.play(sfx_id::powerdown); break;
-        default:                            powerup_msg.clear(); break;
+
+            case powerup_type::ball_burst:
+                powerup_msg = "Burst projectiles";
+                audio.play(sfx_id::powerup);
+                burst_clock.restart();
+                burst_duration_clock.restart(); // Optional duration timer
+                burst_ui_active = true;
+                burst_time_left = constants::burst_duration_in_sec;
+                break;
+
+            case powerup_type::ball_faster:
+                powerup_msg = "Faster ball";
+                audio.play(sfx_id::powerup);
+                break;
+
+            case powerup_type::ball_slower:
+                powerup_msg = "Slower ball";
+                audio.play(sfx_id::powerup);
+                break;
+
+            case powerup_type::fireball:
+                // fireball_clock.restart(); // Fireball can also expire after X seconds:
+                break;
+
+            case powerup_type::multiball:
+                powerup_msg = "Multiball";
+                audio.play(sfx_id::powerup);
+                break;
+
+            case powerup_type::paddle_wider:
+                powerup_msg = "Wider paddle";
+                audio.play(sfx_id::powerup);
+                break;
+
+            case powerup_type::paddle_narrower:
+                powerup_msg = "Narrower paddle";
+                audio.play(sfx_id::powerdown);
+                break;
+
+            case powerup_type::reset_powerups:
+                powerup_msg = "Reset powerups";
+                audio.play(sfx_id::powerdown);
+                burst_clock.restart();
+                burst_duration_clock.restart();
+                // fireball_clock.restart();
+                break;
+
+            default:
+                powerup_msg.clear();
+                break;
         }
     });
 
@@ -590,13 +681,46 @@ void game::update_ui_texts(const std::string& powerup_msg) {
     // last pickup message (event)
     if (!powerup_msg.empty())
         text_powerup.setString(powerup_msg);
+
+    // If no new powerup message this frame, show burst countdown (if active)
+    if (!burst_ui_active) return;
+    
+    float elapsed = burst_duration_clock.getElapsedTime().asSeconds();
+    float remaining = constants::burst_duration_in_sec - elapsed;
+
+    if (remaining <= 0.0f) {
+        burst_ui_active = false;
+        text_powerup.setString("");
+        return;
+    }
+
+    // Update UI text
+    std::ostringstream oss;
+    oss << "Burst projectiles (" << std::fixed << std::setprecision(1) << remaining << "s)";
+    text_powerup.setString(oss.str());
+
 }
 
 // Ball-brick, ball-paddle, bonus-paddle
 std::string game::resolve_collisions() {
 
-    // Ball vs brick
-    manager.apply_all<ball>([this](ball& the_ball) {
+    // Bouncing ball vs brick
+    manager.apply_all<bouncing_ball>([this](bouncing_ball& the_ball) {
+        manager.apply_all<brick>([&](brick& the_brick) {
+            if (handle_collision(the_ball, the_brick) == sfx_id::ball_brick) {
+                audio.play(sfx_id::ball_brick);
+            }
+        });
+    });
+
+    // Bouncing ball vs wall
+    manager.apply_all<bouncing_ball>([this](bouncing_ball& the_ball) {
+        if (the_ball.consumed_wall_hit())
+            audio.play(sfx_id::ball_wall);
+    });
+
+    // Burst ball vs brick
+    manager.apply_all<burst_ball>([this](burst_ball& the_ball) {
         manager.apply_all<brick>([&](brick& the_brick) {
             if (handle_collision(the_ball, the_brick) == sfx_id::ball_brick) {
                 audio.play(sfx_id::ball_brick);
@@ -609,17 +733,10 @@ std::string game::resolve_collisions() {
     if (!the_paddle) return {}; // Something went wrong
 
     // Ball vs paddle
-    // manager.apply_all<paddle>([&the_ball](paddle& the_paddle) {
-    manager.apply_all<ball>([this, the_paddle](ball& the_ball) {
+    manager.apply_all<bouncing_ball>([this, the_paddle](bouncing_ball& the_ball) {
         if (handle_collision(the_ball, *the_paddle) == sfx_id::ball_paddle) {
             audio.play(sfx_id::ball_paddle);
         }
-    });
-
-    // Ball vs wall
-    manager.apply_all<ball>([this](ball& b) {
-        if (b.consumed_wall_hit())
-            audio.play(sfx_id::ball_wall);
     });
 
     // Bonus vs paddle (returns the powerup message)

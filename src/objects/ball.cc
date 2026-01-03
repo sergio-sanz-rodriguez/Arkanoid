@@ -1,19 +1,19 @@
 #include "ball.h"
 
 // Initialize static data
-sf::Texture ball::texture;
+sf::Texture bouncing_ball::texture;
+sf::Texture burst_ball::texture;
 
-ball::ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool fireball) : fireball(fireball) {
+bouncing_ball::bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool fireball) : fireball(fireball) {
 
     // Load the texture
     if (!texture.loadFromFile(constants::img_ball_path())) {
-        throw std::runtime_error("Failed to load the ball texture.");
+        throw std::runtime_error("Failed to load the bouncing ball texture.");
     }
-    //sprite.setTexture(texture);
-    sprite = std::make_unique<sf::Sprite>(texture);
 
     // Set the initial position, velocity, and color of the ball
     // Use (x, y) for the initial position of the ball
+    sprite = std::make_unique<sf::Sprite>(texture);
     sprite->setOrigin(get_centre());
     sprite->setPosition(pos);
     sprite->scale(sca);
@@ -24,9 +24,12 @@ ball::ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, 
     radius = get_bounding_box().size.x / 2.0f;
 }
 
+// Get the radius of the ball
+float bouncing_ball::get_radius() const noexcept { return radius; }
+
 // Get and set the state of the fireball feature
-bool ball::get_fireball() const noexcept { return fireball; }
-void ball::set_fireball(bool on, float factor) noexcept {
+bool bouncing_ball::get_fireball() const noexcept { return fireball; }
+void bouncing_ball::set_fireball(bool on, float factor) noexcept {
     fireball = on;
     sprite->setColor(on ? constants::orange : constants::steel);
     sprite->setScale(on ? factor * sf::Vector2f{ 0.5f, 0.5f } : sf::Vector2f{ 0.5f, 0.5f });
@@ -34,18 +37,14 @@ void ball::set_fireball(bool on, float factor) noexcept {
 }
 
 // Function to detect if the ball hits the any wall
-bool ball::consumed_wall_hit() noexcept {
+bool bouncing_ball::consumed_wall_hit() noexcept {
     bool r = hit_wall_this_frame;
     hit_wall_this_frame = false;   // consume it
     return r;
 }
 
-// Set the x component of the velocity vector
-void ball:: set_velocity_x(float x) noexcept {
-    velocity.x = x;
-}
-
-void ball::bounce_from_paddle(float dist) noexcept {
+// Set the components of the velocity vector when the ball hits the paddle
+void bouncing_ball::bounce_from_paddle(float dist) noexcept {
 
     dist = std::clamp(dist, -1.f, 1.f);
 
@@ -64,44 +63,50 @@ void ball::bounce_from_paddle(float dist) noexcept {
 
 
 // Drawing function
-void ball::draw(sf::RenderWindow& window) {
+void bouncing_ball::draw(sf::RenderWindow& window) {
     // Ask the window to draw the sprite for us
     window.draw(*sprite);
 }
 
 // Update velocities
-void ball::move_up() noexcept {
+void bouncing_ball::move_up() noexcept {
     velocity.y = -std::abs(velocity.y);
-    rotate(constants::rotation_angle);
 }
 
-void ball::move_down() noexcept {
+void bouncing_ball::move_down() noexcept {
     velocity.y = std::abs(velocity.y);
-    rotate(constants::rotation_angle);
 }
 
-void ball::move_left() noexcept {
+void bouncing_ball::move_left() noexcept {
     velocity.x = -std::abs(velocity.x);
-    rotate(constants::rotation_angle);
 }
 
-void ball::move_right() noexcept {
+void bouncing_ball::move_right() noexcept {
     velocity.x = std::abs(velocity.x);
-    rotate(constants::rotation_angle);
 }
 
-void ball::move_left(float angle) noexcept {
+void bouncing_ball::move_up(float angle) noexcept {
+    velocity.y = -std::abs(velocity.y);
+    rotate(angle);
+}
+
+void bouncing_ball::move_down(float angle) noexcept {
+    velocity.y = std::abs(velocity.y);
+    rotate(angle);
+}
+
+void bouncing_ball::move_left(float angle) noexcept {
     velocity.x = -std::abs(velocity.x);
     rotate(angle);
 }
 
-void ball::move_right(float angle) noexcept {
+void bouncing_ball::move_right(float angle) noexcept {
     velocity.x = std::abs(velocity.x);
     rotate(angle);
 }
 
 // Compute the ball's new position
-void ball::update() {
+void bouncing_ball::update() {
 
     // Respond to user input as this will affect how the ball moves
     //process_player_input();
@@ -140,7 +145,7 @@ void ball::update() {
 }
 
 // Logic when the user speed ups or down the speed
-void ball::process_player_input() {
+void bouncing_ball::process_player_input() {
 
     // Up key increases the velocity of the ball, and down key decreases it
     const bool upKey = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up);
@@ -165,4 +170,40 @@ void ball::process_player_input() {
     velocity.x *= speed / vx;
     velocity.y *= speed / vy;
 
+}
+
+burst_ball::burst_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col) {
+
+    // Load the texture
+    if (!texture.loadFromFile(constants::img_burst_path())) {
+        throw std::runtime_error("Failed to load burst_ball texture");
+    }
+
+    // Set the initial position, velocity, and color of the ball
+    // Use (x, y) for the initial position of the ball
+    sprite = std::make_unique<sf::Sprite>(texture);
+    sprite->setOrigin(get_centre());
+    sprite->setPosition(pos);
+    sprite->setScale(sca);
+    sprite->setColor(col);
+    velocity = vel;
+
+    // Set the radius of the ball
+    radius = get_bounding_box().size.x / 2.f;
+}
+
+// Compute the ball's new position
+void burst_ball::update() {
+
+    sprite->move(velocity);
+
+    // If it leaves the screen (top), destroy it
+    if (get_position().y + radius < 0.f) {
+        destroy();
+    }
+}
+
+// Drawing function
+void burst_ball::draw(sf::RenderWindow& w) {
+    w.draw(*sprite);
 }

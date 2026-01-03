@@ -11,6 +11,9 @@
 // When the ball hits a brick, the brick is destroyed and disappears
 // When a brick is destroyed, it is deleted from the vector
 class brick: public entity {
+
+private:
+
     // Private data members
     static sf::Texture texture;
 
@@ -18,6 +21,7 @@ class brick: public entity {
     int strength{ constants::brick_strength };
 
 public:
+
     // Interface of the class
 
     // Constructors

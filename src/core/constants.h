@@ -17,8 +17,10 @@ struct constants {
     static constexpr float ball_max_speed{ 16.0f };
     static constexpr float ball_min_speed{ 6.0f };
     static constexpr float ball_speed_step{ 0.5f };
+    static constexpr float burst_speed{ 10.0f };
+    static constexpr float burst_interval{ 0.25f }; // fire every 0.25 sec
+    static constexpr float burst_duration_in_sec{ 5.0f }; // lasts 5 secs
     static constexpr float paddle_width{ 75.0f };
-    //static constexpr float paddle_width_by_2{ 37.5f };
     static constexpr float paddle_height{ 40.0f };
     static constexpr float paddle_speed{ 10.0f };
     static constexpr float paddle_max_speed{ 20.0f }; // { 21.33f };
@@ -31,7 +33,7 @@ struct constants {
     static constexpr float rotation_angle{ 1.0f };
     static constexpr float max_angle{ 60.0f };
     static constexpr float multiball_angle{ 2.0f };
-    static constexpr int multiball_extra_balls{ 3 };
+    static constexpr int   multiball_extra_balls{ 3 };
     static constexpr float pi{ 3.14159265358979323846f };
     static constexpr int brick_strength{ 1 }; // The brick needs to be hit X times before it disappears 
     static constexpr int brick_columns{ 12 };
@@ -66,6 +68,7 @@ struct constants {
     static constexpr std::string_view sfx_dir{ "..\\..\\assets\\sfx\\" };
     static constexpr std::string_view img_background_filename{ "background_stars.jpg" };
     static constexpr std::string_view img_ball_filename{ "ball_llwhite.png" };
+    static constexpr std::string_view img_burst_filename{ "burst.png" };
     static constexpr std::string_view img_paddle_filename{ "paddle_gray.png" };
     static constexpr std::string_view img_brick_filename{ "brick_s.png" };
     static constexpr std::string_view img_fireball_filename{ "ball_orange.png" };
@@ -74,6 +77,7 @@ struct constants {
     static constexpr std::string_view sfx_ball_brick_filename{ "ball_brick.wav" };
     static constexpr std::string_view sfx_ball_paddle_filename{ "ball_paddle.wav" };
     static constexpr std::string_view sfx_ball_wall_filename{ "ball_wall.wav" };
+    static constexpr std::string_view sfx_ball_burst_filename{ "ball_burst.wav" };
     static constexpr std::string_view sfx_game_over_filename{ "game_over.wav" };
     static constexpr std::string_view sfx_life_minus_filename{ "life_minus.wav" };
     static constexpr std::string_view sfx_player_wins_filename{ "player_wins.wav" };
@@ -85,6 +89,7 @@ struct constants {
     static constexpr std::string_view font_consola{ "..\\..\\assets\\fonts\\consola.ttf" };
     static std::string img_background_path() { return std::string(image_dir) + std::string(img_background_filename); }
     static std::string img_ball_path() { return std::string(image_dir) + std::string(img_ball_filename); }
+    static std::string img_burst_path() { return std::string(image_dir) + std::string(img_burst_filename); }
     static std::string img_paddle_path() { return std::string(image_dir) + std::string(img_paddle_filename); }
     static std::string img_brick_path() { return std::string(image_dir) + std::string(img_brick_filename); }
     static std::string img_fireball_path() { return std::string(image_dir) + std::string(img_fireball_filename); }
@@ -93,6 +98,7 @@ struct constants {
     static std::string sfx_ball_brick_path() { return std::string(sfx_dir) + std::string(sfx_ball_brick_filename); }
     static std::string sfx_ball_paddle_path() { return std::string(sfx_dir) + std::string(sfx_ball_paddle_filename); }
     static std::string sfx_ball_wall_path() { return std::string(sfx_dir) + std::string(sfx_ball_wall_filename); }
+    static std::string sfx_ball_burst_path() { return std::string(sfx_dir) + std::string(sfx_ball_burst_filename); }
     static std::string sfx_game_over_path() { return std::string(sfx_dir) + std::string(sfx_game_over_filename); }
     static std::string sfx_life_minus_path() { return std::string(sfx_dir) + std::string(sfx_life_minus_filename); }
     static std::string sfx_player_wins_path() { return std::string(sfx_dir) + std::string(sfx_player_wins_filename); }

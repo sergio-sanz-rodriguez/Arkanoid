@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <iostream>
 #include <chrono>
+#include <sstream>
+#include <iomanip>
 
 #include "constants.h"
 #include "background.h"
@@ -38,6 +40,8 @@ using entity_vector = std::vector<std::unique_ptr<entity>>;
 using entity_alias_vector = std::vector<entity *>;
 
 class entity_manager {
+
+private:
 
     // A vector to store all the entities in the game (all brick objects, background, ball, paddle)
     entity_vector all_entities;
@@ -161,6 +165,8 @@ public:
 
 class game {
 
+private:
+
     // Enum with allowed values for the game's state
     enum class game_state { game_over, paused, player_wins, start_screen, running };
 
@@ -217,8 +223,15 @@ class game {
     float next_bonus_time = 0.0f;
     std::mt19937 rng{ std::random_device{}() };
 
-    // Timing
+    // Bonus timing
     std::uniform_real_distribution<float> bonus_delay_dist{ 5.0f, 15.0f };
+
+    // Ball burst powerup timing
+    sf::Clock burst_clock;            // controls "fire every X seconds"
+    sf::Clock burst_duration_clock;   // controls "powerup lasts X seconds"
+    
+    // Fireball clock
+    // sf::Clock fireball_clock;
 
     // X position
     std::uniform_real_distribution<float> bonus_x_dist{
@@ -245,13 +258,16 @@ class game {
 
     // --- Helper functions --- //
 
-    // Handle powerups
+    // Powerup logic
     powerups active_powerups;
     void sync_powerups_to_entities();
     void apply_one_shot_powerups();
-    void spawn_extra_balls();
+    void spawn_multiball();
+    void spawn_ball_burst();
     powerup_type random_powerup();
     std::optional<powerup_type> last_powerup;
+    bool burst_ui_active = false;       // Burst projectile UI state
+    float burst_time_left = 0.f;        // Seconds remaining
 
     // Check for any events since the last loop iteration: start, close
     void handle_window_events();
