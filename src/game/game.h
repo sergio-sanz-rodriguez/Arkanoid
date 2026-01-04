@@ -227,8 +227,8 @@ private:
     std::uniform_real_distribution<float> bonus_delay_dist{ 5.0f, 15.0f };
 
     // Ball burst powerup timing
-    sf::Clock burst_clock;            // controls "fire every X seconds"
-    sf::Clock burst_duration_clock;   // controls "powerup lasts X seconds"
+    sf::Clock ballstorm_clock;            // controls "fire every X seconds"
+    sf::Clock ballstorm_duration_clock;   // controls "powerup lasts X seconds"
     
     // Fireball clock
     // sf::Clock fireball_clock;
@@ -263,11 +263,11 @@ private:
     void sync_powerups_to_entities();
     void apply_one_shot_powerups();
     void spawn_multiball();
-    void spawn_ball_burst();
+    void spawn_ballstorm();
     powerup_type random_powerup();
     std::optional<powerup_type> last_powerup;
-    bool burst_ui_active = false;       // Burst projectile UI state
-    float burst_time_left = 0.f;        // Seconds remaining
+    bool ballstorm_ui_active = false;       // Ballstorm UI state
+    float ballstorm_time_left = 0.f;        // Seconds remaining
 
     // Check for any events since the last loop iteration: start, close
     void handle_window_events();

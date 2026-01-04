@@ -2,7 +2,7 @@
 
 // Initialize static data
 sf::Texture bouncing_ball::texture;
-sf::Texture burst_ball::texture;
+sf::Texture ballstorm::texture;
 
 bouncing_ball::bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool fireball) : fireball(fireball) {
 
@@ -172,10 +172,10 @@ void bouncing_ball::process_player_input() {
 
 }
 
-burst_ball::burst_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col) {
+ballstorm::ballstorm(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col) {
 
     // Load the texture
-    if (!texture.loadFromFile(constants::img_burst_path())) {
+    if (!texture.loadFromFile(constants::img_ballstorm_path())) {
         throw std::runtime_error("Failed to load burst_ball texture");
     }
 
@@ -193,7 +193,7 @@ burst_ball::burst_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf:
 }
 
 // Compute the ball's new position
-void burst_ball::update() {
+void ballstorm::update() {
 
     sprite->move(velocity);
 
@@ -204,6 +204,6 @@ void burst_ball::update() {
 }
 
 // Drawing function
-void burst_ball::draw(sf::RenderWindow& w) {
+void ballstorm::draw(sf::RenderWindow& w) {
     w.draw(*sprite);
 }

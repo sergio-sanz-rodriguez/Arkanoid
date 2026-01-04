@@ -13,7 +13,7 @@ enum class sfx_id {
     ball_brick,
     ball_paddle,
     ball_wall,
-    ball_burst,
+    ballstorm,
     game_over,
     life_minus,
     player_wins,

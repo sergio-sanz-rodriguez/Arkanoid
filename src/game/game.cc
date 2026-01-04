@@ -64,31 +64,41 @@ game::game() :
 
     // Configure our text objects
     text_state.setFont(font);
-    text_state.setPosition({ constants::window_width / 2.0f - std::ceilf(constants::window_width / 5.1f), (constants::window_height / 2.0f) - std::ceilf(constants::window_height / 8.6f) });
+    text_state.setPosition(
+        { (constants::window_width / 2.0f) - std::ceilf(constants::window_width / 5.1f),
+        (constants::window_height / 2.0f) - std::ceilf(constants::window_height / 8.6f) });
     text_state.setCharacterSize(35);
     text_state.setFillColor(constants::white);
     text_state.setString("PAUSED");
 
     text_fireball.setFont(font);
-    text_fireball.setPosition({ (constants::window_width / 2.0f) - std::ceilf(constants::window_width / 32.0f), constants::window_height - std::ceilf(constants::window_height / 31.8f)});
+    text_fireball.setPosition(
+        { (constants::window_width / 2.0f) - std::ceilf(constants::window_width / 32.0f),
+        constants::window_height - std::ceilf(constants::window_height / 31.8f)});
     text_fireball.setCharacterSize(13);
     text_fireball.setFillColor(constants::orange);
     text_fireball.setString("");
 
     text_lives.setFont(font);
-    text_lives.setPosition({ constants::window_width - std::ceilf(constants::window_width / 8.5f), constants::window_height - std::ceilf(constants::window_height / 31.8f) });
+    text_lives.setPosition(
+        { constants::window_width - std::ceilf(constants::window_width / 8.5f),
+        constants::window_height - std::ceilf(constants::window_height / 31.8f) });
     text_lives.setCharacterSize(13);
     text_lives.setFillColor(constants::true_green);
     text_lives.setString("Lives: " + std::to_string(lives));
 
     text_powerup.setFont(font);
-    text_powerup.setPosition({ std::ceilf(constants::window_width / 25.0f), constants::window_height - std::ceilf(constants::window_height / 31.8f) });
+    text_powerup.setPosition(
+        { std::ceilf(constants::window_width / 25.0f),
+        constants::window_height - std::ceilf(constants::window_height / 31.8f) });
     text_powerup.setCharacterSize(13);
     text_powerup.setFillColor(constants::true_blue);
     text_powerup.setString("");
 
     text_instructions.setFont(font);
-    text_instructions.setPosition({ constants::window_width / 16.0f, constants::window_height / 7.0f });
+    text_instructions.setPosition(
+        { constants::window_width / 16.0f,
+        constants::window_height / 8.0f });
     text_instructions.setCharacterSize(20);
     text_instructions.setFillColor(constants::white);
     text_instructions.setString(
@@ -119,7 +129,7 @@ game::game() :
     audio.load(sfx_id::ball_brick, constants::sfx_ball_brick_path());
     audio.load(sfx_id::ball_paddle, constants::sfx_ball_paddle_path());
     audio.load(sfx_id::ball_wall, constants::sfx_ball_wall_path());
-    audio.load(sfx_id::ball_burst, constants::sfx_ball_burst_path());
+    audio.load(sfx_id::ballstorm, constants::sfx_ballstorm_path());
     audio.load(sfx_id::game_over, constants::sfx_game_over_path());
     audio.load(sfx_id::life_minus, constants::sfx_life_minus_path());
     audio.load(sfx_id::player_wins, constants::sfx_player_wins_path());
@@ -148,17 +158,20 @@ void game::reset() {
 
     // Create ball object
     manager.create<bouncing_ball>(
-        sf::Vector2f{ constants::window_width / 2.0f, constants::window_height - constants::paddle_height },
-        sf::Vector2f{ constants::ball_speed, -constants::ball_speed },
-        sf::Vector2f{ 0.5f, 0.5f},
+        sf::Vector2f{ constants::window_width / 2.0f,
+                      constants::window_height - constants::paddle_height },
+        sf::Vector2f{ constants::ball_speed,
+                     -constants::ball_speed },
+        constants::ballstorm_scale,
         constants::steel
     );
 
     // Create paddle object
     manager.create<paddle>(
-        sf::Vector2f{ constants::window_width / 2.0f, constants::window_height - constants::paddle_height },
+        sf::Vector2f{ constants::window_width / 2.0f,
+                      constants::window_height - constants::paddle_height },
         sf::Vector2f{ constants::paddle_speed, 0.0f },
-        sf::Vector2f{ constants::paddle_scale_width, constants::paddle_scale_height },
+        constants::paddle_scale,
         constants::white
     );
 
@@ -177,7 +190,7 @@ void game::reset() {
             //sf::Color c = vcolor[color_dist(rng)]; // Pick a random color
             manager.create<brick>(
                 sf::Vector2f{ x, y },
-                sf::Vector2f{ 1.0f, 1.0f },
+                constants::brick_scale,
                 c); // Create the brick with the color
         }
     }
@@ -226,7 +239,7 @@ void game::spawn_multiball() {
         auto& b = manager.create<bouncing_ball>(
             pos,
             vel,
-            sf::Vector2f{ 0.5f, 0.5f },
+            constants::ball_scale,
             active_powerups.fireball ? constants::orange : constants::steel,
             active_powerups.fireball
         );
@@ -238,7 +251,7 @@ void game::spawn_multiball() {
     }
 }
 
-void game::spawn_ball_burst() {
+void game::spawn_ballstorm() {
 
     // We assume exactly one paddle exists
     paddle* p = manager.get_first<paddle>();
@@ -250,17 +263,17 @@ void game::spawn_ball_burst() {
     const sf::Vector2f spawn_pos = { pos.x, pos.y - constants::paddle_height };
 
     // Straight up projectile velocity
-    const sf::Vector2f vel = { 0.f, -constants::burst_speed }; // tune speed
+    const sf::Vector2f vel = { 0.f, -constants::ballstorm_speed }; // tune speed
 
-    manager.create<burst_ball>(
+    manager.create<ballstorm>(
         spawn_pos,
         vel,
-        sf::Vector2f{ 0.25f, 0.25f },
+        constants::ballstorm_scale,
         constants::white // that is, default
     );
 
     // Play the sound effect
-    audio.play(sfx_id::ball_burst);
+    audio.play(sfx_id::ballstorm);
 
 }
 
@@ -276,16 +289,16 @@ void game::apply_one_shot_powerups() {
     }
 
     // Ball burst: spawn a projectile periodically while active
-    if (active_powerups.ball_burst) {
+    if (active_powerups.ballstorm) {
 
-        if (burst_clock.getElapsedTime().asSeconds() >= constants::burst_interval) {
-            spawn_ball_burst();
-            burst_clock.restart();
+        if (ballstorm_clock.getElapsedTime().asSeconds() >= constants::ballstorm_interval) {
+            spawn_ballstorm();
+            ballstorm_clock.restart();
         }
 
         // OPTIONAL: expire burst after N seconds
-        if (burst_duration_clock.getElapsedTime().asSeconds() >= constants::burst_duration_in_sec) {
-             active_powerups.ball_burst = false;
+        if (ballstorm_duration_clock.getElapsedTime().asSeconds() >= constants::ballstorm_duration_in_sec) {
+             active_powerups.ballstorm = false;
         }
     }
 }
@@ -498,7 +511,7 @@ void game::ensure_ball_exists() {
     manager.create<bouncing_ball>(
         pos,
         vel,
-        sf::Vector2f{ 0.5f, 0.5f },
+        constants::ball_scale,
         constants::steel,
         false
     );
@@ -507,7 +520,8 @@ void game::ensure_ball_exists() {
     active_powerups.reset();
     text_fireball.setString("");
     text_powerup.setString("");
-    burst_clock.restart();
+    ballstorm_ui_active = false;
+    ballstorm_clock.restart();
     // fireball_clock.restart();
 
     // Decrease the number of lives
@@ -552,7 +566,7 @@ void game::spawn_bonuses() {
             type,
             sf::Vector2f{ x, 0.f },
             sf::Vector2f{ 0.f, constants::bonus_speed * life_jitter(rng) },
-            sf::Vector2f{ constants::bonus_scale, constants::bonus_scale },
+             constants::bonus_scale,
             constants::white
         );
     }
@@ -569,7 +583,7 @@ void game::spawn_bonuses() {
             bonus_type::powerup,
             sf::Vector2f{ x, 0.f },
             sf::Vector2f{ 0.f, constants::bonus_speed * powerup_jitter(rng) },
-            sf::Vector2f{ constants::bonus_scale, constants::bonus_scale },
+            constants::bonus_scale,
             constants::white
         );
     }
@@ -608,20 +622,20 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
             return;
         }
 
-        // POWERUP bonus :apply a random powerup type and choose a user-friendly message for the UI
+        // POWERUP bonus: apply a random powerup type and choose a user-friendly message for the UI
         powerup_type chosen = random_powerup();
         active_powerups.apply(chosen);
 
         // Set game mesages and play sound effects
         switch (chosen) {
 
-            case powerup_type::ball_burst:
-                powerup_msg = "Burst projectiles";
+            case powerup_type::ballstorm:
+                powerup_msg = "Ballstorm";
                 audio.play(sfx_id::powerup);
-                burst_clock.restart();
-                burst_duration_clock.restart(); // Optional duration timer
-                burst_ui_active = true;
-                burst_time_left = constants::burst_duration_in_sec;
+                ballstorm_clock.restart();
+                ballstorm_duration_clock.restart(); // Optional duration timer
+                ballstorm_ui_active = true;
+                ballstorm_time_left = constants::ballstorm_duration_in_sec;
                 break;
 
             case powerup_type::ball_faster:
@@ -635,7 +649,8 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
                 break;
 
             case powerup_type::fireball:
-                // fireball_clock.restart(); // Fireball can also expire after X seconds:
+                // Fireball can also expire after X seconds:
+                // fireball_clock.restart();
                 break;
 
             case powerup_type::multiball:
@@ -656,8 +671,8 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
             case powerup_type::reset_powerups:
                 powerup_msg = "Reset powerups";
                 audio.play(sfx_id::powerdown);
-                burst_clock.restart();
-                burst_duration_clock.restart();
+                ballstorm_clock.restart();
+                ballstorm_duration_clock.restart();
                 // fireball_clock.restart();
                 break;
 
@@ -683,20 +698,20 @@ void game::update_ui_texts(const std::string& powerup_msg) {
         text_powerup.setString(powerup_msg);
 
     // If no new powerup message this frame, show burst countdown (if active)
-    if (!burst_ui_active) return;
+    if (!ballstorm_ui_active) return;
     
-    float elapsed = burst_duration_clock.getElapsedTime().asSeconds();
-    float remaining = constants::burst_duration_in_sec - elapsed;
+    float elapsed = ballstorm_duration_clock.getElapsedTime().asSeconds();
+    float remaining = constants::ballstorm_duration_in_sec - elapsed;
 
     if (remaining <= 0.0f) {
-        burst_ui_active = false;
+        ballstorm_ui_active = false;
         text_powerup.setString("");
         return;
     }
 
     // Update UI text
     std::ostringstream oss;
-    oss << "Burst projectiles (" << std::fixed << std::setprecision(1) << remaining << "s)";
+    oss << "Burst projectiles (" << std::fixed << std::setprecision(0) << remaining << "s)";
     text_powerup.setString(oss.str());
 
 }
@@ -720,7 +735,7 @@ std::string game::resolve_collisions() {
     });
 
     // Burst ball vs brick
-    manager.apply_all<burst_ball>([this](burst_ball& the_ball) {
+    manager.apply_all<ballstorm>([this](ballstorm& the_ball) {
         manager.apply_all<brick>([&](brick& the_brick) {
             if (handle_collision(the_ball, the_brick) == sfx_id::ball_brick) {
                 audio.play(sfx_id::ball_brick);
@@ -728,11 +743,9 @@ std::string game::resolve_collisions() {
         });
     });
 
-    // We assume exactly one paddle exists
+    // Ball vs paddle (we assume exactly one paddle exists)
     paddle* the_paddle = manager.get_first<paddle>();
     if (!the_paddle) return {}; // Something went wrong
-
-    // Ball vs paddle
     manager.apply_all<bouncing_ball>([this, the_paddle](bouncing_ball& the_ball) {
         if (handle_collision(the_ball, *the_paddle) == sfx_id::ball_paddle) {
             audio.play(sfx_id::ball_paddle);
