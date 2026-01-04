@@ -102,5 +102,5 @@ float bonus::half_width_for(bonus_type type) {
     const sf::Texture& tex =
         (type == bonus_type::fireball) ? fireball_texture :
         (type == bonus_type::life)     ? life_texture     : powerup_texture;
-    return tex.getSize().x * constants::bonus_scale * 0.5f;
+    return tex.getSize().x * constants::bonus_scale.x * 0.5f;
 }

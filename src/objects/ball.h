@@ -62,7 +62,7 @@ private:
 };
 
 // Class to represent the burst_ball (a powerup)
-class burst_ball : public moving_entity {
+class ballstorm : public moving_entity {
 
 private:
 
@@ -72,7 +72,7 @@ private:
     void process_player_input() override {} // no input
 
 public:
-    burst_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col);
+    ballstorm(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col);
 
     void update() override;
     void draw(sf::RenderWindow& w) override;

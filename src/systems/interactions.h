@@ -20,7 +20,7 @@ sfx_id handle_collision(bouncing_ball& the_ball, brick& the_brick);
 bool handle_collision(bonus& the_bonus, const paddle& the_paddle);
 
 // Resolve potenttial collision between the burst ball and the brick
-sfx_id handle_collision(burst_ball& the_ball, brick& the_brick);
+sfx_id handle_collision(ballstorm& the_ball, brick& the_brick);
 
 #endif //INTERACTIONS_H
 #pragma once

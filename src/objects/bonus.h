@@ -12,9 +12,9 @@ enum class bonus_type {
 };
 
 enum class powerup_type {
-    ball_burst,
     ball_faster,
     ball_slower,
+    ballstorm,
     fireball,
     multiball,
     paddle_wider,
@@ -24,9 +24,9 @@ enum class powerup_type {
 
 struct powerups {
 
-    bool ball_burst = false;
     bool ball_faster = false;
     bool ball_slower = false;
+    bool ballstorm = false;
     bool fireball = false;
     bool multiball = false;
     bool paddle_wider = false;
@@ -39,7 +39,7 @@ struct powerups {
         switch (bonus) {
             case powerup_type::fireball:        fireball = true; break;
             case powerup_type::multiball:       multiball = true; break;
-            case powerup_type::ball_burst:      ball_burst = true; break;
+            case powerup_type::ballstorm:       ballstorm = true; break;
             case powerup_type::ball_faster:     ball_faster = true; ball_slower = false; break;
             case powerup_type::ball_slower:     ball_slower = true; ball_faster = false; break;
             case powerup_type::paddle_wider:    paddle_wider = true; paddle_narrower = false; break;
@@ -51,10 +51,10 @@ struct powerups {
 };
 
 inline constexpr std::array<powerup_type, 7> powerup_candidates = {
-    powerup_type::ball_burst,
+    powerup_type::multiball,
+    powerup_type::ballstorm,
     powerup_type::ball_faster,
     powerup_type::ball_slower,
-    powerup_type::multiball,
     powerup_type::paddle_wider,
     powerup_type::paddle_narrower,
     powerup_type::reset_powerups

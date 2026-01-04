@@ -17,9 +17,9 @@ struct constants {
     static constexpr float ball_max_speed{ 16.0f };
     static constexpr float ball_min_speed{ 6.0f };
     static constexpr float ball_speed_step{ 0.5f };
-    static constexpr float burst_speed{ 10.0f };
-    static constexpr float burst_interval{ 0.25f }; // fire every 0.25 sec
-    static constexpr float burst_duration_in_sec{ 5.0f }; // lasts 5 secs
+    static constexpr float ballstorm_speed{ 10.0f };
+    static constexpr float ballstorm_interval{ 0.25f }; // fire every 0.25 sec
+    static constexpr float ballstorm_duration_in_sec{ 10.0f }; // lasts 5 secs
     static constexpr float paddle_width{ 75.0f };
     static constexpr float paddle_height{ 40.0f };
     static constexpr float paddle_speed{ 10.0f };
@@ -45,30 +45,37 @@ struct constants {
     static constexpr float bonus_speed{ 6.0f };
     static constexpr float bonus_max_speed{ 16.0f };
     static constexpr float bonus_min_speed{ 6.0f };
-    static constexpr float bonus_speed_jitter{ 0.9f }; // a jitter better 0.9 * speed and (1/0.9) * speed.
+    static constexpr float bonus_speed_jitter{ 0.9f }; // A jitter better 0.9 * speed and (1/0.9) * speed.
     static constexpr float bonus_speed_step{ 0.5f };
-    static constexpr float bonus_scale{ 1.0f };
     static constexpr float powerup_prob{ 0.7f };
     static constexpr float brick_width{ 43.0f };
     static constexpr float brick_height{ 20.0f };
     static constexpr float brick_offset{ brick_width * 0.9f };
     static constexpr int player_lives{ 3 };
     static constexpr int max_sounds{ 16 };
-    static constexpr sf::Color white{ 255, 255, 255, 255 }; // White
-    static constexpr sf::Color red{ 205, 92, 92, 255 };     // Light Coral
-    static constexpr sf::Color orange{ 255, 129, 24, 255 }; // Dark Orange
-    static constexpr sf::Color green{ 60, 179, 113, 255 };  // Medium Sea Green
-    static constexpr sf::Color cyan{ 0, 206, 209, 255 };    // Dark Turquoise
-    static constexpr sf::Color blue{ 70, 130, 180, 255 };   // Calming Blue
-    static constexpr sf::Color steel{ 156, 208, 255, 255 }; // Steel Blue
-    static constexpr sf::Color true_red{ 250, 0, 0, 255 };   // True Red
-    static constexpr sf::Color true_green{ 0, 255, 0, 255 }; // True Green
-    static constexpr sf::Color true_blue{ 0, 0, 255, 255 }; // True Blue
+    static constexpr sf::Vector2f ball_scale{ 0.5f, 0.5f };
+    static constexpr sf::Vector2f ballstorm_scale{ 0.5f, 0.5f };
+    static constexpr sf::Vector2f brick_scale{ 1.0f, 1.0f };
+    static constexpr sf::Vector2f bonus_scale{ 1.0f, 1.0f };
+    static constexpr sf::Vector2f paddle_scale{ 0.411f, 0.25f };
+    static constexpr sf::Color white{ 255, 255, 255, 255 };      // White
+    static constexpr sf::Color red{ 205, 92, 92, 255 };          // Light Coral
+    static constexpr sf::Color orange{ 255, 129, 24, 255 };      // Dark Orange
+    static constexpr sf::Color green{ 60, 179, 113, 255 };       // Medium Sea Green
+    static constexpr sf::Color cyan{ 0, 206, 209, 255 };         // Dark Turquoise
+    static constexpr sf::Color blue{ 70, 130, 180, 255 };        // Calming Blue
+    static constexpr sf::Color steel{ 156, 208, 255, 255 };      // Steel Blue
+    static constexpr sf::Color true_red{ 250, 0, 0, 255 };       // True Red
+    static constexpr sf::Color true_green{ 0, 255, 0, 255 };     // True Green
+    static constexpr sf::Color true_blue{ 0, 0, 255, 255 };      // True Blue
+    static constexpr sf::Color gold_base{ 212, 175, 55, 255 };   // True Blue
+    static constexpr sf::Color gold_shiny{ 255, 215, 0, 255 };   // True Blue
+    static constexpr sf::Color gold_shadow{ 184, 134, 11, 255 }; // True Blue
     static constexpr std::string_view image_dir{ "..\\..\\assets\\images\\" };
     static constexpr std::string_view sfx_dir{ "..\\..\\assets\\sfx\\" };
     static constexpr std::string_view img_background_filename{ "background_stars.jpg" };
     static constexpr std::string_view img_ball_filename{ "ball_llwhite.png" };
-    static constexpr std::string_view img_burst_filename{ "burst.png" };
+    static constexpr std::string_view img_ballstorm_filename{ "burst.png" };
     static constexpr std::string_view img_paddle_filename{ "paddle_gray.png" };
     static constexpr std::string_view img_brick_filename{ "brick_s.png" };
     static constexpr std::string_view img_fireball_filename{ "ball_orange.png" };
@@ -77,7 +84,7 @@ struct constants {
     static constexpr std::string_view sfx_ball_brick_filename{ "ball_brick.wav" };
     static constexpr std::string_view sfx_ball_paddle_filename{ "ball_paddle.wav" };
     static constexpr std::string_view sfx_ball_wall_filename{ "ball_wall.wav" };
-    static constexpr std::string_view sfx_ball_burst_filename{ "ball_burst.wav" };
+    static constexpr std::string_view sfx_ballstorm_filename{ "ballstorm.wav" };
     static constexpr std::string_view sfx_game_over_filename{ "game_over.wav" };
     static constexpr std::string_view sfx_life_minus_filename{ "life_minus.wav" };
     static constexpr std::string_view sfx_player_wins_filename{ "player_wins.wav" };
@@ -89,7 +96,7 @@ struct constants {
     static constexpr std::string_view font_consola{ "..\\..\\assets\\fonts\\consola.ttf" };
     static std::string img_background_path() { return std::string(image_dir) + std::string(img_background_filename); }
     static std::string img_ball_path() { return std::string(image_dir) + std::string(img_ball_filename); }
-    static std::string img_burst_path() { return std::string(image_dir) + std::string(img_burst_filename); }
+    static std::string img_ballstorm_path() { return std::string(image_dir) + std::string(img_ballstorm_filename); }
     static std::string img_paddle_path() { return std::string(image_dir) + std::string(img_paddle_filename); }
     static std::string img_brick_path() { return std::string(image_dir) + std::string(img_brick_filename); }
     static std::string img_fireball_path() { return std::string(image_dir) + std::string(img_fireball_filename); }
@@ -98,7 +105,7 @@ struct constants {
     static std::string sfx_ball_brick_path() { return std::string(sfx_dir) + std::string(sfx_ball_brick_filename); }
     static std::string sfx_ball_paddle_path() { return std::string(sfx_dir) + std::string(sfx_ball_paddle_filename); }
     static std::string sfx_ball_wall_path() { return std::string(sfx_dir) + std::string(sfx_ball_wall_filename); }
-    static std::string sfx_ball_burst_path() { return std::string(sfx_dir) + std::string(sfx_ball_burst_filename); }
+    static std::string sfx_ballstorm_path() { return std::string(sfx_dir) + std::string(sfx_ballstorm_filename); }
     static std::string sfx_game_over_path() { return std::string(sfx_dir) + std::string(sfx_game_over_filename); }
     static std::string sfx_life_minus_path() { return std::string(sfx_dir) + std::string(sfx_life_minus_filename); }
     static std::string sfx_player_wins_path() { return std::string(sfx_dir) + std::string(sfx_player_wins_filename); }
