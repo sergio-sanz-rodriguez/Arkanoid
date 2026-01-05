@@ -12,11 +12,10 @@ private:
 
     // Private data members
     static sf::Texture texture;
-    float half_width;
     static sf::RenderWindow* window_;
-    float current_speed = constants::paddle_speed;
-    //bool speed_multiplier{ 1.0f };
     bool scaleup{ false };
+    float half_width;
+    float height;
 
     // Respond to input from the player
     void process_player_input() override;
@@ -28,8 +27,9 @@ private:
      // Constructor
      paddle(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col);
 
-     // Get the (half) width of the paddle
+     // Get the (half) width and height of the paddle
      float get_half_width() const noexcept;
+     float get_height() const noexcept;
 
      // Get and set the the scale of the paddle
      bool get_scale() const noexcept;

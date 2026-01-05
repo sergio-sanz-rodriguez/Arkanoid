@@ -26,8 +26,9 @@ paddle::paddle(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color c
     sprite->setColor(col);
     velocity = vel;
 
-    // Set the width of the paddle divided by 2
+    // Set the width of the paddle divided by 2 and the height
     half_width = get_bounding_box().size.x / 2.0f;
+    height = get_bounding_box().size.y;
 
 }
 
@@ -70,13 +71,18 @@ void paddle::set_window(sf::RenderWindow& w) {
 // Get the (half) width of the paddle
 float paddle::get_half_width() const noexcept { return half_width; }
 
+// Get the height of the paddle
+float paddle::get_height() const noexcept { return height; }
+
 // Get and set the scale of the paddle
 bool paddle::get_scale() const noexcept { return scaleup; }
 void paddle::set_scale(bool on, float factor) noexcept {
-    //scaleup = on;
-    //sprite->setScale(on ? sf::Vector2f{ 2.0f, 1.0f } : sf::Vector2f{ 1.0f, 1.0f });
+
+    // Set scale
     sprite->setScale(on ? sf::Vector2f{ factor * constants::paddle_scale_width, constants::paddle_scale_height } 
                         : sf::Vector2f{ constants::paddle_scale_width, constants::paddle_scale_height });
+    
+    // Update the width of the paddle, as it may have changed after scaling
     half_width = get_bounding_box().size.x / 2.0f;
 }
 
@@ -87,17 +93,17 @@ void paddle::set_scale(bool on, float factor) noexcept {
 // Do not allow the paddle to move off the screen
 void paddle::process_player_input() {
 
-    //static float current_speed = constants::paddle_speed;
+    static float current_speed = constants::paddle_speed;
 
     // Speed adjust (Up/Down) - do NOT return
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
-        current_speed += constants::paddle_speed_step;
+    //if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
+    //    current_speed += constants::paddle_speed_step;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
-        current_speed -= constants::paddle_speed_step;
+    //if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
+    //    current_speed -= constants::paddle_speed_step;
 
     current_speed = std::clamp(current_speed, constants::paddle_min_speed, constants::paddle_max_speed);
-    
+
     // Keyboard input
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
         velocity.x = ((get_position().x - half_width) >= 0.f) ? -current_speed : 0.f;
@@ -109,7 +115,7 @@ void paddle::process_player_input() {
     }
 
     // Mouse input (ONLY if mouse moved)
-    velocity.x = 0.f; // default
+    velocity.x = 0.0f; // default
 
     if (!window_) return;
 

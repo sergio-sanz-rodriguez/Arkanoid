@@ -18,13 +18,13 @@ struct constants {
     static constexpr float ball_min_speed{ 6.0f };
     static constexpr float ball_speed_step{ 0.5f };
     static constexpr float ballstorm_speed{ 10.0f };
-    static constexpr float ballstorm_interval{ 0.25f }; // fire every 0.25 sec
+    static constexpr float ballstorm_interval{ 0.2f }; // fire every 200 ms
     static constexpr float ballstorm_duration_in_sec{ 10.0f }; // lasts 5 secs
     static constexpr float paddle_width{ 75.0f };
     static constexpr float paddle_height{ 40.0f };
     static constexpr float paddle_speed{ 10.0f };
     static constexpr float paddle_max_speed{ 20.0f }; // { 21.33f };
-    static constexpr float paddle_min_speed{ 6.0f };
+    static constexpr float paddle_min_speed{ 8.0f };
     static constexpr float paddle_speed_step{
         ball_speed_step * (paddle_max_speed - paddle_min_speed) / (ball_max_speed - ball_min_speed) 
     };
@@ -73,7 +73,7 @@ struct constants {
     static constexpr sf::Color gold_shadow{ 184, 134, 11, 255 }; // True Blue
     static constexpr std::string_view image_dir{ "..\\..\\assets\\images\\" };
     static constexpr std::string_view sfx_dir{ "..\\..\\assets\\sfx\\" };
-    static constexpr std::string_view img_background_filename{ "background_stars.jpg" };
+    static constexpr std::string_view img_background_filename{ "level_1.jpeg" }; //"background_stars.jpg"};
     static constexpr std::string_view img_ball_filename{ "ball_llwhite.png" };
     static constexpr std::string_view img_ballstorm_filename{ "burst.png" };
     static constexpr std::string_view img_paddle_filename{ "paddle_gray.png" };

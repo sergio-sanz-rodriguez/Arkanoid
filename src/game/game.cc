@@ -175,25 +175,27 @@ void game::reset() {
         constants::white
     );
 
+    load_level(current_level);
+
     // Create random number generator and uniform distribution
     //thread_local std::mt19937 rng(std::random_device{}());
-    std::uniform_int_distribution<int> color_dist(0, static_cast<int>(vcolor.size()) - 1);
+    //std::uniform_int_distribution<int> color_dist(0, static_cast<int>(vcolor.size()) - 1);
 
-    for (int i = 0; i < constants::brick_columns; ++i) {
-        for (int j = 0; j < constants::brick_rows; ++j) {
-            // Calculate the brick's position
-            float x = constants::brick_offset + (i + 1) * constants::brick_width;
-            float y = (j + 2) * constants::brick_height;
+    //for (int i = 0; i < constants::brick_columns; ++i) {
+    //    for (int j = 0; j < constants::brick_rows; ++j) {
+    //        // Calculate the brick's position
+    //        float x = constants::brick_offset + (i + 1) * constants::brick_width;
+    //        float y = (j + 2) * constants::brick_height;
 
-            // Create the brick object
-            sf::Color c = vcolor[j % vcolor.size()]; // Access the color at the correct index
-            //sf::Color c = vcolor[color_dist(rng)]; // Pick a random color
-            manager.create<brick>(
-                sf::Vector2f{ x, y },
-                constants::brick_scale,
-                c); // Create the brick with the color
-        }
-    }
+    //        // Create the brick object
+    //        sf::Color c = vcolor[j % vcolor.size()]; // Access the color at the correct index
+    //        //sf::Color c = vcolor[color_dist(rng)]; // Pick a random color
+    //        manager.create<brick>(
+    //            sf::Vector2f{ x, y },
+    //            constants::brick_scale,
+    //            c); // Create the brick with the color
+    //    }
+    //}
 
     // Initialize bonus spawn
     bonus_clock.restart();
@@ -204,6 +206,46 @@ void game::reset() {
 
 }
 
+// Load the current difficulty level
+void game::load_level(int level) {
+    current_level = level;
+    spawn_bricks_from_level(get_level(current_level));
+}
+
+// Create the layout of the bricks for the current level
+void game::spawn_bricks_from_level(const level_data& lvl) {
+
+    // std::uniform_int_distribution<int> color_dist(0, static_cast<int>(vcolor.size()) - 1);
+    for (int x = 0; x < lvl.columns; ++x) {
+        for (int y = 0; y < lvl.rows; ++y) {
+
+            // Calculate the brick's position
+            const auto& cell = lvl.at(x, y);
+
+            // Check if that position has a brick or not; if not, then return
+            if (cell.strength == 0)
+                continue;
+
+            // Create the brick object: position, scale, and color
+            float px = constants::brick_offset + (x + 1) * constants::brick_width;
+            float py = (y + 2) * constants::brick_height;
+
+            sf::Color c = vcolor[cell.color_idx % vcolor.size()];
+            //sf::Color c = vcolor[color_dist(rng)]; // Pick a random color
+
+            auto& b = manager.create<brick>(
+                sf::Vector2f{ px, py },
+                constants::brick_scale,
+                c
+            );
+
+            // Optional: set brick strength if your brick supports it
+            b.set_strength(cell.strength);
+        }
+    }
+}
+
+// Function to spawn a multiball object
 void game::spawn_multiball() {
 
     // How many balls are allowed in total after multiball?
@@ -251,22 +293,23 @@ void game::spawn_multiball() {
     }
 }
 
+// Function to spaw the storm of balls
 void game::spawn_ballstorm() {
 
     // We assume exactly one paddle exists
     paddle* p = manager.get_first<paddle>();
     if (!p) return;
 
-    const sf::Vector2f pos = p->get_position();
+    const sf::Vector2f paddle_pos = p->get_position();
 
     // Spawn slightly above the paddle so it doesn't instantly collide
-    const sf::Vector2f spawn_pos = { pos.x, pos.y - constants::paddle_height };
+    const sf::Vector2f pos = { paddle_pos.x, paddle_pos.y - p->get_height()};
 
     // Straight up projectile velocity
     const sf::Vector2f vel = { 0.f, -constants::ballstorm_speed }; // tune speed
 
     manager.create<ballstorm>(
-        spawn_pos,
+        pos,
         vel,
         constants::ballstorm_scale,
         constants::white // that is, default

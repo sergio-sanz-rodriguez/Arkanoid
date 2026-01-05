@@ -20,6 +20,7 @@
 #include "paddle.h"
 #include "bonus.h"
 #include "audio.h"
+#include "levels.h"
 
 // A class to manage the entities in the game
 // It stores the entities in a vector of std::unique_ptr
@@ -188,7 +189,7 @@ private:
     sf::Text text_powerup;
     sf::Text text_instructions;
 
-    // Member to store the current state of the game
+    // Members to store the current state of the game
     game_state state{ game_state::start_screen };
     game_state previous_state{ game_state::start_screen };
 
@@ -268,6 +269,11 @@ private:
     std::optional<powerup_type> last_powerup;
     bool ballstorm_ui_active = false;       // Ballstorm UI state
     float ballstorm_time_left = 0.f;        // Seconds remaining
+
+    // Logic to manage the difficulty levels of the game
+    int current_level = 0;
+    void load_level(int level);
+    void spawn_bricks_from_level(const level_data& lvl);
 
     // Check for any events since the last loop iteration: start, close
     void handle_window_events();

@@ -25,8 +25,9 @@
     <ClCompile Include="src\objects\audio.cc" />
     <ClCompile Include="src\objects\background.cc" />
     <ClCompile Include="src\objects\ball.cc" />
+    <ClCompile Include="src\objects\bonus.cc" />
     <ClCompile Include="src\objects\brick.cc" />
-    <ClCompile Include="src\objects\bonus.cpp" />
+    <ClCompile Include="src\objects\levels.cc" />
     <ClCompile Include="src\objects\paddle.cc" />
     <ClCompile Include="src\systems\interactions.cc" />
   </ItemGroup>
@@ -40,6 +41,7 @@
     <ClInclude Include="src\objects\ball.h" />
     <ClInclude Include="src\objects\brick.h" />
     <ClInclude Include="src\objects\bonus.h" />
+    <ClInclude Include="src\objects\levels.h" />
     <ClInclude Include="src\objects\paddle.h" />
     <ClInclude Include="src\systems\interactions.h" />
   </ItemGroup>
