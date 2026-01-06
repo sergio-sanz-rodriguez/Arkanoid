@@ -93,18 +93,15 @@ void paddle::set_scale(bool on, float factor) noexcept {
 // Do not allow the paddle to move off the screen
 void paddle::process_player_input() {
 
-    static float current_speed = constants::paddle_speed;
-
-    // Speed adjust (Up/Down) - do NOT return
-    //if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
-    //    current_speed += constants::paddle_speed_step;
-
-    //if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
-    //    current_speed -= constants::paddle_speed_step;
-
-    current_speed = std::clamp(current_speed, constants::paddle_min_speed, constants::paddle_max_speed);
+    if (!window_) return;
 
     // Keyboard input
+    static float current_speed = std::clamp(
+        constants::paddle_speed,
+        constants::paddle_min_speed, constants::paddle_max_speed
+    );
+
+    // Keyboard input (priority over mouse)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
         velocity.x = ((get_position().x - half_width) >= 0.f) ? -current_speed : 0.f;
         return;
@@ -117,28 +114,27 @@ void paddle::process_player_input() {
     // Mouse input (ONLY if mouse moved)
     velocity.x = 0.0f; // default
 
-    if (!window_) return;
-
-    // static here means: keep this value between frames(it doesn’t reset each function call).
-    static int lastMouseX = 0;
+    // Static here means: keep this value between frames(it doesn’t reset each function call).
+    static float lastMouseX = 0.0f;
     static bool first = true;
 
-    const int mouseX_i = sf::Mouse::getPosition(*window_).x;
-
+    // Get mouse input (coordinates in the view)
+    const sf::Vector2i mousePixel = sf::Mouse::getPosition(*window_);
+    const sf::Vector2f mouseBoard = window_->mapPixelToCoords(mousePixel);
+    float mouseX = mouseBoard.x;
+    
+    // If mouse didn't move, don't override keyboard / don't snap paddle
     if (first) {
-        lastMouseX = mouseX_i;
+        lastMouseX = mouseX;
         first = false;
         return;
     }
 
-    const int dx = mouseX_i - lastMouseX;
-    lastMouseX = mouseX_i;
-
-    // If mouse didn't move, don't override keyboard / don't snap paddle
-    if (dx == 0) return;
+    const float dx = mouseX - lastMouseX;
+    lastMouseX = mouseX;
+    if (dx == 0.0f) return;
 
     // Mouse moved: directly position paddle
-    float mouseX = static_cast<float>(mouseX_i);
     if (mouseX < half_width) mouseX = half_width;
     if (mouseX > constants::window_width - half_width)
         mouseX = constants::window_width - half_width;

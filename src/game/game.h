@@ -169,14 +169,13 @@ class game {
 private:
 
     // Enum with allowed values for the game's state
-    enum class game_state { game_over, paused, player_wins, start_screen, running };
+    enum class game_state { game_over, paused, player_wins, start_screen, start_level, running };
 
     // Create the game's window using an object of class RenderWindow
     // The constructor takes an SFML 2D vector with the window dimensions
     // and an std::string with the window title
     // The SFML code is in the sf namespace
-    sf::RenderWindow game_window{ sf::VideoMode({constants::window_width, constants::window_height}),
-        "Arkanoid: Reclaiming the Solar System" };
+    sf::RenderWindow game_window{ sf::VideoMode({constants::window_width, constants::window_height}), constants::arkanoid_title };
 
     // Instead of embedding every entity in the game class, use an entity_manager
     entity_manager manager;
@@ -188,6 +187,11 @@ private:
     sf::Text text_lives;
     sf::Text text_powerup;
     sf::Text text_instructions;
+    sf::Text text_level;
+
+    // Logic to define what region is show on screen and update it if user scales it.
+    sf::View view;
+    void update_view();
 
     // Members to store the current state of the game
     game_state state{ game_state::start_screen };

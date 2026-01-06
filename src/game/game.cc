@@ -48,13 +48,21 @@ game::game() :
     text_fireball(font),
     text_lives(font),
     text_powerup(font),
-    text_instructions(font) {
+    text_instructions(font), 
+    text_level(font) {
 
     // Limit the framerate
     game_window.setFramerateLimit(60);      // Max rate is 60 frames per second
 
     // Set window in paddle to allow mouse interaction
     paddle::set_window(game_window);
+
+    // Define the view with the default size and center it
+    view.setSize({ constants::window_width, constants::window_height });
+    view.setCenter({ constants::window_width / 2.f, constants::window_height / 2.f });
+
+    // Apply the view with correct letterboxing for the current window size.
+    update_view();
 
     // Load a font from file
     if (!font.openFromFile(constants::font_consola)) {
@@ -124,6 +132,13 @@ game::game() :
         "PRESS ANY KEY TO START."
     );
 
+    text_level.setFont(font);
+    text_level.setPosition(
+        { constants::window_width / 4.0f,
+        constants::window_height / 2.0f });
+    text_level.setCharacterSize(20);
+    text_level.setFillColor(constants::white);
+    text_level.setString(""); // To be set when the level is loaded
 
     // Load sound effects
     audio.load(sfx_id::ball_brick, constants::sfx_ball_brick_path());
@@ -154,7 +169,9 @@ void game::reset() {
     text_powerup.setString("");
 
     // Create background picture
-    manager.create<background>(0.0f, 0.0f);
+    //manager.create<background>(0.0f, 0.0f);
+    // Load level including: background, brick arrangement, and level title
+    load_level(current_level);
 
     // Create ball object
     manager.create<bouncing_ball>(
@@ -174,8 +191,6 @@ void game::reset() {
         constants::paddle_scale,
         constants::white
     );
-
-    load_level(current_level);
 
     // Create random number generator and uniform distribution
     //thread_local std::mt19937 rng(std::random_device{}());
@@ -202,14 +217,83 @@ void game::reset() {
     next_bonus_time = bonus_delay_dist(rng);
 
     // Limit the framerate
-    game_window.setFramerateLimit(60); // Max rate is 60 frames per second
+    //game_window.setFramerateLimit(60); // Max rate is 60 frames per second
+
+}
+
+// Returns a "letterboxed" view so the game keeps its original aspect ratio.
+// Example:
+// - The default game board is 600x800 (3:4)
+// - The user resizes the window to 1920x1080 (16:9)
+// Without letterboxing: the game board gets stretched (distorted).
+// With letterboxing: the board keeps 3:4 and SFML adds black bars.
+void game::update_view() {
+
+    // Get the size of the current game board
+    const auto size = game_window.getSize();
+
+    // Aspect ratio of the *window* (what the user resized to)
+    const float windowRatio = static_cast<float>(size.x) / static_cast<float>(size.y);
+
+    // Aspect ratio of the view
+    const float viewRatio = view.getSize().x / view.getSize().y;
+
+    // These four values define the viewport rectangle inside the window:
+    // - sizeX/sizeY: the relative width/height (0..1) used by the view
+    // - posX/posY: where that viewport starts (0..1)
+    // Default is full window:
+    float sizeX = 1.0f;
+    float sizeY = 1.0f;
+    float posX = 0.0f;
+    float posY = 0.0f;
+
+    // If the window is wider than the view, we need bars on the left and right.
+    // If the window is taller than the view, we need bars on the top and bottom.
+    const bool windowIsWider = (windowRatio > viewRatio);
+
+    if (windowIsWider) {
+
+        // Window is too wide: shrink the viewport width.
+        // The height stays full (1.0).
+        sizeX = viewRatio / windowRatio;
+
+        // Center the viewport horizontally: leftover space is divided by 2.
+        posX = (1.f - sizeX) / 2.f;
+
+    }
+    else {
+
+        // Window is too tall: shrink the viewport height.
+        // The width stays full (1.0).
+        sizeY = windowRatio / viewRatio;
+
+        // Center the viewport vertically.
+        posY = (1.f - sizeY) / 2.f;
+
+    }
+
+    // Apply the viewport: this tells SFML what portion of the window is used by the view.
+    // The rest becomes "black bars" because your window is cleared with black.
+    view.setViewport(sf::FloatRect({ posX, posY }, { sizeX, sizeY }));
+
+    //Update the game board (or window)
+    game_window.setView(view);
 
 }
 
 // Load the current difficulty level
 void game::load_level(int level) {
-    current_level = level;
-    spawn_bricks_from_level(get_level(current_level));
+
+    const level_data& lvl = get_level(level);
+    
+    // Show the title of the level
+    text_level.setString(lvl.level_title);
+
+    // Spawn background for this level
+    manager.create<background>(0.0f, 0.0f, lvl.background_path);
+
+    // Spawn brick according to the arrangement of cells
+    spawn_bricks_from_level(lvl);
 }
 
 // Create the layout of the bricks for the current level
@@ -320,7 +404,6 @@ void game::spawn_ballstorm() {
 
 }
 
-
 // Helper functions to handle powerups in the game
 // One-shot powerups trigger a single, immediate effect and then end
 void game::apply_one_shot_powerups() {
@@ -402,7 +485,7 @@ powerup_type game::random_powerup() {
 // Check for any events since the last loop iteration: start, close
 void game::handle_window_events() {
 
-    // Handle window events (close button, key presses for start/restart screens).
+    // Handle window events (close button, key presses for start/restart screens, resizing).
     while (auto event = game_window.pollEvent()) {
         if (event->is<sf::Event::Closed>()) {
             game_window.close();
@@ -411,17 +494,26 @@ void game::handle_window_events() {
         if (event->is<sf::Event::KeyPressed>()) {
             // Start screen: any key starts
             if (state == game_state::start_screen) {
+                state = game_state::start_level;
+            }
+
+            // Start level: any key starts
+            else if (state == game_state::start_level) {
                 state = game_state::running;
             }
 
             // End screens: any key restarts
-            if (state == game_state::game_over || state == game_state::player_wins) {
+            else if (state == game_state::game_over || state == game_state::player_wins) {
                 reset();
-                state = game_state::running;
+                state = game_state::start_level;
             }
 
             // Reinitialize previous state
             previous_state = game_state::start_screen;
+        }
+
+        if (event->is<sf::Event::Resized>()) {
+            update_view();
         }
     }
 }
@@ -508,8 +600,18 @@ void game::draw_frame() {
         return;
     }
 
+    // START LEVEL: show only level title
+    else if (state == game_state::start_level) {
+        if (previous_state == state) {
+            previous_state = game_state::start_screen;
+        }
+        game_window.draw(text_level);
+        game_window.display();
+        return;
+    }
+
     // GAME OVER / PLAYER WINS: show only the end-screen text
-    if (state == game_state::game_over || state == game_state::player_wins) {
+    else if (state == game_state::game_over || state == game_state::player_wins) {
         if (previous_state != state) {
             switch (state) {
             case game_state::game_over:   audio.play(sfx_id::game_over); break;
@@ -523,7 +625,7 @@ void game::draw_frame() {
         return;
     }
 
-    // RUNNING / PAUSED: draw the game world
+    // RUNNING / PAUSED: draw the game board
     manager.draw(game_window);
 
     // PAUSED: draw paused overlay on top
@@ -754,7 +856,7 @@ void game::update_ui_texts(const std::string& powerup_msg) {
 
     // Update UI text
     std::ostringstream oss;
-    oss << "Burst projectiles (" << std::fixed << std::setprecision(0) << remaining << "s)";
+    oss << "Ballstorm (" << std::fixed << std::setprecision(0) << remaining << "s)";
     text_powerup.setString(oss.str());
 
 }

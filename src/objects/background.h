@@ -20,7 +20,7 @@ public:
     // (0, 0) is the top left corner of the screen
     // x increases to the right
     // y increases downwards
-    background(float x, float y);
+    background(float x, float y, const std::string& path);
 
     // Implement the pure virtual functions
     void update() override;

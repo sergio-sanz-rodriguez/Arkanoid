@@ -12,7 +12,10 @@ static level_data level1 = {
             }
         }
         return g;
-    }()
+    }(),
+        constants::img_background_level1_path(),
+        "  MISSION 1: NEPTUNE\n\n"
+        "PRESS ANY KEY TO START"
 };
 
 // Stack the difficulty levels

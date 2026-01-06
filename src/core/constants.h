@@ -11,6 +11,7 @@
 // Uses the SFML graphics & audio library
 
 struct constants {
+    static constexpr const char* arkanoid_title{ "Arkanoid: Reclaiming the Solar System" };
     static constexpr int window_width{ 638 };
     static constexpr int window_height{ 860 }; // { 960 };
     static constexpr float ball_speed{ 8.0f };
@@ -73,7 +74,7 @@ struct constants {
     static constexpr sf::Color gold_shadow{ 184, 134, 11, 255 }; // True Blue
     static constexpr std::string_view image_dir{ "..\\..\\assets\\images\\" };
     static constexpr std::string_view sfx_dir{ "..\\..\\assets\\sfx\\" };
-    static constexpr std::string_view img_background_filename{ "level_1.jpeg" }; //"background_stars.jpg"};
+    static constexpr std::string_view img_background_level1_filename{ "level_1.jpeg" }; //"background_stars.jpg"};
     static constexpr std::string_view img_ball_filename{ "ball_llwhite.png" };
     static constexpr std::string_view img_ballstorm_filename{ "burst.png" };
     static constexpr std::string_view img_paddle_filename{ "paddle_gray.png" };
@@ -94,7 +95,7 @@ struct constants {
     //static constexpr std::string_view font_filename{ "/usr/local/share/fonts/webfonts/verdana.ttf" };
     static constexpr std::string_view font_verdana{ "..\\..\\assets\\fonts\\verdana.ttf" };
     static constexpr std::string_view font_consola{ "..\\..\\assets\\fonts\\consola.ttf" };
-    static std::string img_background_path() { return std::string(image_dir) + std::string(img_background_filename); }
+    static std::string img_background_level1_path() { return std::string(image_dir) + std::string(img_background_level1_filename); }
     static std::string img_ball_path() { return std::string(image_dir) + std::string(img_ball_filename); }
     static std::string img_ballstorm_path() { return std::string(image_dir) + std::string(img_ballstorm_filename); }
     static std::string img_paddle_path() { return std::string(image_dir) + std::string(img_paddle_filename); }

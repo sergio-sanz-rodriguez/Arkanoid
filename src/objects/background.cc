@@ -4,11 +4,11 @@
 // Initialize static data
 sf::Texture background::texture;
 
-background::background(float x, float y) {
+background::background(float x, float y, const std::string& path) {
     //: sprite(texture) {
   
     // Load the texture    
-    if (!texture.loadFromFile(constants::img_background_path())) {
+    if (!texture.loadFromFile(path)) {
         throw std::runtime_error("Failed to load background.jpg.");
     }    
     sprite = std::make_unique<sf::Sprite>(texture);

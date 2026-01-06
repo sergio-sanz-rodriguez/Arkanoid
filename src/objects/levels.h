@@ -15,6 +15,8 @@ struct level_data {
     int columns = 0;
     int rows = 0;
     std::vector<level_cell> grid; // size = columns * rows
+    std::string background_path;
+    std::string level_title;
 
     const level_cell& at(int x, int y) const {
         return grid[y * columns + x];
