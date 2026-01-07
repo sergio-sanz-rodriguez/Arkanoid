@@ -12,7 +12,7 @@
 
 struct constants {
     static constexpr const char* arkanoid_title{ "Arkanoid: Reclaiming the Solar System" };
-    static constexpr int window_width{ 638 };
+    static constexpr int window_width{ 638 }; //48 - 498
     static constexpr int window_height{ 860 }; // { 960 };
     static constexpr float ball_speed{ 8.0f };
     static constexpr float ball_max_speed{ 16.0f };
@@ -36,7 +36,8 @@ struct constants {
     static constexpr float multiball_angle{ 2.0f };
     static constexpr int   multiball_extra_balls{ 3 };
     static constexpr float pi{ 3.14159265358979323846f };
-    static constexpr int brick_strength{ 1 }; // The brick needs to be hit X times before it disappears 
+    static constexpr int max_brick_strength{ 3 }; // The brick needs to be hit X times before it disappears
+    static constexpr int indestructible_strength{ 255 };
     static constexpr int brick_columns{ 12 };
     static constexpr int brick_rows{ 12 };
     static constexpr int brick_alpha_hit3{ 80 };  // Dull
@@ -59,6 +60,7 @@ struct constants {
     static constexpr sf::Vector2f brick_scale{ 1.0f, 1.0f };
     static constexpr sf::Vector2f bonus_scale{ 1.0f, 1.0f };
     static constexpr sf::Vector2f paddle_scale{ 0.411f, 0.25f };
+    static constexpr sf::Color anthracite{ 53, 60, 64 };         // Anthracite (indestructible)
     static constexpr sf::Color white{ 255, 255, 255, 255 };      // White
     static constexpr sf::Color red{ 205, 92, 92, 255 };          // Light Coral
     static constexpr sf::Color orange{ 255, 129, 24, 255 };      // Dark Orange
@@ -74,7 +76,16 @@ struct constants {
     static constexpr sf::Color gold_shadow{ 184, 134, 11, 255 }; // True Blue
     static constexpr std::string_view image_dir{ "..\\..\\assets\\images\\" };
     static constexpr std::string_view sfx_dir{ "..\\..\\assets\\sfx\\" };
-    static constexpr std::string_view img_background_level1_filename{ "level_1.jpeg" }; //"background_stars.jpg"};
+    static constexpr std::string_view img_background_level1_filename{ "level_1.png" };
+    static constexpr std::string_view img_background_level2_filename{ "level_2.png" };
+    static constexpr std::string_view img_background_level3_filename{ "level_3.png" };
+    static constexpr std::string_view img_background_level4_filename{ "level_4.jpeg" };
+    static constexpr std::string_view img_background_level5_filename{ "level_5.jpeg" };
+    static constexpr std::string_view img_background_level6_filename{ "level_6.jpeg" };
+    static constexpr std::string_view img_background_level7_filename{ "level_7.jpeg" };
+    static constexpr std::string_view img_background_level8_filename{ "level_8.jpeg" };
+    static constexpr std::string_view img_background_level9_filename{ "level_9.jpeg" };
+    static constexpr std::string_view img_background_level10_filename{ "level_10.jpeg" };
     static constexpr std::string_view img_ball_filename{ "ball_llwhite.png" };
     static constexpr std::string_view img_ballstorm_filename{ "burst.png" };
     static constexpr std::string_view img_paddle_filename{ "paddle_gray.png" };
@@ -91,11 +102,13 @@ struct constants {
     static constexpr std::string_view sfx_player_wins_filename{ "player_wins.wav" };
     static constexpr std::string_view sfx_powerdown_filename{ "powerdown.wav" };
     static constexpr std::string_view sfx_powerup_filename{ "powerup.wav" };
-    static constexpr std::string_view sfx_welcome_filename{ "welcome.wav" };
+    static constexpr std::string_view sfx_welcome_filename{ "intro.wav" };
     //static constexpr std::string_view font_filename{ "/usr/local/share/fonts/webfonts/verdana.ttf" };
     static constexpr std::string_view font_verdana{ "..\\..\\assets\\fonts\\verdana.ttf" };
     static constexpr std::string_view font_consola{ "..\\..\\assets\\fonts\\consola.ttf" };
     static std::string img_background_level1_path() { return std::string(image_dir) + std::string(img_background_level1_filename); }
+    static std::string img_background_level2_path() { return std::string(image_dir) + std::string(img_background_level2_filename); }
+    static std::string img_background_level3_path() { return std::string(image_dir) + std::string(img_background_level3_filename); }
     static std::string img_ball_path() { return std::string(image_dir) + std::string(img_ball_filename); }
     static std::string img_ballstorm_path() { return std::string(image_dir) + std::string(img_ballstorm_filename); }
     static std::string img_paddle_path() { return std::string(image_dir) + std::string(img_paddle_filename); }

@@ -6,7 +6,10 @@ sf::Texture brick::texture;
 // Use different colors, depending on the strength of the brick in RGBA format
 
 
-void brick::set_strength(int s) noexcept { strength = s; }
+void brick::set_strength(int value) noexcept { strength = value; }
+int  brick::get_strength() const noexcept { return strength; }
+void brick::set_indestructible(bool value) noexcept { indestructible = value; }
+bool brick::is_indestructible() const noexcept { return indestructible; }
 void brick::weaken() noexcept { --strength;  }
 bool brick::is_too_weak() const noexcept { return strength <= 0;  }
 
@@ -37,13 +40,13 @@ void brick::update() {
     // Change the transparence of the brick based on its weakness
     sf::Color color = sprite->getColor();
     if (strength == 1) {
-        color.a = constants::brick_alpha_hit1;
+        color.a = constants::brick_alpha_hit3;
     }
     else if (strength == 2) {
         color.a = constants::brick_alpha_hit2;
     }
     else if (strength == 3) {
-        color.a = constants::brick_alpha_hit3;
+        color.a = constants::brick_alpha_hit1;
     }
     sprite->setColor(color);
 }

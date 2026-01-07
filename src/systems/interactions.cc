@@ -58,14 +58,15 @@ sfx_id handle_collision(bouncing_ball& the_ball, brick& the_brick) {
         return sfx_id::none;
 
     // Update the brick's strength
-    the_brick.weaken();
-    
-    // If very damage brick, destroy it
-    if (the_brick.is_too_weak()) {
-        the_brick.destroy();
+    if (!the_brick.is_indestructible()) {
+        the_brick.weaken();
+        // If very damage brick, destroy it
+        if (the_brick.is_too_weak()) {
+            the_brick.destroy();
+        }
     }
 
-    if (!the_ball.get_fireball()) {
+    if ( !the_ball.get_fireball() || (the_ball.get_fireball() && (the_brick.is_indestructible() || the_brick.get_strength() > 1) ) ) {
         // Make the new direction depend on where the collision occurs on the brick
         // If the ball collides on the side of the brick, make the ball bounce to the left/right
         // If the ball collides on the top/bottom of the brick, make the ball bounce upwards/downwards

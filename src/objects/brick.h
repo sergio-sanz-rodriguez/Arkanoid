@@ -18,7 +18,8 @@ private:
     static sf::Texture texture;
 
     // How many times the brick can be hit before destroying it
-    int strength{ constants::brick_strength };
+    int strength{ constants::max_brick_strength };
+    bool indestructible{ false };
 
 public:
 
@@ -28,7 +29,10 @@ public:
     brick(sf::Vector2f pos, sf::Vector2f sca, sf::Color col);
 
     // Helper functions for brick strength
-    void set_strength(int) noexcept;
+    void set_strength(int value) noexcept;
+    int get_strength() const noexcept;
+    void set_indestructible(bool value) noexcept;
+    bool is_indestructible() const noexcept;
     void weaken() noexcept;
     bool is_too_weak() const noexcept;
 

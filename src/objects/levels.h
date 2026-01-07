@@ -7,13 +7,15 @@
 
 // Cell struct specifying brick properties
 struct level_cell {
-    uint8_t strength = 0;     // 0 = empty
+    uint8_t strength = 0;     // 0 = empty, constants::max_brick_strength + 1 = indestructible
     uint8_t color_idx = 0;    // index into vcolor
 };
 
 struct level_data {
     int columns = 0;
     int rows = 0;
+    float width_offset = 4.0f;
+    float height_offset = 3.0f;
     std::vector<level_cell> grid; // size = columns * rows
     std::string background_path;
     std::string level_title;

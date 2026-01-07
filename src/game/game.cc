@@ -42,13 +42,15 @@ void entity_manager::draw(sf::RenderWindow& window) {
         e->draw(window);
 }
 
+// ********** PUBLIC FUNCTIONS **********//
+
 game::game() :
     rng(std::random_device{}()),
     text_state(font),
     text_fireball(font),
     text_lives(font),
     text_powerup(font),
-    text_instructions(font), 
+    text_instructions(font),
     text_level(font) {
 
     // Limit the framerate
@@ -70,19 +72,19 @@ game::game() :
         // Handle font loading failure (could exit, use default font, etc.)
     }
 
-    // Configure our text objects
+    // Configure text objects with default values
     text_state.setFont(font);
     text_state.setPosition(
         { (constants::window_width / 2.0f) - std::ceilf(constants::window_width / 5.1f),
         (constants::window_height / 2.0f) - std::ceilf(constants::window_height / 8.6f) });
     text_state.setCharacterSize(35);
     text_state.setFillColor(constants::white);
-    text_state.setString("PAUSED");
+    text_state.setString("");
 
     text_fireball.setFont(font);
     text_fireball.setPosition(
         { (constants::window_width / 2.0f) - std::ceilf(constants::window_width / 32.0f),
-        constants::window_height - std::ceilf(constants::window_height / 31.8f)});
+        constants::window_height - std::ceilf(constants::window_height / 31.8f) });
     text_fireball.setCharacterSize(13);
     text_fireball.setFillColor(constants::orange);
     text_fireball.setString("");
@@ -106,36 +108,58 @@ game::game() :
     text_instructions.setFont(font);
     text_instructions.setPosition(
         { constants::window_width / 16.0f,
-        constants::window_height / 8.0f });
+        constants::window_height / 9.0f });
     text_instructions.setCharacterSize(20);
     text_instructions.setFillColor(constants::white);
     text_instructions.setString(
-        "WELCOME TO ARKANOID: RECLAIMING THE SOLAR SYSTEM\n\n"
-        "YEAR 3056.\n"
-        "COSMIC BRICKS HAVE INVADED THE SOLAR SYSTEM.\n"
-        "PLANET AFTER PLANET HAS FALLEN.\n"
-        "THE SUN ITSELF IS UNDER THREAT.\n\n"
-        "YOU ARE A HERO FROM THE ALPHA CENTAURI SYSTEM,\n"
-        "SENT TO SAVE YOUR NEIGHBORS.\n\n"
-        "YOU CONTROL THE LAST DEFENSE:\n"
-        "A PADDLE AND ENERGY BALLS.\n\n"
-        "BREAK THE BRICKS.\n"
-        "RECLAIM THE PLANETS.\n"
-        "SAVE THE SUN.\n\n"
-        "INSTRUCTIONS:\n\n"
-        "- LEFT ARROW / MOVE MOUSE LEFT: MOVE PADDLE LEFT\n"
-        "- RIGHT ARROW / MOVE MOUSE RIGHT: MOVE PADDLE RIGHT\n"
-        "- P: PAUSE / RESUME\n"
-        "- R: RESET\n"
-        "- CATCH BLUE AND ORANGE BALLS TO GET A POWER-UP\n"
-        "- CATCH THE GREEN BALL TO GAIN AN EXTRA LIFE\n\n"
-        "PRESS ANY KEY TO START."
+        "      ARKANOID: RECLAIMING THE SOLAR SYSTEM        "
+        "\n\n"
+        "                    YEAR 3056.                     "
+        "\n"
+        "           AI-CREATED COSMIC STRUCTURES            "
+        "\n"
+        "           HAVE INVADED THE SOLAR SYSTEM.          "
+        "\n"
+        "          PLANET AFTER PLANET HAS FALLEN.          "
+        "\n"
+        "          THE SUN ITSELF IS UNDER THREAT.          "
+        "\n\n"
+        "  YOU ARE A HERO FROM THE ALPHA CENTAURI SYSTEM,   "
+        "\n"
+        "           SENT TO SAVE YOUR NEIGHBORS.            "
+        "\n\n"
+        "          YOU CONTROL THE LAST DEFENSE:            "
+        "\n"
+        "            A PADDLE AND ENERGY BALLS.             "
+        "\n\n"
+        "                BREAK THE BRICKS.                  "
+        "\n"
+        "               RECLAIM THE PLANETS.                "
+        "\n"
+        "                  SAVE THE SUN.                    "
+        "\n\n"
+        "                  INSTRUCTIONS:                    "
+        "\n\n"
+        "- LEFT ARROW / MOVE MOUSE LEFT: MOVE PADDLE LEFT   "
+        "\n"
+        "- RIGHT ARROW / MOVE MOUSE RIGHT: MOVE PADDLE RIGHT"
+        "\n"
+        "- P: PAUSE / RESUME                                "
+        "\n"
+        "- R: RESET                                         "
+        "\n"
+        "- CATCH BLUE AND ORANGE BALLS TO GET A POWER-UP    "
+        "\n"
+        "- CATCH THE GREEN BALL TO GAIN AN EXTRA LIFE       "
+        "\n\n"
+        "            PRESS ANY KEY TO CONTINUE.             "
     );
+
 
     text_level.setFont(font);
     text_level.setPosition(
         { constants::window_width / 4.0f,
-        constants::window_height / 2.0f });
+          constants::window_height / 3.0f });
     text_level.setCharacterSize(20);
     text_level.setFillColor(constants::white);
     text_level.setString(""); // To be set when the level is loaded
@@ -151,75 +175,111 @@ game::game() :
     audio.load(sfx_id::powerdown, constants::sfx_powerdown_path());
     audio.load(sfx_id::powerup, constants::sfx_powerup_path());
     audio.load(sfx_id::welcome, constants::sfx_welcome_path());
-
 }
 
 // (Re)initialize the game
-void game::reset() {
+void game::reset_game() {
 
-    // Reset the number of lives
-    lives = constants::player_lives;
+    setup_level(0, true);
+    state = game_state::start_screen;
 
-    // Destroy all the entities and re-create them
+}
+
+// (Re)start the game
+void game::run_game() {
+
+    while (game_window.isOpen()) {
+
+        // Clear the screen
+        //game_window.clear(sf::Color::Black);
+
+        // Check for any events since the last loop iteration: start, close
+        handle_window_events();
+
+        // If the window was closed from events, stop
+        if (!game_window.isOpen()) break;
+
+        // Handle global inputs
+        if (handle_global_inputs()) break;
+
+        // Update gameplay only when the game is running
+        if (state == game_state::running) {
+            update_running_frame();
+        }
+
+        // Otherwise, update the state overlay text (Paused / Game Over / Win screen)
+        else {
+            update_state_text();
+        }
+
+        // Draw frame: entities and UI
+        draw_frame();
+    }
+
+}
+
+// ********** PRIVATE AND HELPER FUNCTIONS **********//
+
+// Reset the current level
+void game::reset_level() {
+
+    setup_level(current_level, false);
+    state = game_state::start_level;
+
+}
+// Set up current level 
+void game::setup_level(int level, bool full_reset) {
+
+    // Clear entity buffers
     manager.clear();
 
-    // Reset powerups
+    // Full reset, beginning of the game
+    if (full_reset) {
+        lives = constants::player_lives;
+        current_level = level;
+    }
+
+    // Reset powerups and timers
+    reset_powerups();
+    reset_bonus_timers();
+    
+    // Load the difficulty level
+    load_level(level);
+
+    // Spawn the bouncing ball
+    spawn_ball({ constants::window_width / 2.0f,
+                 constants::window_height - constants::paddle_height });
+
+    // Spawn the paddle
+    spawn_paddle({ constants::window_width / 2.0f,
+                   constants::window_height - constants::paddle_height });
+
+}
+
+// Function to reset powerups including UI texts
+void game::reset_powerups() {
+
     active_powerups.reset();
+
     text_fireball.setString("");
     text_powerup.setString("");
 
-    // Create background picture
-    //manager.create<background>(0.0f, 0.0f);
-    // Load level including: background, brick arrangement, and level title
-    load_level(current_level);
+    // Ballstorm UI
+    ballstorm_ui_active = false;
+    ballstorm_time_left = 0.f;
 
-    // Create ball object
-    manager.create<bouncing_ball>(
-        sf::Vector2f{ constants::window_width / 2.0f,
-                      constants::window_height - constants::paddle_height },
-        sf::Vector2f{ constants::ball_speed,
-                     -constants::ball_speed },
-        constants::ballstorm_scale,
-        constants::steel
-    );
-
-    // Create paddle object
-    manager.create<paddle>(
-        sf::Vector2f{ constants::window_width / 2.0f,
-                      constants::window_height - constants::paddle_height },
-        sf::Vector2f{ constants::paddle_speed, 0.0f },
-        constants::paddle_scale,
-        constants::white
-    );
-
-    // Create random number generator and uniform distribution
-    //thread_local std::mt19937 rng(std::random_device{}());
-    //std::uniform_int_distribution<int> color_dist(0, static_cast<int>(vcolor.size()) - 1);
-
-    //for (int i = 0; i < constants::brick_columns; ++i) {
-    //    for (int j = 0; j < constants::brick_rows; ++j) {
-    //        // Calculate the brick's position
-    //        float x = constants::brick_offset + (i + 1) * constants::brick_width;
-    //        float y = (j + 2) * constants::brick_height;
-
-    //        // Create the brick object
-    //        sf::Color c = vcolor[j % vcolor.size()]; // Access the color at the correct index
-    //        //sf::Color c = vcolor[color_dist(rng)]; // Pick a random color
-    //        manager.create<brick>(
-    //            sf::Vector2f{ x, y },
-    //            constants::brick_scale,
-    //            c); // Create the brick with the color
-    //    }
-    //}
-
-    // Initialize bonus spawn
-    bonus_clock.restart();
-    next_bonus_time = bonus_delay_dist(rng);
-
-    // Limit the framerate
-    //game_window.setFramerateLimit(60); // Max rate is 60 frames per second
+    // Restart powerup clocks
+    ballstorm_clock.restart();
+    ballstorm_duration_clock.restart();
 
 }
+
+// Function to reset bonus timers
+void game::reset_bonus_timers() {
+    bonus_clock.restart();
+    next_bonus_time = bonus_delay_dist(rng);
+}
+
 
 // Returns a "letterboxed" view so the game keeps its original aspect ratio.
 // Example:
@@ -288,12 +348,36 @@ void game::load_level(int level) {
     
     // Show the title of the level
     text_level.setString(lvl.level_title);
+    text_level.setPosition(
+        { constants::window_width / lvl.width_offset,
+          constants::window_height / lvl.height_offset });
 
     // Spawn background for this level
     manager.create<background>(0.0f, 0.0f, lvl.background_path);
 
     // Spawn brick according to the arrangement of cells
     spawn_bricks_from_level(lvl);
+}
+
+// Spawn the bouncing ball
+void game::spawn_ball(sf::Vector2f pos) {
+    manager.create<bouncing_ball>(
+        pos,
+        sf::Vector2f{ constants::ball_speed, -constants::ball_speed },
+        constants::ball_scale,
+        constants::steel,
+        false
+    );
+}
+
+// Spawn the paddle
+void game::spawn_paddle(sf::Vector2f pos) {
+    manager.create<paddle>(
+        pos,
+        sf::Vector2f{ constants::paddle_speed, 0.0f },
+        constants::paddle_scale,
+        constants::white
+    );
 }
 
 // Create the layout of the bricks for the current level
@@ -314,17 +398,20 @@ void game::spawn_bricks_from_level(const level_data& lvl) {
             float px = constants::brick_offset + (x + 1) * constants::brick_width;
             float py = (y + 2) * constants::brick_height;
 
-            sf::Color c = vcolor[cell.color_idx % vcolor.size()];
+            // Define colors
+            const bool is_indestructible = cell.strength == constants::indestructible_strength;
+            sf::Color color = is_indestructible ? indestructible_color : vcolor[cell.color_idx % vcolor.size()];
             //sf::Color c = vcolor[color_dist(rng)]; // Pick a random color
 
             auto& b = manager.create<brick>(
                 sf::Vector2f{ px, py },
                 constants::brick_scale,
-                c
+                color
             );
 
             // Optional: set brick strength if your brick supports it
             b.set_strength(cell.strength);
+            b.set_indestructible(is_indestructible);
         }
     }
 }
@@ -487,10 +574,13 @@ void game::handle_window_events() {
 
     // Handle window events (close button, key presses for start/restart screens, resizing).
     while (auto event = game_window.pollEvent()) {
+        
+        // We close the window
         if (event->is<sf::Event::Closed>()) {
             game_window.close();
         }
 
+        // We press any key
         if (event->is<sf::Event::KeyPressed>()) {
             // Start screen: any key starts
             if (state == game_state::start_screen) {
@@ -504,7 +594,7 @@ void game::handle_window_events() {
 
             // End screens: any key restarts
             else if (state == game_state::game_over || state == game_state::player_wins) {
-                reset();
+                //reset();
                 state = game_state::start_level;
             }
 
@@ -512,6 +602,7 @@ void game::handle_window_events() {
             previous_state = game_state::start_screen;
         }
 
+        // We resize the window
         if (event->is<sf::Event::Resized>()) {
             update_view();
         }
@@ -535,7 +626,7 @@ bool game::handle_global_inputs() {
     // If the user presses "R", reset the game
     bool rpressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R);
     if (rpressed && !reset_key_active) {
-        reset();
+        reset_level();
         state = game_state::running;
     }
     reset_key_active = rpressed;
@@ -578,6 +669,11 @@ void game::update_state_text() {
             "  - PRESS ESCAPE TO QUIT\n"
         );
         break;
+    case game_state::start_level:
+        text_state.setPosition( text_level.getPosition());
+        text_state.setCharacterSize(20);
+        text_state.setString(text_level.getString());
+        break;
     default:
         text_state.setString("");
         break;
@@ -600,23 +696,14 @@ void game::draw_frame() {
         return;
     }
 
-    // START LEVEL: show only level title
-    else if (state == game_state::start_level) {
-        if (previous_state == state) {
-            previous_state = game_state::start_screen;
-        }
-        game_window.draw(text_level);
-        game_window.display();
-        return;
-    }
-
     // GAME OVER / PLAYER WINS: show only the end-screen text
-    else if (state == game_state::game_over || state == game_state::player_wins) {
+    if (state == game_state::start_level || state == game_state::player_wins || state == game_state::game_over ) {
         if (previous_state != state) {
             switch (state) {
-            case game_state::game_over:   audio.play(sfx_id::game_over); break;
-            case game_state::player_wins: audio.play(sfx_id::player_wins); break;
-            default:                      break;
+                case game_state::start_level: if (current_level > 0) audio.play(sfx_id::player_wins); break;
+                case game_state::player_wins: audio.play(sfx_id::player_wins); break;
+                case game_state::game_over:   audio.play(sfx_id::game_over); break;
+                default:                      break;
             }
             previous_state = state;
         }
@@ -645,37 +732,26 @@ void game::draw_frame() {
 // Respawn ball if none
 void game::ensure_ball_exists() {
 
-    if (manager.has_any<bouncing_ball>())
-        return;
-
-    // Spawn one ball, so we need to set the position and velocity
-    auto pos = sf::Vector2f{ constants::window_width / 2.f, constants::window_height / 2.f };
-    auto vel = sf::Vector2f{ std::abs(current_ball_velocity.x), -std::abs(current_ball_velocity.y) };
-
-    // And create it
-    manager.create<bouncing_ball>(
-        pos,
-        vel,
-        constants::ball_scale,
-        constants::steel,
-        false
-    );
+    // Check if there is at least one ball in the board
+    if (manager.has_any<bouncing_ball>()) return;
 
     // Losing a ball resets powerups and clocks
-    active_powerups.reset();
-    text_fireball.setString("");
-    text_powerup.setString("");
-    ballstorm_ui_active = false;
-    ballstorm_clock.restart();
-    // fireball_clock.restart();
+    reset_powerups();
+    reset_bonus_timers();
 
-    // Decrease the number of lives
+    // Spawn the ball from the center of the paddle.
+    paddle* p = manager.get_first<paddle>();
+    spawn_ball({ p->get_position().x,
+                 constants::window_height - constants::paddle_height - 10 });
+
+    // Decrease the life count
     --lives;
     audio.play(sfx_id::life_minus);
 
-    // And finish the game if the player runs out of lives
-    if (lives <= 0)
+    // And enable the game-over flag if the player runs out of lives
+    if (lives <= 0) {
         state = game_state::game_over;
+    }
 
 }
 
@@ -904,8 +980,29 @@ std::string game::resolve_collisions() {
 
 // Checks if the player wins, that is, when all bricks are destroyed
 void game::check_win_condition() {
-    if (!manager.has_any<brick>())
+    
+    //if (manager.has_any<brick>()) return;
+    // If at least one brick is destructible, the game continues.
+    bool has_destructible = false;
+    manager.apply_all<brick>([&](const brick& b) {
+        if (!b.is_indestructible())
+            has_destructible = true;
+    });
+    if (has_destructible) return;
+
+    // Got to next level;
+    ++current_level;
+
+    // If no more levels, player wins the game
+    if (current_level >= level_count()) {
         state = game_state::player_wins;
+        return;
+    }
+
+    // Set up a new level: background, bricks, texts
+    setup_level(current_level, false);
+    state = game_state::start_level;
+
 }
 
 // Running game function
@@ -935,37 +1032,4 @@ void game::update_running_frame() {
 
     // If all bricks are destroyed, then the player wins
     check_win_condition();
-}
-
-// (Re)start the game
-void game::run() {
-
-    while (game_window.isOpen()) {
-
-        // Clear the screen
-        //game_window.clear(sf::Color::Black);
-
-        // Check for any events since the last loop iteration: start, close
-        handle_window_events();
-
-        // If the window was closed from events, stop
-        if (!game_window.isOpen()) break;
-
-        // Handle global inputs
-        if (handle_global_inputs()) break;
-
-        // Update gameplay only when the game is running
-        if (state == game_state::running) {
-            update_running_frame();
-        }
-
-        // Otherwise, update the state overlay text (Paused / Game Over / Win screen)
-        else {
-            update_state_text();
-        }
-
-        // Draw frame: entities and UI
-        draw_frame();
-    }
-
 }

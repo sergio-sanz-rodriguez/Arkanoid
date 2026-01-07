@@ -206,6 +206,9 @@ private:
         constants::blue,
         constants::white};
 
+    // Define the color for the indestructible bricks
+    sf::Color indestructible_color = constants::anthracite;
+
     // How many lives does the player have left?
     int lives{ constants::player_lives };
 
@@ -263,6 +266,9 @@ private:
 
     // --- Helper functions --- //
 
+    // Set up level
+    void setup_level(int level, bool full_reset);
+
     // Powerup logic
     powerups active_powerups;
     void sync_powerups_to_entities();
@@ -273,6 +279,15 @@ private:
     std::optional<powerup_type> last_powerup;
     bool ballstorm_ui_active = false;       // Ballstorm UI state
     float ballstorm_time_left = 0.f;        // Seconds remaining
+
+    // Resets
+    void reset_level();
+    void reset_powerups();
+    void reset_bonus_timers();
+
+    // Spawing player entities: ball and paddle
+    void spawn_ball(sf::Vector2f pos);
+    void spawn_paddle(sf::Vector2f pos);
 
     // Logic to manage the difficulty levels of the game
     int current_level = 0;
@@ -318,10 +333,10 @@ public:
     game();
 
     // Reinitialize the game
-    void reset();
+    void reset_game();
 
     // Game loop
-    void run();
+    void run_game();
 };
 
 #endif // GAME_H

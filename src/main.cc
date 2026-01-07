@@ -8,6 +8,6 @@
 int main() {
   // Create an instance of the game, initialize it and run it
   game the_game;
-  the_game.reset();
-  the_game.run();
+  the_game.reset_game();
+  the_game.run_game();
 }
