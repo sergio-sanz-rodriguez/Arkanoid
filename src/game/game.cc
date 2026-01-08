@@ -111,50 +111,7 @@ game::game() :
         constants::window_height / 9.0f });
     text_instructions.setCharacterSize(20);
     text_instructions.setFillColor(constants::white);
-    text_instructions.setString(
-        "      ARKANOID: RECLAIMING THE SOLAR SYSTEM        "
-        "\n\n"
-        "                    YEAR 3056.                     "
-        "\n"
-        "           AI-CREATED COSMIC STRUCTURES            "
-        "\n"
-        "           HAVE INVADED THE SOLAR SYSTEM.          "
-        "\n"
-        "          PLANET AFTER PLANET HAS FALLEN.          "
-        "\n"
-        "          THE SUN ITSELF IS UNDER THREAT.          "
-        "\n\n"
-        "  YOU ARE A HERO FROM THE ALPHA CENTAURI SYSTEM,   "
-        "\n"
-        "           SENT TO SAVE YOUR NEIGHBORS.            "
-        "\n\n"
-        "          YOU CONTROL THE LAST DEFENSE:            "
-        "\n"
-        "            A PADDLE AND ENERGY BALLS.             "
-        "\n\n"
-        "                BREAK THE BRICKS.                  "
-        "\n"
-        "               RECLAIM THE PLANETS.                "
-        "\n"
-        "                  SAVE THE SUN.                    "
-        "\n\n"
-        "                  INSTRUCTIONS:                    "
-        "\n\n"
-        "- LEFT ARROW / MOVE MOUSE LEFT: MOVE PADDLE LEFT   "
-        "\n"
-        "- RIGHT ARROW / MOVE MOUSE RIGHT: MOVE PADDLE RIGHT"
-        "\n"
-        "- P: PAUSE / RESUME                                "
-        "\n"
-        "- R: RESET                                         "
-        "\n"
-        "- CATCH BLUE AND ORANGE BALLS TO GET A POWER-UP    "
-        "\n"
-        "- CATCH THE GREEN BALL TO GAIN AN EXTRA LIFE       "
-        "\n\n"
-        "            PRESS ANY KEY TO CONTINUE.             "
-    );
-
+    text_instructions.setString(static_cast<std::string>(constants::string_instructions));
 
     text_level.setFont(font);
     text_level.setPosition(
@@ -641,33 +598,18 @@ void game::update_state_text() {
     case game_state::paused:
         text_state.setPosition({ constants::window_width / 2.0f - 65.0f, (constants::window_height / 2.0f) - (constants::window_height / 8.6f) });
         text_state.setCharacterSize(30);
-        text_state.setString("PAUSED");
+        text_state.setString(static_cast<std::string>(constants::string_paused));
         break;
     case game_state::game_over:
         text_state.setPosition({ constants::window_width / 16.0f, (constants::window_height / 2.0f) - (constants::window_height / 5.7f) });
         text_state.setCharacterSize(20);
-        text_state.setString(
-            "  GAME OVER!\n\n"
-            "  YOUR MISSION TO RECLAIM THE SOLAR SYSTEM FAILED.\n"
-            "  THE SUN IS STILL UNDER THREAT.\n\n"
-            "  - PRESS ANY KEY TO TRY AGAIN AND SAVE THE SUN\n"
-            "  - PRESS ESCAPE TO QUIT\n"
-        );
+        text_state.setString(static_cast<std::string>(constants::string_game_over));
         break;
     case game_state::player_wins:
         //text_state.setPosition({ constants::window_width / 2.0f - 100.0f, constants::window_height / 2.0f - 100.0f });
         text_state.setPosition({ constants::window_width / 10.0f, (constants::window_height / 2.0f) - (constants::window_height / 5.7f) });
         text_state.setCharacterSize(22);
-        text_state.setString(
-            "  CONGRATULATIONS!\n\n"
-            "  YOU HAVE DEFEATED THE COSMIC BRICKS.\n"
-            "  ALL PLANETS HAVE BEEN RECLAIMED,\n"
-            "  AND THE SUN IS SAFE AGAIN.\n\n"
-            "  THE SOLAR SYSTEM THANKS YOU,\n"
-            "  HERO FROM ALPHA CENTAURI!\n\n"
-            "  - PRESS ANY KEY TO PLAY AGAIN\n"
-            "  - PRESS ESCAPE TO QUIT\n"
-        );
+        text_state.setString(static_cast<std::string>(constants::string_player_wins));
         break;
     case game_state::start_level:
         text_state.setPosition( text_level.getPosition());

@@ -213,48 +213,6 @@ static level_data level1 = {
     "         PRESS ANY KEY TO START          "
 };
 
-/* Level 3 (Saturn)
-111111111111
-211111111112
-221111111122
-222111112222
-222211122222
-222211122222
-222111112222
-221111111122
-211111111112
-111111111111
-*/
-/*
-// Design the arrangement of level 3 (Saturn)
-static level_data level3 = {
-    12, // columns
-    10, // rows
-    [] {
-        const int W = 12;
-        const int H = 10;
-
-        const auto rows = grid_from_strings(W, H, {
-            "111111111111",
-            "211111111112",
-            "221111111122",
-            "222111112222",
-            "222211122222",
-            "222211122222",
-            "222111112222",
-            "221111111122",
-            "211111111112",
-            "111111111111"
-        });
-
-        return parse_grid(W, H, rows);
-    }(),
-    constants::img_background_level2_path(),
-    "  \n\n"
-    "THIRD MISSION (3/10): SATURN\n\n"
-    "   PRESS ANY KEY TO START"
-};
-*/
 
 /* Level 4 (Jupiter)
 ..................
