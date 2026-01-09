@@ -135,10 +135,10 @@ game::game() :
 }
 
 // (Re)initialize the game
-void game::reset_game() {
+void game::reset_game(game_state reset_state) {
 
     setup_level(0, true);
-    state = game_state::start_screen;
+    state = reset_state;
 
 }
 
@@ -551,8 +551,7 @@ void game::handle_window_events() {
 
             // End screens: any key restarts
             else if (state == game_state::game_over || state == game_state::player_wins) {
-                //reset();
-                state = game_state::start_level;
+                reset_game(game_state::start_level);
             }
 
             // Reinitialize previous state

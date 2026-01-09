@@ -333,7 +333,7 @@ public:
     game();
 
     // Reinitialize the game
-    void reset_game();
+    void reset_game(game_state reset_state = game_state::start_screen);
 
     // Game loop
     void run_game();

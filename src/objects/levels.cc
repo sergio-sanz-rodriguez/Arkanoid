@@ -36,7 +36,7 @@ static std::vector<level_cell> parse_grid(
             cell.strength = 0;
             cell.color_idx = 0;
 
-            if (c == '.') {
+            if (c == '.' || c == ' ') {
                 // empty
                 cell.strength = 0;
             }
@@ -103,7 +103,7 @@ static std::vector<std::string> grid_from_strings(
 }
 
 // Design the arrangement of level 1 (Neptune)
-static level_data level3 = {
+static level_data level1 = {
     12, // columns
     12, // rows
     4.0f, // width offset, to center the text in the screen
@@ -159,7 +159,7 @@ static level_data level2 = {
             ".....##.....", // 14
             "............", // 15
             "............", // 16
-            "###......###"  // 17
+            "##........##"  // 17
         });
         return parse_grid(W, H, rows);
     }(),
@@ -171,7 +171,7 @@ static level_data level2 = {
 
 
 // Design the arrangement of level 2 (The Titan Mond)
-static level_data level1 = {
+static level_data level3 = {
     12, // columns
     22, // rows
     7.2f, // width offset, to center the text in the screen
@@ -323,7 +323,8 @@ static level_data level1 = {
 // Stack the difficulty levels
 static const level_data* all_levels[] = {
     &level1,
-    &level2
+    //&level2,
+    //&level3
     // add up to 10
 };
 

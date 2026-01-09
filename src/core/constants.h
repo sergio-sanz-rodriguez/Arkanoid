@@ -171,21 +171,32 @@ struct constants {
     };
     static constexpr std::string_view string_paused{ "PAUSED" };
     static constexpr std::string_view string_game_over{
-        "  GAME OVER!\n\n"
-        "  YOUR MISSION TO RECLAIM THE SOLAR SYSTEM FAILED.\n"
-        "  THE SUN IS STILL UNDER THREAT.\n\n"
-        "  - PRESS ANY KEY TO TRY AGAIN AND SAVE THE SUN\n"
-        "  - PRESS ESCAPE TO QUIT\n"
+        "  GAME OVER!"
+        "\n\n"
+        "  YOUR MISSION TO RECLAIM THE SOLAR SYSTEM FAILED."
+        "\n"
+        "  THE SUN IS STILL UNDER THREAT."
+        "\n\n"
+        "  - PRESS ANY KEY TO TRY AGAIN AND SAVE THE SUN"
+        "\n"
+        "  - PRESS ESCAPE TO QUIT"
     };
     static constexpr std::string_view string_player_wins{
-        "  CONGRATULATIONS!\n\n"
-        "  YOU HAVE DEFEATED THE COSMIC BRICKS.\n"
-        "  ALL PLANETS HAVE BEEN RECLAIMED,\n"
-        "  AND THE SUN IS SAFE AGAIN.\n\n"
-        "  THE SOLAR SYSTEM THANKS YOU,\n"
-        "  HERO FROM ALPHA CENTAURI!\n\n"
-        "  - PRESS ANY KEY TO PLAY AGAIN\n"
-        "  - PRESS ESCAPE TO QUIT\n"
+        "          SUCESSFULL MISSION!           "
+        "\n\n"
+        "  YOU HAVE DEFEATED THE COSMIC BRICKS.  "
+        "\n"
+        "    ALL PLANETS HAVE BEEN RECLAIMED,    "
+        "\n"
+        "       AND THE SUN IS SAFE AGAIN.       "
+        "\n\n"
+        "      THE SOLAR SYSTEM THANKS YOU,      "
+        "\n"
+        "       HERO FROM ALPHA CENTAURI!        "
+        "\n\n"
+        "      PRESS ANY KEY TO PLAY AGAIN       "
+        "\n"
+        "         PRESS ESCAPE TO QUIT           "
     };
 };
 
