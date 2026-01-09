@@ -6,7 +6,7 @@
 
 // Define the two types of bonuses for the dame
 enum class bonus_type {
-    fireball,
+    plasma_ball,
     life,
     powerup
 };
@@ -15,7 +15,7 @@ enum class powerup_type {
     ball_faster,
     ball_slower,
     ballstorm,
-    fireball,
+    plasma_ball,
     multiball,
     paddle_wider,
     paddle_narrower,
@@ -27,7 +27,7 @@ struct powerups {
     bool ball_faster = false;
     bool ball_slower = false;
     bool ballstorm = false;
-    bool fireball = false;
+    bool plasma_ball = false;
     bool multiball = false;
     bool paddle_wider = false;
     bool paddle_narrower = false;
@@ -37,7 +37,7 @@ struct powerups {
 
     void apply(powerup_type bonus) {
         switch (bonus) {
-            case powerup_type::fireball:        fireball = true; break;
+            case powerup_type::plasma_ball:        plasma_ball = true; break;
             case powerup_type::multiball:       multiball = true; break;
             case powerup_type::ballstorm:       ballstorm = true; break;
             case powerup_type::ball_faster:     ball_faster = true; ball_slower = false; break;
@@ -67,7 +67,7 @@ class bonus : public moving_entity {
 private:
 
     // Private data members
-    static sf::Texture fireball_texture;
+    static sf::Texture plasma_ball_texture;
     static sf::Texture life_texture;
     static sf::Texture powerup_texture;
     float half_width;

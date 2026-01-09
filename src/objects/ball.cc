@@ -4,7 +4,7 @@
 sf::Texture bouncing_ball::texture;
 sf::Texture ballstorm::texture;
 
-bouncing_ball::bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool fireball) : fireball(fireball) {
+bouncing_ball::bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool plasma_ball) : plasma_ball(plasma_ball) {
 
     // Load the texture
     if (!texture.loadFromFile(constants::img_ball_path())) {
@@ -18,7 +18,7 @@ bouncing_ball::bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sc
     sprite->setPosition(pos);
     sprite->scale(sca);
     sprite->setColor(col);
-    velocity = vel; //velocity = { vx, vy };
+    velocity = vel;
 
     // Set the radius of the ball
     radius = get_bounding_box().size.x / 2.0f;
@@ -27,10 +27,10 @@ bouncing_ball::bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sc
 // Get the radius of the ball
 float bouncing_ball::get_radius() const noexcept { return radius; }
 
-// Get and set the state of the fireball feature
-bool bouncing_ball::get_fireball() const noexcept { return fireball; }
-void bouncing_ball::set_fireball(bool on, float factor) noexcept {
-    fireball = on;
+// Get and set the state of the plasma_ball feature
+bool bouncing_ball::get_plasma_ball() const noexcept { return plasma_ball; }
+void bouncing_ball::set_plasma_ball(bool on, float factor) noexcept {
+    plasma_ball = on;
     sprite->setColor(on ? constants::orange : constants::steel);
     sprite->setScale(on ? factor * sf::Vector2f{ 0.5f, 0.5f } : sf::Vector2f{ 0.5f, 0.5f });
     radius = get_bounding_box().size.x / 2.0f;

@@ -47,7 +47,7 @@ void entity_manager::draw(sf::RenderWindow& window) {
 game::game() :
     rng(std::random_device{}()),
     text_state(font),
-    text_fireball(font),
+    text_plasma_ball(font),
     text_lives(font),
     text_powerup(font),
     text_instructions(font),
@@ -81,13 +81,13 @@ game::game() :
     text_state.setFillColor(constants::white);
     text_state.setString("");
 
-    text_fireball.setFont(font);
-    text_fireball.setPosition(
-        { (constants::window_width / 2.0f) - std::ceilf(constants::window_width / 32.0f),
+    text_plasma_ball.setFont(font);
+    text_plasma_ball.setPosition(
+        { (constants::window_width / 2.0f) - std::ceilf(constants::window_width / 20.0f),
         constants::window_height - std::ceilf(constants::window_height / 31.8f) });
-    text_fireball.setCharacterSize(13);
-    text_fireball.setFillColor(constants::orange);
-    text_fireball.setString("");
+    text_plasma_ball.setCharacterSize(13);
+    text_plasma_ball.setFillColor(constants::orange);
+    text_plasma_ball.setString("");
 
     text_lives.setFont(font);
     text_lives.setPosition(
@@ -207,6 +207,11 @@ void game::setup_level(int level, bool full_reset) {
     spawn_ball({ constants::window_width / 2.0f,
                  constants::window_height - constants::paddle_height });
 
+    // Randomly rotate the ball (optional)
+    manager.apply_all<bouncing_ball>([this](bouncing_ball& b) {
+        b.rotate(90.0f, true);
+    });
+
     // Spawn the paddle
     spawn_paddle({ constants::window_width / 2.0f,
                    constants::window_height - constants::paddle_height });
@@ -218,7 +223,7 @@ void game::reset_powerups() {
 
     active_powerups.reset();
 
-    text_fireball.setString("");
+    text_plasma_ball.setString("");
     text_powerup.setString("");
 
     // Ballstorm UI
@@ -352,8 +357,8 @@ void game::spawn_bricks_from_level(const level_data& lvl) {
                 continue;
 
             // Create the brick object: position, scale, and color
-            float px = constants::brick_offset + (x + 1) * constants::brick_width;
-            float py = (y + 2) * constants::brick_height;
+            float px = constants::brick_offset_width  + x * constants::brick_width;
+            float py = constants::brick_offset_height + y * constants::brick_height;
 
             // Define colors
             const bool is_indestructible = cell.strength == constants::indestructible_strength;
@@ -410,8 +415,8 @@ void game::spawn_multiball() {
             pos,
             vel,
             constants::ball_scale,
-            active_powerups.fireball ? constants::orange : constants::steel,
-            active_powerups.fireball
+            active_powerups.plasma_ball ? constants::orange : constants::steel,
+            active_powerups.plasma_ball
         );
 
         // Compute symmetric offset around 0°
@@ -479,8 +484,8 @@ void game::sync_powerups_to_entities() {
     // Ball effects
     manager.apply_all<bouncing_ball>([this](bouncing_ball& b) {
 
-        // Fireball flag controls color + scale internally
-        b.set_fireball(active_powerups.fireball, 1.0f);
+        // plasma_ball flag controls color + scale internally
+        b.set_plasma_ball(active_powerups.plasma_ball, 1.0f);
 
         // Adjust speed WITHOUT changing direction
         float target_ball_speed = constants::ball_speed;
@@ -663,7 +668,7 @@ void game::draw_frame() {
 
     // UI texts are always visible
     game_window.draw(text_lives);
-    game_window.draw(text_fireball);
+    game_window.draw(text_plasma_ball);
     game_window.draw(text_powerup);
 
     // Present the frame
@@ -700,24 +705,24 @@ void game::ensure_ball_exists() {
 void game::spawn_bonuses() {
 
     // Count active bonuses
-    size_t life_fireball_count = 0;
+    size_t life_plasma_ball_count = 0;
     size_t powerup_count = 0;
     manager.apply_all<bonus>([&](bonus& b) {
         if (b.get_type() == bonus_type::powerup) ++powerup_count;
-        else ++life_fireball_count;
+        else ++life_plasma_ball_count;
     });
 
     // Timer check
     if (bonus_clock.getElapsedTime().asSeconds() < next_bonus_time)
         return;
 
-    // Spawn LIFE or FIREBALL
-    if (life_fireball_count == 0 && std::bernoulli_distribution(1.0f - constants::powerup_prob)(rng)) {
+    // Spawn LIFE or plasma_ball
+    if (life_plasma_ball_count == 0 && std::bernoulli_distribution(1.0f - constants::powerup_prob)(rng)) {
 
-        static std::bernoulli_distribution spawn_fireball(0.5);
-        const bool is_fireball = spawn_fireball(rng);
+        static std::bernoulli_distribution spawn_plasma_ball(0.5);
+        const bool is_plasma_ball = spawn_plasma_ball(rng);
 
-        const bonus_type type = is_fireball ? bonus_type::fireball : bonus_type::life;
+        const bonus_type type = is_plasma_ball ? bonus_type::plasma_ball : bonus_type::life;
 
         float x = std::uniform_real_distribution<float>(
             bonus::half_width_for(type),
@@ -775,11 +780,11 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
             return;
         }
 
-        // FIREBALL bonus: set fireball powerup and change the message color
-        if (the_bonus.get_type() == bonus_type::fireball) {
-            active_powerups.apply(powerup_type::fireball);
-            // Optional: restart a fireball timer
-            // fireball_clock.restart();
+        // plasma_ball bonus: set plasma_ball powerup and change the message color
+        if (the_bonus.get_type() == bonus_type::plasma_ball) {
+            active_powerups.apply(powerup_type::plasma_ball);
+            // Optional: restart a plasma_ball timer
+            // plasma_ball_clock.restart();
             audio.play(sfx_id::powerup);
             return;
         }
@@ -810,9 +815,9 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
                 audio.play(sfx_id::powerup);
                 break;
 
-            case powerup_type::fireball:
-                // Fireball can also expire after X seconds:
-                // fireball_clock.restart();
+            case powerup_type::plasma_ball:
+                // plasma_ball can also expire after X seconds:
+                // plasma_ball_clock.restart();
                 break;
 
             case powerup_type::multiball:
@@ -835,7 +840,7 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
                 audio.play(sfx_id::powerdown);
                 ballstorm_clock.restart();
                 ballstorm_duration_clock.restart();
-                // fireball_clock.restart();
+                // plasma_ball_clock.restart();
                 break;
 
             default:
@@ -847,13 +852,13 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
     return powerup_msg;
 }
 
-// Lives, fireball, powerup msg
+// Lives, plasma_ball, powerup msg
 void game::update_ui_texts(const std::string& powerup_msg) {
 
     text_lives.setString("Lives: " + std::to_string(lives));
 
     // persistent state
-    text_fireball.setString(active_powerups.fireball ? "Fireball" : "");
+    text_plasma_ball.setString(active_powerups.plasma_ball ? "Plasma ball" : "");
 
     // last pickup message (event)
     if (!powerup_msg.empty())

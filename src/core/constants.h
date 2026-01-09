@@ -40,6 +40,10 @@ struct constants {
     static constexpr int indestructible_strength{ 255 };
     static constexpr int brick_columns{ 12 };
     static constexpr int brick_rows{ 12 };
+    static constexpr float brick_width{ 43.0f };
+    static constexpr float brick_height{ 20.0f };
+    static constexpr float brick_offset_width{ brick_width * 0.5f }; // brick_width * 0.9f
+    static constexpr float brick_offset_height{ brick_height * 0.5f }; // brick_width * 0.9f
     static constexpr int brick_alpha_hit3{ 80 };  // Dull
     static constexpr int brick_alpha_hit2{ 170 }; // Medium
     static constexpr int brick_alpha_hit1{ 255 }; // Bright
@@ -50,9 +54,6 @@ struct constants {
     static constexpr float bonus_speed_jitter{ 0.9f }; // A jitter better 0.9 * speed and (1/0.9) * speed.
     static constexpr float bonus_speed_step{ 0.5f };
     static constexpr float powerup_prob{ 0.7f };
-    static constexpr float brick_width{ 43.0f };
-    static constexpr float brick_height{ 20.0f };
-    static constexpr float brick_offset{ brick_width * 0.9f };
     static constexpr int player_lives{ 3 };
     static constexpr int max_sounds{ 16 };
     static constexpr sf::Vector2f ball_scale{ 0.5f, 0.5f };
@@ -79,18 +80,18 @@ struct constants {
     static constexpr std::string_view img_background_level1_filename{ "level_1.png" };
     static constexpr std::string_view img_background_level2_filename{ "level_2.png" };
     static constexpr std::string_view img_background_level3_filename{ "level_3.png" };
-    static constexpr std::string_view img_background_level4_filename{ "level_4.jpeg" };
-    static constexpr std::string_view img_background_level5_filename{ "level_5.jpeg" };
-    static constexpr std::string_view img_background_level6_filename{ "level_6.jpeg" };
-    static constexpr std::string_view img_background_level7_filename{ "level_7.jpeg" };
-    static constexpr std::string_view img_background_level8_filename{ "level_8.jpeg" };
-    static constexpr std::string_view img_background_level9_filename{ "level_9.jpeg" };
-    static constexpr std::string_view img_background_level10_filename{ "level_10.jpeg" };
+    static constexpr std::string_view img_background_level4_filename{ "level_4.png" };
+    static constexpr std::string_view img_background_level5_filename{ "level_5.png" };
+    static constexpr std::string_view img_background_level6_filename{ "level_6.png" };
+    static constexpr std::string_view img_background_level7_filename{ "level_7.png" };
+    static constexpr std::string_view img_background_level8_filename{ "level_8.png" };
+    static constexpr std::string_view img_background_level9_filename{ "level_9.png" };
+    static constexpr std::string_view img_background_level10_filename{ "level_10.png" };
     static constexpr std::string_view img_ball_filename{ "ball_llwhite.png" };
     static constexpr std::string_view img_ballstorm_filename{ "burst.png" };
     static constexpr std::string_view img_paddle_filename{ "paddle_gray.png" };
     static constexpr std::string_view img_brick_filename{ "brick_s.png" };
-    static constexpr std::string_view img_fireball_filename{ "ball_orange.png" };
+    static constexpr std::string_view img_plasma_ball_filename{ "ball_orange.png" };
     static constexpr std::string_view img_life_filename{ "ball_green.png" };
     static constexpr std::string_view img_powerup_filename{ "ball_blue.png" };
     static constexpr std::string_view sfx_ball_brick_filename{ "ball_brick.wav" };
@@ -109,11 +110,12 @@ struct constants {
     static std::string img_background_level1_path() { return std::string(image_dir) + std::string(img_background_level1_filename); }
     static std::string img_background_level2_path() { return std::string(image_dir) + std::string(img_background_level2_filename); }
     static std::string img_background_level3_path() { return std::string(image_dir) + std::string(img_background_level3_filename); }
+    static std::string img_background_level4_path() { return std::string(image_dir) + std::string(img_background_level4_filename); }
     static std::string img_ball_path() { return std::string(image_dir) + std::string(img_ball_filename); }
     static std::string img_ballstorm_path() { return std::string(image_dir) + std::string(img_ballstorm_filename); }
     static std::string img_paddle_path() { return std::string(image_dir) + std::string(img_paddle_filename); }
     static std::string img_brick_path() { return std::string(image_dir) + std::string(img_brick_filename); }
-    static std::string img_fireball_path() { return std::string(image_dir) + std::string(img_fireball_filename); }
+    static std::string img_plasma_ball_path() { return std::string(image_dir) + std::string(img_plasma_ball_filename); }
     static std::string img_life_path() { return std::string(image_dir) + std::string(img_life_filename); }
     static std::string img_powerup_path() { return std::string(image_dir) + std::string(img_powerup_filename); }
     static std::string sfx_ball_brick_path() { return std::string(sfx_dir) + std::string(sfx_ball_brick_filename); }

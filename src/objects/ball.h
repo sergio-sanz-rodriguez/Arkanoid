@@ -13,7 +13,7 @@ private:
     // Private data members
     static sf::Texture texture;
     float radius;
-    bool fireball{ false };
+    bool plasma_ball{ false };
     bool hit_wall_this_frame = false;
 
     void process_player_input() override;
@@ -30,14 +30,14 @@ private:
      // vel: current speed of the ball
      // sca: current scale of the ball
      // col: current color of the ball
-     bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool fireball = false);
+     bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool plasma_ball = false);
 
      // Get the radius of the ball
      float get_radius() const noexcept;
 
-     // Get and set the state of the fireball feature
-     bool get_fireball() const noexcept;
-     void set_fireball(bool on, float factor) noexcept;
+     // Get and set the state of the plasma_ball feature
+     bool get_plasma_ball() const noexcept;
+     void set_plasma_ball(bool on, float factor) noexcept;
 
      // Detecting the hit with the wall
      bool consumed_wall_hit() noexcept;

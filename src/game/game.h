@@ -183,7 +183,7 @@ private:
     // Use SFML text and font classes to communicate with text with the player
     sf::Font font;
     sf::Text text_state;
-    sf::Text text_fireball;
+    sf::Text text_plasma_ball;
     sf::Text text_lives;
     sf::Text text_powerup;
     sf::Text text_instructions;
@@ -238,8 +238,8 @@ private:
     sf::Clock ballstorm_clock;            // controls "fire every X seconds"
     sf::Clock ballstorm_duration_clock;   // controls "powerup lasts X seconds"
     
-    // Fireball clock
-    // sf::Clock fireball_clock;
+    // plasma_ball clock
+    // sf::Clock plasma_ball_clock;
 
     // X position
     std::uniform_real_distribution<float> bonus_x_dist{
@@ -248,7 +248,7 @@ private:
     };
 
     // Speed jitter for each bonus type
-    std::uniform_real_distribution<float> fireball_jitter{
+    std::uniform_real_distribution<float> plasma_ball_jitter{
        constants::bonus_speed_jitter,
        1.0f / constants::bonus_speed_jitter
     };
@@ -318,7 +318,7 @@ private:
     // Powerup logic + message
     std::string handle_bonus_pickups(paddle& the_paddle);
 
-    // Lives, fireball, powerup msg
+    // Lives, plasma_ball, powerup msg
     void update_ui_texts(const std::string& powerup_msg);
 
     // Checks if the player wins, when all bricks are destroyed

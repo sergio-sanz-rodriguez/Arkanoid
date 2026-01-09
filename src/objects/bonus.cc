@@ -1,7 +1,7 @@
 #include "bonus.h"
 
 // Initialize static data
-sf::Texture bonus::fireball_texture;
+sf::Texture bonus::plasma_ball_texture;
 sf::Texture bonus::life_texture;
 sf::Texture bonus::powerup_texture;
 
@@ -10,8 +10,8 @@ bonus::bonus(bonus_type type, sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f s
     // Load static texture only once
     static bool loaded = false;
     if (!loaded) {
-        if (!fireball_texture.loadFromFile(constants::img_fireball_path())) {
-            throw std::runtime_error("Failed to load the fireball texture.");
+        if (!plasma_ball_texture.loadFromFile(constants::img_plasma_ball_path())) {
+            throw std::runtime_error("Failed to load the plasma_ball texture.");
         }
         if (!life_texture.loadFromFile(constants::img_life_path())) {
             throw std::runtime_error("Failed to load the life texture.");
@@ -24,7 +24,7 @@ bonus::bonus(bonus_type type, sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f s
 
     // Create sprite using the correct textrue
     sprite = std::make_unique<sf::Sprite>(
-        (type == bonus_type::fireball) ? fireball_texture :
+        (type == bonus_type::plasma_ball) ? plasma_ball_texture :
         (type == bonus_type::life)     ? life_texture     : powerup_texture
     );
 
@@ -100,7 +100,7 @@ bonus_type bonus::get_type() const { return type; }
 // Helper function to get half width of a bonus type
 float bonus::half_width_for(bonus_type type) {
     const sf::Texture& tex =
-        (type == bonus_type::fireball) ? fireball_texture :
+        (type == bonus_type::plasma_ball) ? plasma_ball_texture :
         (type == bonus_type::life)     ? life_texture     : powerup_texture;
     return tex.getSize().x * constants::bonus_scale.x * 0.5f;
 }

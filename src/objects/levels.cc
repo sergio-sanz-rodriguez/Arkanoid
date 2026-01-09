@@ -104,26 +104,26 @@ static std::vector<std::string> grid_from_strings(
 
 // Design the arrangement of level 1 (Neptune)
 static level_data level1 = {
-    12, // columns
+    15, // columns
     12, // rows
     4.0f, // width offset, to center the text in the screen
     3.0f, // height offset
     [] {
-        const int W = 12;
+        const int W = 15;
         const int H = 12;
         const auto rows = grid_from_strings(W, H, {
-            "111111111111",
-            "111111111111",
-            "111111111111",
-            "111111111111",
-            "111111111111",
-            "111111111111",
-            "111111111111",
-            "111111111111",
-            "111111111111",
-            "111111111111",
-            "111111111111",
-            "111111111111"
+            "111111111111111",
+            "111111111111111",
+            "111111111111111",
+            "111111111111111",
+            "111111111111111",
+            "111111111111111",
+            "111111111111111",
+            "111111111111111",
+            "111111111111111",
+            "111111111111111",
+            "111111111111111",
+            "111111111111111"
         });
         return parse_grid(W, H, rows);
     }(),
@@ -170,7 +170,7 @@ static level_data level2 = {
 };
 
 
-// Design the arrangement of level 2 (The Titan Mond)
+// Design the arrangement of level 3 (Titan)
 static level_data level3 = {
     12, // columns
     22, // rows
@@ -213,6 +213,48 @@ static level_data level3 = {
     "         PRESS ANY KEY TO START          "
 };
 
+// Design the arrangement of level 4 (Europa)
+static level_data level4 = {
+    12, // columns
+    22, // rows
+    7.2f, // width offset, to center the text in the screen
+    3.0f, // height offset
+    [] {
+        const int W = 12;
+        const int H = 22;
+        const auto rows = grid_from_strings(W, H, {
+            ".....11.....", //  1
+            "....1111....", //  2
+            "...122221...", //  3
+            "..13333331..", //  4
+            "123333333321", //  5
+            "123333333321", //  6
+            "123333333321", //  7
+            "..13333331..", //  8
+            "...122221...", //  9
+            "....1111....", // 10
+            ".....11.....", // 11
+            "111111111111", // 12
+            "............", // 13
+            "............", // 14
+            "............", // 15
+            "............", // 16
+            "............", // 17
+            "............", // 18
+            "............", // 19
+            ".....##.....", // 20
+            "....####....", // 21
+            ".....##....."  // 22
+        });
+        return parse_grid(W, H, rows);
+    }(),
+    constants::img_background_level3_path(),
+    "            CONTRATULATIONS!             "
+    "\n\n"
+    "NEXT MISSION (3/10): TITAN - SATURN'S MOON"
+    "\n\n"
+    "         PRESS ANY KEY TO START          "
+};
 
 /* Level 4 (Jupiter)
 ..................
