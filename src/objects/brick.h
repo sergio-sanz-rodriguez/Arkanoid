@@ -1,13 +1,12 @@
 #ifndef BRICK_H
 #define BRICK_H
 
-#include "constants.h"
 #include "entity.h"
+#include "brick_config.h"
 
 // Class to represent a brick
 // Inherits from entity
 // A grid of bricks is displayed across the top of the screen
-// This grid will be represented by an std::vector of brick objects
 // When the ball hits a brick, the brick is destroyed and disappears
 // When a brick is destroyed, it is deleted from the vector
 class brick: public entity {
@@ -18,12 +17,10 @@ private:
     static sf::Texture texture;
 
     // How many times the brick can be hit before destroying it
-    int strength{ constants::max_brick_strength };
+    int strength{ brick_config::max_brick_strength };
     bool indestructible{ false };
 
 public:
-
-    // Interface of the class
 
     // Constructors
     brick(sf::Vector2f pos, sf::Vector2f sca, sf::Color col);

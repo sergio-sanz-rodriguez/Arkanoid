@@ -1,5 +1,6 @@
 #include <iostream>
 #include "paddle.h"
+#include "assets.h"
 
 // Initialize static data
 sf::Texture paddle::texture;
@@ -8,7 +9,7 @@ sf::RenderWindow* paddle::window_ = nullptr;
 paddle::paddle(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col) {
 
     // Load the texture
-    if (!texture.loadFromFile(constants::img_paddle_path())) {
+    if (!texture.loadFromFile(assets::img_paddle_path())) {
         throw std::runtime_error("Failed to load the paddle texture.");
     }
 

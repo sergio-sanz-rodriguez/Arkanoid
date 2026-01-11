@@ -32,15 +32,22 @@
     <ClCompile Include="src\systems\interactions.cc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\core\assets.h" />
+    <ClInclude Include="src\core\colors.h" />
     <ClInclude Include="src\core\constants.h" />
     <ClInclude Include="src\core\entity.h" />
+    <ClInclude Include="src\core\strings.h" />
     <ClInclude Include="src\game\game.h" />
     <ClInclude Include="src\game\resource.h" />
     <ClInclude Include="src\objects\audio.h" />
     <ClInclude Include="src\objects\background.h" />
     <ClInclude Include="src\objects\ball.h" />
+    <ClInclude Include="src\objects\ball_colors.h" />
+    <ClInclude Include="src\objects\bonus_config.h" />
     <ClInclude Include="src\objects\brick.h" />
     <ClInclude Include="src\objects\bonus.h" />
+    <ClInclude Include="src\objects\brick_colors.h" />
+    <ClInclude Include="src\objects\brick_config.h" />
     <ClInclude Include="src\objects\levels.h" />
     <ClInclude Include="src\objects\paddle.h" />
     <ClInclude Include="src\systems\interactions.h" />

@@ -1,5 +1,10 @@
 #include "game.h"
+#include "assets.h"
+#include "ball_colors.h"
+#include "brick_colors.h"
+#include "colors.h"
 #include "interactions.h"
+#include "strings.h"
 
 // Function to scan all entities and clean up the destroyed ones
 void entity_manager::refresh() {
@@ -55,7 +60,10 @@ game::game() :
 
     // Limit the framerate
     game_window.setFramerateLimit(60);      // Max rate is 60 frames per second
-
+    
+    // Hide system cursor inside the game window
+    game_window.setMouseCursorVisible(false);
+    
     // Set window in paddle to allow mouse interaction
     paddle::set_window(game_window);
 
@@ -67,7 +75,7 @@ game::game() :
     update_view();
 
     // Load a font from file
-    if (!font.openFromFile(constants::font_consola)) {
+    if (!font.openFromFile(assets::font_consola)) {
         std::cerr << "Failed to load font!" << std::endl;
         // Handle font loading failure (could exit, use default font, etc.)
     }
@@ -78,7 +86,7 @@ game::game() :
         { (constants::window_width / 2.0f) - std::ceilf(constants::window_width / 5.1f),
         (constants::window_height / 2.0f) - std::ceilf(constants::window_height / 8.6f) });
     text_state.setCharacterSize(35);
-    text_state.setFillColor(constants::white);
+    text_state.setFillColor(colors::white);
     text_state.setString("");
 
     text_plasma_ball.setFont(font);
@@ -86,7 +94,7 @@ game::game() :
         { (constants::window_width / 2.0f) - std::ceilf(constants::window_width / 20.0f),
         constants::window_height - std::ceilf(constants::window_height / 31.8f) });
     text_plasma_ball.setCharacterSize(13);
-    text_plasma_ball.setFillColor(constants::orange);
+    text_plasma_ball.setFillColor(ball_colors::plasma_ball);
     text_plasma_ball.setString("");
 
     text_lives.setFont(font);
@@ -94,7 +102,7 @@ game::game() :
         { constants::window_width - std::ceilf(constants::window_width / 8.5f),
         constants::window_height - std::ceilf(constants::window_height / 31.8f) });
     text_lives.setCharacterSize(13);
-    text_lives.setFillColor(constants::true_green);
+    text_lives.setFillColor(colors::true_green);
     text_lives.setString("Lives: " + std::to_string(lives));
 
     text_powerup.setFont(font);
@@ -102,7 +110,7 @@ game::game() :
         { std::ceilf(constants::window_width / 25.0f),
         constants::window_height - std::ceilf(constants::window_height / 31.8f) });
     text_powerup.setCharacterSize(13);
-    text_powerup.setFillColor(constants::true_blue);
+    text_powerup.setFillColor(colors::true_blue);
     text_powerup.setString("");
 
     text_instructions.setFont(font);
@@ -110,28 +118,28 @@ game::game() :
         { constants::window_width / 16.0f,
         constants::window_height / 9.0f });
     text_instructions.setCharacterSize(20);
-    text_instructions.setFillColor(constants::white);
-    text_instructions.setString(static_cast<std::string>(constants::string_instructions));
+    text_instructions.setFillColor(colors::white);
+    text_instructions.setString(static_cast<std::string>(strings::string_instructions));
 
     text_level.setFont(font);
     text_level.setPosition(
         { constants::window_width / 4.0f,
           constants::window_height / 3.0f });
     text_level.setCharacterSize(20);
-    text_level.setFillColor(constants::white);
+    text_level.setFillColor(colors::white);
     text_level.setString(""); // To be set when the level is loaded
 
     // Load sound effects
-    audio.load(sfx_id::ball_brick, constants::sfx_ball_brick_path());
-    audio.load(sfx_id::ball_paddle, constants::sfx_ball_paddle_path());
-    audio.load(sfx_id::ball_wall, constants::sfx_ball_wall_path());
-    audio.load(sfx_id::ballstorm, constants::sfx_ballstorm_path());
-    audio.load(sfx_id::game_over, constants::sfx_game_over_path());
-    audio.load(sfx_id::life_minus, constants::sfx_life_minus_path());
-    audio.load(sfx_id::player_wins, constants::sfx_player_wins_path());
-    audio.load(sfx_id::powerdown, constants::sfx_powerdown_path());
-    audio.load(sfx_id::powerup, constants::sfx_powerup_path());
-    audio.load(sfx_id::welcome, constants::sfx_welcome_path());
+    audio.load(sfx_id::ball_brick,  assets::sfx_ball_brick_path());
+    audio.load(sfx_id::ball_paddle, assets::sfx_ball_paddle_path());
+    audio.load(sfx_id::ball_wall,   assets::sfx_ball_wall_path());
+    audio.load(sfx_id::ballstorm,   assets::sfx_ballstorm_path());
+    audio.load(sfx_id::game_over,   assets::sfx_game_over_path());
+    audio.load(sfx_id::life_minus,  assets::sfx_life_minus_path());
+    audio.load(sfx_id::player_wins, assets::sfx_player_wins_path());
+    audio.load(sfx_id::powerdown,   assets::sfx_powerdown_path());
+    audio.load(sfx_id::powerup,     assets::sfx_powerup_path());
+    audio.load(sfx_id::welcome,     assets::sfx_welcome_path());
 }
 
 // (Re)initialize the game
@@ -327,7 +335,7 @@ void game::spawn_ball(sf::Vector2f pos) {
         pos,
         sf::Vector2f{ constants::ball_speed, -constants::ball_speed },
         constants::ball_scale,
-        constants::steel,
+        ball_colors::bouncing_ball,
         false
     );
 }
@@ -338,7 +346,7 @@ void game::spawn_paddle(sf::Vector2f pos) {
         pos,
         sf::Vector2f{ constants::paddle_speed, 0.0f },
         constants::paddle_scale,
-        constants::white
+        colors::white
     );
 }
 
@@ -357,12 +365,13 @@ void game::spawn_bricks_from_level(const level_data& lvl) {
                 continue;
 
             // Create the brick object: position, scale, and color
-            float px = constants::brick_offset_width  + x * constants::brick_width;
-            float py = constants::brick_offset_height + y * constants::brick_height;
+            float px = brick_config::brick_offset_width  + x * brick_config::brick_width;
+            float py = brick_config::brick_offset_height + y * brick_config::brick_height;
 
             // Define colors
-            const bool is_indestructible = cell.strength == constants::indestructible_strength;
-            sf::Color color = is_indestructible ? indestructible_color : vcolor[cell.color_idx % vcolor.size()];
+            const auto& colors = get_color_vector(lvl.color_map);
+            const bool is_indestructible = cell.strength == brick_config::indestructible_strength;
+            sf::Color color = is_indestructible ? brick_colors::indestructible : colors[cell.color_idx];
             //sf::Color c = vcolor[color_dist(rng)]; // Pick a random color
 
             auto& b = manager.create<brick>(
@@ -415,7 +424,7 @@ void game::spawn_multiball() {
             pos,
             vel,
             constants::ball_scale,
-            active_powerups.plasma_ball ? constants::orange : constants::steel,
+            active_powerups.plasma_ball ? ball_colors::plasma_ball : ball_colors::bouncing_ball,
             active_powerups.plasma_ball
         );
 
@@ -433,6 +442,7 @@ void game::spawn_ballstorm() {
     paddle* p = manager.get_first<paddle>();
     if (!p) return;
 
+    // Get its position
     const sf::Vector2f paddle_pos = p->get_position();
 
     // Spawn slightly above the paddle so it doesn't instantly collide
@@ -445,7 +455,7 @@ void game::spawn_ballstorm() {
         pos,
         vel,
         constants::ballstorm_scale,
-        constants::white // that is, default
+        colors::white // that is, default
     );
 
     // Play the sound effect
@@ -602,18 +612,18 @@ void game::update_state_text() {
     case game_state::paused:
         text_state.setPosition({ constants::window_width / 2.0f - 65.0f, (constants::window_height / 2.0f) - (constants::window_height / 8.6f) });
         text_state.setCharacterSize(30);
-        text_state.setString(static_cast<std::string>(constants::string_paused));
+        text_state.setString(static_cast<std::string>(strings::string_paused));
         break;
     case game_state::game_over:
         text_state.setPosition({ constants::window_width / 16.0f, (constants::window_height / 2.0f) - (constants::window_height / 5.7f) });
         text_state.setCharacterSize(20);
-        text_state.setString(static_cast<std::string>(constants::string_game_over));
+        text_state.setString(static_cast<std::string>(strings::string_game_over));
         break;
     case game_state::player_wins:
         //text_state.setPosition({ constants::window_width / 2.0f - 100.0f, constants::window_height / 2.0f - 100.0f });
         text_state.setPosition({ constants::window_width / 10.0f, (constants::window_height / 2.0f) - (constants::window_height / 5.7f) });
         text_state.setCharacterSize(22);
-        text_state.setString(static_cast<std::string>(constants::string_player_wins));
+        text_state.setString(static_cast<std::string>(strings::string_player_wins));
         break;
     case game_state::start_level:
         text_state.setPosition( text_level.getPosition());
@@ -717,7 +727,7 @@ void game::spawn_bonuses() {
         return;
 
     // Spawn LIFE or plasma_ball
-    if (life_plasma_ball_count == 0 && std::bernoulli_distribution(1.0f - constants::powerup_prob)(rng)) {
+    if (life_plasma_ball_count == 0 && std::bernoulli_distribution(1.0f - bonus_config::powerup_prob)(rng)) {
 
         static std::bernoulli_distribution spawn_plasma_ball(0.5);
         const bool is_plasma_ball = spawn_plasma_ball(rng);
@@ -732,14 +742,14 @@ void game::spawn_bonuses() {
         manager.create<bonus>(
             type,
             sf::Vector2f{ x, 0.f },
-            sf::Vector2f{ 0.f, constants::bonus_speed * life_jitter(rng) },
+            sf::Vector2f{ 0.f, bonus_config::bonus_speed * life_jitter(rng) },
              constants::bonus_scale,
-            constants::white
+            colors::white
         );
     }
 
     // Spawn POWERUP
-    if (powerup_count == 0 && std::bernoulli_distribution(constants::powerup_prob)(rng)) {
+    if (powerup_count == 0 && std::bernoulli_distribution(bonus_config::powerup_prob)(rng)) {
 
         float x = std::uniform_real_distribution<float>(
             bonus::half_width_for(bonus_type::powerup),
@@ -749,9 +759,9 @@ void game::spawn_bonuses() {
         manager.create<bonus>(
             bonus_type::powerup,
             sf::Vector2f{ x, 0.f },
-            sf::Vector2f{ 0.f, constants::bonus_speed * powerup_jitter(rng) },
+            sf::Vector2f{ 0.f, bonus_config::bonus_speed * powerup_jitter(rng) },
             constants::bonus_scale,
-            constants::white
+            colors::white
         );
     }
 

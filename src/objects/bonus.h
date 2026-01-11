@@ -37,7 +37,7 @@ struct powerups {
 
     void apply(powerup_type bonus) {
         switch (bonus) {
-            case powerup_type::plasma_ball:        plasma_ball = true; break;
+            case powerup_type::plasma_ball:     plasma_ball = true; break;
             case powerup_type::multiball:       multiball = true; break;
             case powerup_type::ballstorm:       ballstorm = true; break;
             case powerup_type::ball_faster:     ball_faster = true; ball_slower = false; break;

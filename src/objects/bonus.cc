@@ -1,4 +1,6 @@
+#include "assets.h"
 #include "bonus.h"
+#include "bonus_config.h"
 
 // Initialize static data
 sf::Texture bonus::plasma_ball_texture;
@@ -10,13 +12,13 @@ bonus::bonus(bonus_type type, sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f s
     // Load static texture only once
     static bool loaded = false;
     if (!loaded) {
-        if (!plasma_ball_texture.loadFromFile(constants::img_plasma_ball_path())) {
+        if (!plasma_ball_texture.loadFromFile(assets::img_plasma_ball_path())) {
             throw std::runtime_error("Failed to load the plasma_ball texture.");
         }
-        if (!life_texture.loadFromFile(constants::img_life_path())) {
+        if (!life_texture.loadFromFile(assets::img_life_path())) {
             throw std::runtime_error("Failed to load the life texture.");
         }
-        if (!powerup_texture.loadFromFile(constants::img_powerup_path())) {
+        if (!powerup_texture.loadFromFile(assets::img_powerup_path())) {
             throw std::runtime_error("Failed to load the powerup texture.");
         }
         loaded = true;
@@ -81,10 +83,10 @@ void bonus::process_player_input() {
     if (velocity.y <= 0.f) return; // safety
 
     // New desired speed
-    if (upKey)   velocity.y += constants::bonus_speed_step;
-    if (downKey) velocity.y -= constants::bonus_speed_step;
+    if (upKey)   velocity.y += bonus_config::bonus_speed_step;
+    if (downKey) velocity.y -= bonus_config::bonus_speed_step;
 
-    velocity.y = std::clamp(velocity.y, constants::bonus_min_speed, constants::bonus_max_speed);
+    velocity.y = std::clamp(velocity.y, bonus_config::bonus_min_speed, bonus_config::bonus_max_speed);
 
 }
 

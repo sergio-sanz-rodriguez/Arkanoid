@@ -1,6 +1,25 @@
-#include "levels.h"
 #include <stdexcept>
 #include <algorithm>
+#include <random>
+#include "levels.h"
+#include "assets.h"
+#include "brick_colors.h"
+#include "brick_config.h"
+
+// Return the color vector corresponding to a given color map
+const std::vector<sf::Color>& get_color_vector(color_map_type map) {
+    switch (map) {
+    case color_map_type::arcade: return brick_colors::arcade;
+    case color_map_type::cosmic: return brick_colors::cosmic;
+    case color_map_type::planets: return brick_colors::planets;
+    case color_map_type::starfield: return brick_colors::starfield;
+    case color_map_type::alien: return brick_colors::alien;
+    case color_map_type::darkmatter: return brick_colors::darkmatter;
+    case color_map_type::grayscale: return brick_colors::grayscale;
+    case color_map_type::medal: return brick_colors::medal;
+    }
+    return brick_colors::arcade; // fallback
+}
 
 // Convert a vector<string> of ASCII into a vector<level_cell> grid.
 // Rules:
@@ -16,45 +35,73 @@
 static std::vector<level_cell> parse_grid(
     int W,
     int H,
-    const std::vector<std::string>& rows
+    const std::vector<std::string>& rows_strength,
+    const std::vector<std::string>& rows_color,
+    color_map_type color_map,
+    bool apply_random_idx
 ) {
-    if ((int)rows.size() != H) {
+    // Validate grid height
+    if ((int)rows_strength.size() != H) {
         throw std::runtime_error("parse_grid(): rows.size() must match H.");
     }
 
+    // Allocate the grid cells
     std::vector<level_cell> g(W * H);
 
+    // Get number of colors in the selected color map
+    size_t max_c = get_color_vector(color_map).size();
+
+    // Random color shift for the whole level
+    size_t X = 0;
+    if (apply_random_idx) {
+        static std::mt19937 rng{ std::random_device{}() };
+        std::uniform_int_distribution<size_t> dist(0, max_c - 1);
+        X = dist(rng);
+    }
+
+    // Iterate over rows
     for (int y = 0; y < H; ++y) {
-        if ((int)rows[y].size() != W) {
+
+        // Validate row width
+        if ((int)rows_strength[y].size() != W) {
             throw std::runtime_error("parse_grid(): each row must have exactly W characters.");
         }
 
+        // Iterate over columns
         for (int x = 0; x < W; ++x) {
-            const char c = rows[y][x];
+            const char s = rows_strength[y][x]; // Strength of the brick
+            const char c = rows_color[y][x];  // Color of the brick
 
+            // Initialize cell
             level_cell cell{};
             cell.strength = 0;
             cell.color_idx = 0;
 
-            if (c == '.' || c == ' ') {
-                // empty
+            // Empty cell?
+            if (s == '.' || s == ' ') {
                 cell.strength = 0;
             }
-            else if (c >= '1' && c <= '3') {
-                // destructible strength 1..3
-                cell.strength = static_cast<uint8_t>(c - '0');
 
-                // color depends on row (same pattern as your level1)
-                cell.color_idx = static_cast<uint8_t>(y % H);
+            // Destructible brick (strength 1..3)
+            else if (s >= '1' && s <= '3') {
+                // Destructible strength 1..3
+                cell.strength = static_cast<uint8_t>(s - '0');
+
+                // Apply color index with random offset
+                size_t base = static_cast<size_t>(c - '0');
+                cell.color_idx = static_cast<uint8_t>((base + X) % max_c);
             }
-            else if (c == '#') {
-                // indestructible
-                cell.strength = static_cast<uint8_t>(constants::indestructible_strength);
+
+            // Indestructible brick
+            else if (s == '#') {
+                cell.strength = static_cast<uint8_t>(brick_config::indestructible_strength);
 
                 // You can choose a special color index, e.g. dark gray.
                 // Here we store 0; later you can map '#' to a dedicated gray color in brick creation.
                 cell.color_idx = 0;
             }
+
+            // Invalid character
             else {
                 // Unknown character -> treat as empty, OR throw.
                 // Throwing is safer so you detect mistakes early.
@@ -68,35 +115,79 @@ static std::vector<level_cell> parse_grid(
     return g;
 }
 
-// Ensures the ASCII level is exactly WxH (padding with empty rows if needed).
-// Use this when you're prototyping and some levels have fewer rows.
+// Generate random color rows based on brick positions
+static std::vector<std::string> random_rows_color(
+    int W,
+    int H,
+    const std::vector<std::string>& rows_strength,
+    color_map_type color_map
+) {
+    static std::mt19937 rng{ std::random_device{}() };
+    size_t max_c = get_color_vector(color_map).size();
+    
+    std::uniform_int_distribution<int> dist(
+        0,
+        static_cast<int>(max_c)
+    );
+
+    std::vector<std::string> rows;
+    rows.reserve(H);
+
+    for (int y = 0; y < H; ++y) {
+        std::string row(W, '.');
+
+        for (int x = 0; x < W; ++x) {
+            char s = rows_strength[y][x];
+
+            // Only bricks get colors
+            if (s >= '1' && s <= '3') {
+                row[x] = static_cast<char>('0' + dist(rng));
+            }
+            // empty '.' and '#' stay '.'
+        }
+
+        rows.emplace_back(std::move(row));
+    }
+
+    return rows;
+}
+
+// Ensure ASCII input matches WxH, padding missing rows/columns
 static std::vector<std::string> grid_from_strings(
     int W,
     int H,
     std::initializer_list<const char*> lines
 ) {
+
+    // Preallocate space for exactly H rows to avoid reallocations
     std::vector<std::string> rows;
     rows.reserve(H);
 
+    // Copy input rows, clamping to the requested height
+    std::size_t row = 0;
     for (const char* s : lines) {
-        rows.emplace_back(s);
-    }
-
-    // If less rows than H, add empty rows at bottom
-    while ((int)rows.size() < H) {
-        rows.emplace_back(std::string(W, '.'));
-    }
-
-    // If too many rows, throw
-    if ((int)rows.size() > H) {
-        throw std::runtime_error("grid_from_strings(): too many rows provided.");
-    }
-
-    // Validate width
-    for (auto& r : rows) {
-        if ((int)r.size() != W) {
-            throw std::runtime_error("grid_from_strings(): a row has wrong width.");
+        // Too many input rows is considered a logic error
+        if (row++ >= static_cast<std::size_t>(H)) {
+            throw std::runtime_error(
+                "grid_from_strings(): too many rows provided."
+            );
         }
+
+        // Copy at most W characters from the input string
+        std::size_t cols = std::min<std::size_t>(std::strlen(s), W);
+        std::string r(s, cols);
+
+        // Pad short rows so every row is exactly W characters wide
+        if (r.size() < static_cast<std::size_t>(W)) {
+            r.append(W - r.size(), '.');
+        }
+
+        rows.emplace_back(std::move(r));
+    }
+
+    // Pad missing rows at the bottom so the grid has exactly H rows
+    while (rows.size() < static_cast<std::size_t>(H)) {
+        rows.emplace_back(W, '.');
     }
 
     return rows;
@@ -104,156 +195,281 @@ static std::vector<std::string> grid_from_strings(
 
 // Design the arrangement of level 1 (Neptune)
 static level_data level1 = {
-    15, // columns
-    12, // rows
+    brick_config::brick_columns, // columns
+    brick_config::brick_rows, // rows
     4.0f, // width offset, to center the text in the screen
     3.0f, // height offset
     [] {
-        const int W = 15;
-        const int H = 12;
-        const auto rows = grid_from_strings(W, H, {
-            "111111111111111",
-            "111111111111111",
-            "111111111111111",
-            "111111111111111",
-            "111111111111111",
-            "111111111111111",
-            "111111111111111",
-            "111111111111111",
-            "111111111111111",
-            "111111111111111",
-            "111111111111111",
-            "111111111111111"
+        const int W = brick_config::brick_columns;
+        const int H = brick_config::brick_rows;
+
+        // Define brick strengths
+        const auto rows_strength = grid_from_strings(W, H, {
+            "...............",
+            "...............",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
         });
-        return parse_grid(W, H, rows);
+
+        // Define brick colors
+        const auto rows_color = grid_from_strings(W, H, {
+            "...............",
+            "...............",
+            "..00000000000..",
+            "..11111111111..",
+            "..55555555555..",
+            "..22222222222..",
+            "..88888888888..",
+            "..44444444444..",
+            "..66666666666..",
+            "..99999999999..",
+            "..77777777777..",
+            "..33333333333..",
+            "..00000000000..",
+            "..55555555555..",
+            "..44444444444..",
+            "..11111111111..",
+            "..88888888888..",
+            "..77777777777..",
+        });
+
+        // Parse grid
+        return parse_grid(W, H, rows_strength, rows_color, color_map_type::arcade, true);
     }(),
-    constants::img_background_level1_path(),
+    color_map_type::arcade, // Color map type
+    assets::img_background_level1_path(), // Background asset
     "\n\n"
     "FIRST MISSION (1/10): NEPTUNE\n\n"
-    "   PRESS ANY KEY TO START"
+    "   PRESS ANY KEY TO START" // Intro text
 };
+
 
 // Design the arrangement of level 2 (Uranus)
 static level_data level2 = {
-    12, // columns
-    17, // rows
+    brick_config::brick_columns, // columns
+    brick_config::brick_rows, // rows
     4.0f, // width offset, to center the text in the screen
     3.0f, // height offset
     [] {
-        const int W = 12;
-        const int H = 17;
-        const auto rows = grid_from_strings(W, H, {
-            "111111111111", //  1
-            "111111111111", //  2
-            "111111111111", //  3
-            "111111111111", //  4
-            "111111111111", //  5
-            "111111111111", //  6
-            "111111111111", //  7
-            "111111111111", //  8
-            "111111111111", //  9
-            "111111111111", // 10
-            "111111111111", // 11
-            "111111111111", // 12
-            "............", // 13
-            ".....##.....", // 14
-            "............", // 15
-            "............", // 16
-            "##........##"  // 17
+        const int W = brick_config::brick_columns;
+        const int H = brick_config::brick_rows;
+
+        // Define brick strengths
+        const auto rows_strength = grid_from_strings(W, H, {
+            "...............",
+            "...............",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "..11111111111..",
+            "...............",
+            "...............",
+            "...............",
+            "...............",
+            "##...........##",
         });
-        return parse_grid(W, H, rows);
+
+        // Define brick colors  (random)
+        const auto rows_color = random_rows_color(W, H, rows_strength, color_map_type::arcade);
+
+        // Parse grid
+        return parse_grid(W, H, rows_strength, rows_color, color_map_type::arcade, false);
     }(),
-    constants::img_background_level2_path(),
+    color_map_type::arcade, // Color map type
+    assets::img_background_level2_path(), // Background asset
     "     CONTRATULATIONS!\n\n"
     "NEXT MISSION (2/10): URANUS\n\n"
-    "  PRESS ANY KEY TO START"
+    "  PRESS ANY KEY TO START" // Intro text
 };
 
 
 // Design the arrangement of level 3 (Titan)
 static level_data level3 = {
-    12, // columns
-    22, // rows
+    brick_config::brick_columns, // columns
+    brick_config::brick_rows, // rows
     7.2f, // width offset, to center the text in the screen
     3.0f, // height offset
     [] {
-        const int W = 12;
-        const int H = 22;
-        const auto rows = grid_from_strings(W, H, {
-            "111111111111", //  1
-            "311111111113", //  2
-            "321111111123", //  3
-            "322111111223", //  4
-            "322211112223", //  5
-            "322221122223", //  6
-            "322221122223", //  7
-            "322211112223", //  8
-            "322111111223", //  9
-            "321111111123", // 10
-            "311111111113", // 11
-            "111111111111", // 12
-            "............", // 13
-            "............", // 14
-            "............", // 15
-            "............", // 16
-            "............", // 17
-            "............", // 18
-            "............", // 19
-            ".....##.....", // 20
-            "....####....", // 21
-            ".....##....."  // 22
+        const int W = brick_config::brick_columns;
+        const int H = brick_config::brick_rows;
+
+        // Define brick strengths
+        const auto rows_strength = grid_from_strings(W, H, {
+            "...............",
+            "...............",
+            ".1111111111111.",
+            ".3111111111113.",
+            ".3211111111123.",
+            ".3221111111223.",
+            ".3222111112223.",
+            ".3222211122223.",
+            ".3222221222223.",
+            ".3222222222223.",
+            ".3222221222223.",
+            ".3222211122223.",
+            ".3222111112223.",
+            ".3221111111223.",
+            ".3211111111123.",
+            ".3111111111113.",
+            ".1111113111111.",
+            "......333......",
+            ".......3.......",
+            "...............",
+            "...##..........",
+            "...............",
+            ".........##....",
+            "...............",
         });
-        return parse_grid(W, H, rows);
+
+        // Define brick colors
+        const auto rows_color = grid_from_strings(W, H, {
+            "...............",
+            "...............",
+            ".0000000000000.",
+            ".2000000000002.",
+            ".2100000000012.",
+            ".2110000000112.",
+            ".2111000001112.",
+            ".2111100011112.",
+            ".2111110111112.",
+            ".2111111111112.",
+            ".2111110111112.",
+            ".2111100011112.",
+            ".2111000001112.",
+            ".2110000000112.",
+            ".2100000000012.",
+            ".2000000000002.",
+            ".0000002000000.",
+            "......222......",
+            ".......2.......",
+            "...............",
+            "...##..........",
+            "...............",
+            ".........##....",
+            "...............",
+            });
+
+        // Parse grid
+        return parse_grid(W, H, rows_strength, rows_color, color_map_type::medal, true);
     }(),
-    constants::img_background_level3_path(),
+    color_map_type::medal, // Color map type
+    assets::img_background_level3_path(), //Background asset
     "            CONTRATULATIONS!             "
     "\n\n"
     "NEXT MISSION (3/10): TITAN - SATURN'S MOON"
     "\n\n"
-    "         PRESS ANY KEY TO START          "
+    "         PRESS ANY KEY TO START          " // Intro text
 };
+
 
 // Design the arrangement of level 4 (Europa)
 static level_data level4 = {
-    12, // columns
-    22, // rows
-    7.2f, // width offset, to center the text in the screen
+    brick_config::brick_columns, // columns
+    brick_config::brick_rows, // rows
+    8.0f, // width offset, to center the text in the screen
     3.0f, // height offset
     [] {
-        const int W = 12;
-        const int H = 22;
-        const auto rows = grid_from_strings(W, H, {
-            ".....11.....", //  1
-            "....1111....", //  2
-            "...122221...", //  3
-            "..13333331..", //  4
-            "123333333321", //  5
-            "123333333321", //  6
-            "123333333321", //  7
-            "..13333331..", //  8
-            "...122221...", //  9
-            "....1111....", // 10
-            ".....11.....", // 11
-            "111111111111", // 12
-            "............", // 13
-            "............", // 14
-            "............", // 15
-            "............", // 16
-            "............", // 17
-            "............", // 18
-            "............", // 19
-            ".....##.....", // 20
-            "....####....", // 21
-            ".....##....."  // 22
+        const int W = brick_config::brick_columns;
+        const int H = brick_config::brick_rows;
+
+        // Define brick strengths
+        const auto rows_strength = grid_from_strings(W, H, {
+            "...............",
+            "...............",
+            ".......1.......",
+            "...#..111..#...",
+            ".....12221.....",
+            "....1233321....",
+            "...123333321...",
+            "..12333333321..",
+            ".1233333333321.",
+            "123232323232321",
+            ".1233333333321.",
+            "..12333333321..",
+            "...123333321...",
+            ".#..1233321..#.",
+            ".....12221.....",
+            "......111......",
+            "...............",
+            "...............",
+            "...............",
+            "...............",
+            "# # # # # # # #",
+            "...............",
+            "...............",
+            "...............",
+            "......111......",
+            "......131......",
+            "......111......",
         });
-        return parse_grid(W, H, rows);
+
+        // Define brick colors
+        const auto rows_color = grid_from_strings(W, H, {
+            "...............",
+            "...............",
+            ".......0.......",
+            "...#..000..#...",
+            ".....01110.....",
+            "....0122210....",
+            "...012222210...",
+            "..01222222210..",
+            ".0122222222210.",
+            "012121212121210",
+            ".0122222222210.",
+            "..01222222210..",
+            "...012222210...",
+            ".#..0122210..#.",
+            ".....01110.....",
+            "......000......",
+            ".......0.......",
+            "...............",
+            "...............",
+            "...............",
+            "# # # # # # #.#",
+            "...............",
+            "...............",
+            "...............",
+            "......000......",
+            "......020......",
+            "......000......",
+            });
+
+        // Parse grid
+        return parse_grid(W, H, rows_strength, rows_color, color_map_type::cosmic, true);
     }(),
-    constants::img_background_level3_path(),
-    "            CONTRATULATIONS!             "
+    color_map_type::cosmic, // Color map type
+    assets::img_background_level4_path(), // Background asset
+    "              CONTRATULATIONS!              "
     "\n\n"
-    "NEXT MISSION (3/10): TITAN - SATURN'S MOON"
+    "NEXT MISSION (4/10): EUROPA - JUPITER'S MOON"
     "\n\n"
-    "         PRESS ANY KEY TO START          "
+    "           PRESS ANY KEY TO START           " // Intro text
 };
 
 /* Level 4 (Jupiter)
@@ -364,7 +580,7 @@ static level_data level4 = {
 
 // Stack the difficulty levels
 static const level_data* all_levels[] = {
-    &level1,
+    &level4,
     //&level2,
     //&level3
     // add up to 10

@@ -21,6 +21,8 @@
 #include "bonus.h"
 #include "audio.h"
 #include "levels.h"
+#include "strings.h"
+#include "bonus_config.h"
 
 // A class to manage the entities in the game
 // It stores the entities in a vector of std::unique_ptr
@@ -175,7 +177,7 @@ private:
     // The constructor takes an SFML 2D vector with the window dimensions
     // and an std::string with the window title
     // The SFML code is in the sf namespace
-    sf::RenderWindow game_window{ sf::VideoMode({constants::window_width, constants::window_height}), constants::arkanoid_title };
+    sf::RenderWindow game_window{ sf::VideoMode({constants::window_width, constants::window_height}), strings::arkanoid_title };
 
     // Instead of embedding every entity in the game class, use an entity_manager
     entity_manager manager;
@@ -196,18 +198,6 @@ private:
     // Members to store the current state of the game
     game_state state{ game_state::start_screen };
     game_state previous_state{ game_state::start_screen };
-
-    // Define a vector with all the possible colors for the bricks
-    std::vector<sf::Color> vcolor{
-        constants::red,
-        constants::orange,
-        constants::green,
-        constants::cyan,
-        constants::blue,
-        constants::white};
-
-    // Define the color for the indestructible bricks
-    sf::Color indestructible_color = constants::anthracite;
 
     // How many lives does the player have left?
     int lives{ constants::player_lives };
@@ -249,16 +239,16 @@ private:
 
     // Speed jitter for each bonus type
     std::uniform_real_distribution<float> plasma_ball_jitter{
-       constants::bonus_speed_jitter,
-       1.0f / constants::bonus_speed_jitter
+       bonus_config::bonus_speed_jitter,
+       1.0f / bonus_config::bonus_speed_jitter
     };
     std::uniform_real_distribution<float> life_jitter{ 
-        constants::bonus_speed_jitter,
-        1.0f / constants::bonus_speed_jitter
+        bonus_config::bonus_speed_jitter,
+        1.0f / bonus_config::bonus_speed_jitter
     };
     std::uniform_real_distribution<float> powerup_jitter{
-        constants::bonus_speed_jitter,
-        1.0f / constants::bonus_speed_jitter
+        bonus_config::bonus_speed_jitter,
+        1.0f / bonus_config::bonus_speed_jitter
     };
 
     // Audio manager

@@ -1,4 +1,6 @@
+#include "assets.h"
 #include "ball.h"
+#include "ball_colors.h"
 
 // Initialize static data
 sf::Texture bouncing_ball::texture;
@@ -7,7 +9,7 @@ sf::Texture ballstorm::texture;
 bouncing_ball::bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool plasma_ball) : plasma_ball(plasma_ball) {
 
     // Load the texture
-    if (!texture.loadFromFile(constants::img_ball_path())) {
+    if (!texture.loadFromFile(assets::img_ball_path())) {
         throw std::runtime_error("Failed to load the bouncing ball texture.");
     }
 
@@ -31,7 +33,7 @@ float bouncing_ball::get_radius() const noexcept { return radius; }
 bool bouncing_ball::get_plasma_ball() const noexcept { return plasma_ball; }
 void bouncing_ball::set_plasma_ball(bool on, float factor) noexcept {
     plasma_ball = on;
-    sprite->setColor(on ? constants::orange : constants::steel);
+    sprite->setColor(on ? ball_colors::plasma_ball : ball_colors::bouncing_ball);
     sprite->setScale(on ? factor * sf::Vector2f{ 0.5f, 0.5f } : sf::Vector2f{ 0.5f, 0.5f });
     radius = get_bounding_box().size.x / 2.0f;
 }
@@ -175,8 +177,8 @@ void bouncing_ball::process_player_input() {
 ballstorm::ballstorm(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col) {
 
     // Load the texture
-    if (!texture.loadFromFile(constants::img_ballstorm_path())) {
-        throw std::runtime_error("Failed to load burst_ball texture");
+    if (!texture.loadFromFile(assets::img_ballstorm_path())) {
+        throw std::runtime_error("Failed to load ballstorm texture");
     }
 
     // Set the initial position, velocity, and color of the ball

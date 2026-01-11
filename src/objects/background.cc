@@ -1,5 +1,5 @@
-#include "background.h"
 #include <iostream>
+#include "background.h"
 
 // Initialize static data
 sf::Texture background::texture;

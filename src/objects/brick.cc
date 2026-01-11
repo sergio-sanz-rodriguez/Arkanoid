@@ -1,10 +1,9 @@
+#include "assets.h"
 #include "brick.h"
+#include "brick_config.h"
 
 // Initialize static data
 sf::Texture brick::texture;
-
-// Use different colors, depending on the strength of the brick in RGBA format
-
 
 void brick::set_strength(int value) noexcept { strength = value; }
 int  brick::get_strength() const noexcept { return strength; }
@@ -17,7 +16,7 @@ bool brick::is_too_weak() const noexcept { return strength <= 0;  }
 brick::brick(sf::Vector2f pos, sf::Vector2f sca, sf::Color col) {
 
     // Load the texture
-    if (!texture.loadFromFile(constants::img_brick_path())) {
+    if (!texture.loadFromFile(assets::img_brick_path())) {
         throw std::runtime_error("Failed to load the brick texture.");
     }
     // Set sprite
@@ -40,13 +39,13 @@ void brick::update() {
     // Change the transparence of the brick based on its weakness
     sf::Color color = sprite->getColor();
     if (strength == 1) {
-        color.a = constants::brick_alpha_hit3;
+        color.a = brick_config::brick_alpha_hit3;
     }
     else if (strength == 2) {
-        color.a = constants::brick_alpha_hit2;
+        color.a = brick_config::brick_alpha_hit2;
     }
     else if (strength == 3) {
-        color.a = constants::brick_alpha_hit1;
+        color.a = brick_config::brick_alpha_hit1;
     }
     sprite->setColor(color);
 }
