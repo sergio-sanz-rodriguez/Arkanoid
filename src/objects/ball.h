@@ -47,6 +47,7 @@ private:
      void launch();
      void stick_to_paddle(sf::Vector2f paddle_pos);
      bool is_launched() const noexcept;
+     void reset_for_serve();
 
      // Set the components of the velocity vector when the ball hits the paddle
      void bounce_from_paddle(float dist) noexcept;

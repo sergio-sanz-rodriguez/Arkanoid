@@ -38,6 +38,12 @@ namespace brick_colors {
         sf::Color(192, 192, 192), // Moon / grey rocks
     };
 
+    inline const std::vector<sf::Color> tierra = {
+        colors::blue,   // Water
+        colors::brown,  // Rocks
+        colors::orange, // Core
+    };
+
     inline const std::vector<sf::Color> starfield = {
         sf::Color(255, 255, 255), // white stars
         sf::Color(255, 255, 0),   // yellow star

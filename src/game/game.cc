@@ -1,4 +1,4 @@
-#include "game.h"
+ï»¿#include "game.h"
 #include "assets.h"
 #include "ball_colors.h"
 #include "brick_colors.h"
@@ -63,7 +63,7 @@ game::game() :
     
     // Hide system cursor inside the game window
     game_window.setMouseCursorVisible(false);
-    
+
     // Set window in paddle to allow mouse interaction
     paddle::set_window(game_window);
 
@@ -73,6 +73,10 @@ game::game() :
 
     // Apply the view with correct letterboxing for the current window size.
     update_view();
+
+    // Initialize states
+    // state = game_state::start_screen; Already initalized in .h
+    previous_state = game_state::running;
 
     // Load a font from file
     if (!font.openFromFile(assets::font_consola)) {
@@ -142,21 +146,26 @@ game::game() :
     audio.load(sfx_id::welcome,     assets::sfx_welcome_path());
 }
 
-// (Re)initialize the game
-void game::reset_game(game_state reset_state) {
+// Full reset to start screen
+void game::reset_game() {
+    reset_game(game_state::start_screen);
+}
 
+// Start level 0 intro
+void game::restart_from_level_intro() {
+    reset_game(game_state::level_intro);
+}
+
+// Internal only
+void game::reset_game(game_state reset_state) {
     setup_level(0, true);
     state = reset_state;
-
 }
 
 // (Re)start the game
 void game::run_game() {
 
     while (game_window.isOpen()) {
-
-        // Clear the screen
-        //game_window.clear(sf::Color::Black);
 
         // Check for any events since the last loop iteration: start, close
         handle_window_events();
@@ -167,18 +176,17 @@ void game::run_game() {
         // Handle global inputs
         if (handle_global_inputs()) break;
 
-        // Update gameplay only when the game is running
-        if (state == game_state::running) {
-            update_running_frame();
+        // Only recompute overlay text when the state changed
+        if (state != previous_state) {
+            update_state_text();
         }
 
-        //else if (state == game_state::start_level) {
-        //    update_serve_frame();
-        //}
+        // Update gameplay states
+        switch (state) {
 
-        // Otherwise, update the state overlay text (Paused / Game Over / Win screen)
-        else {
-            update_state_text();
+            case game_state::running:     update_running_frame(); break;
+            case game_state::start_level: update_serve_frame(); break;
+            default: break;
         }
 
         // Draw frame: entities and UI
@@ -191,10 +199,7 @@ void game::run_game() {
 
 // Reset the current level
 void game::reset_level() {
-
     setup_level(current_level, false);
-    state = game_state::start_level;
-
 }
 
 // Set up current level 
@@ -228,6 +233,13 @@ void game::setup_level(int level, bool full_reset) {
     // Spawn the paddle
     spawn_paddle({ constants::window_width / 2.0f,
                    constants::window_height - constants::paddle_height }, level);
+
+    // Set velocity to zero and specify the state of the ball as not launched yet.
+    manager.apply_all<bouncing_ball>([](bouncing_ball& b) {
+        b.reset_for_serve();
+    });
+
+    state = game_state::level_intro;
 
 }
 
@@ -423,7 +435,7 @@ void game::spawn_multiball() {
     // Center offset for symmetric distribution (-... 0 ... +)
     const float center = (static_cast<float>(needed) - 1.f) / 2.f;
 
-    // Spawn needed balls with symmetric angle offsets around 0°
+    // Spawn needed balls with symmetric angle offsets around 0Â°
     for (size_t i = 0; i < needed; ++i) {
 
         auto& b = manager.create<bouncing_ball>(
@@ -434,7 +446,7 @@ void game::spawn_multiball() {
             active_powerups.plasma_ball
         );
 
-        // Compute symmetric offset around 0°
+        // Compute symmetric offset around 0Â°
         const float offset = static_cast<float>(i) - center;
         const float angle = offset * step;
         b.rotate(angle, false);
@@ -476,7 +488,7 @@ void game::apply_one_shot_powerups() {
     // Multiball: spawn extra balls only once when collected
     if (active_powerups.multiball) {
         spawn_multiball();
-        active_powerups.multiball = false;   // consume the powerup
+        active_powerups.multiball = false; // Consume the powerup
     }
 
     // Ball burst: spawn a projectile periodically while active
@@ -556,32 +568,41 @@ void game::handle_window_events() {
         // We close the window
         if (event->is<sf::Event::Closed>()) {
             game_window.close();
-        }
-
-        // We press any key
-        if (event->is<sf::Event::KeyPressed>()) {
-            // Start screen: any key starts
-            if (state == game_state::start_screen) {
-                state = game_state::start_level;
-            }
-
-            // Start level: any key starts
-            else if (state == game_state::start_level) {
-                state = game_state::running;
-            }
-
-            // End screens: any key restarts
-            else if (state == game_state::game_over || state == game_state::player_wins) {
-                reset_game(game_state::start_level);
-            }
-
-            // Reinitialize previous state
-            previous_state = game_state::start_screen;
+            continue;
         }
 
         // We resize the window
         if (event->is<sf::Event::Resized>()) {
             update_view();
+            continue;
+        }
+
+        // Use Space to continue the game
+        if (auto* kp = event->getIf<sf::Event::KeyPressed>()) {
+
+            // Only Space is used to advance
+            const bool pressed_space = (kp->code == sf::Keyboard::Key::Space);
+            if (!pressed_space) continue;
+
+            // ONLY handle Space-to-advance in these non-gameplay screens
+            if (state == game_state::start_screen) {
+                state = game_state::level_intro;
+                space_key_active = true;
+                continue;
+            }
+            if (state == game_state::level_intro) {
+                if (current_level == 0) {
+                    audio.stop(sfx_id::welcome);
+                }
+                state = game_state::start_level;
+                space_key_active = true;  // latch: don't launch immediately
+                continue;
+            }
+            if (state == game_state::game_over || state == game_state::player_wins) {
+                reset_game(game_state::level_intro);
+                space_key_active = true;
+                continue;
+            }
         }
     }
 }
@@ -604,7 +625,7 @@ bool game::handle_global_inputs() {
     bool rpressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R);
     if (rpressed && !reset_key_active) {
         reset_level();
-        state = game_state::running;
+        //state = game_state::running;
     }
     reset_key_active = rpressed;
 
@@ -615,17 +636,24 @@ bool game::handle_global_inputs() {
 // Function to handle space to lauch the ball
 void game::handle_ball_launch_input() {
 
-    const bool space_pressed =
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
+    const bool space_pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
+
+    // Only allow launching during serve state.
+    // Still update the latch so transitions don't accidentally trigger a launch.
+    if (state != game_state::start_level) {
+        space_key_active = space_pressed;
+        return;
+    }
 
     // One-shot key press
     if (space_pressed && !space_key_active) {
 
         bool launched_any = false;
 
-        manager.apply_all<bouncing_ball>([](bouncing_ball& b) {
+        manager.apply_all<bouncing_ball>([&](bouncing_ball& b) {
             if (!b.is_launched()) {
                 b.launch();
+                launched_any = true;
             }
         });
 
@@ -640,12 +668,12 @@ void game::stick_unlaunched_balls_to_paddle() {
     paddle* p = manager.get_first<paddle>();
     if (!p) return;
 
-    // put the ball centered on the paddle, slightly above it
-    const float y = p->get_position().y - p->get_height() - 1; // or -some offset you like
+    // Put the ball centered on the paddle, slightly above it
+    const float y = p->get_position().y - p->get_height() - 1; // or -some offset you like FIXME
 
     manager.apply_all<bouncing_ball>([&](bouncing_ball& b) {
         if (!b.is_launched()) {
-            b.set_velocity(0.0f ); // keep it still until launch
+            b.set_velocity( 0.0f );
             b.set_position({ p->get_position().x, y });
         }
     });
@@ -672,7 +700,12 @@ void game::update_state_text() {
         text_state.setString(static_cast<std::string>(strings::string_player_wins));
         break;
     case game_state::start_level:
-        text_state.setPosition( text_level.getPosition());
+        text_state.setPosition(text_level.getPosition());
+        text_state.setCharacterSize(20);
+        text_state.setString(text_level.getString());
+        break;
+    case game_state::level_intro:
+        text_state.setPosition(text_level.getPosition());
         text_state.setCharacterSize(20);
         text_state.setString(text_level.getString());
         break;
@@ -689,39 +722,37 @@ void game::draw_frame() {
 
     // START SCREEN: show only instructions
     if (state == game_state::start_screen) {
-        if (previous_state == state) {
+        if (previous_state != state) {
             audio.play(sfx_id::welcome);
-            previous_state = game_state::running;
         }
         game_window.draw(text_instructions);
         game_window.display();
+        previous_state = state;
+        return;
+    }
+
+    // LEVEL INTRO: show only level title on black background
+    if (state == game_state::level_intro) {
+        game_window.draw(text_state);
+        game_window.display();
+        previous_state = state;
         return;
     }
 
     // GAME OVER / PLAYER WINS: show only the end-screen text
     if (state == game_state::player_wins || state == game_state::game_over) { // (state == game_state::start_level || 
         if (previous_state != state) {
-            switch (state) {
-                case game_state::start_level: if (current_level > 0) audio.play(sfx_id::player_wins); break;
-                case game_state::player_wins: audio.play(sfx_id::player_wins); break;
-                case game_state::game_over:   audio.play(sfx_id::game_over); break;
-                default:                      break;
-            }
-            previous_state = state;
+            if (state == game_state::player_wins) audio.play(sfx_id::player_wins);
+            else                                  audio.play(sfx_id::game_over);
         }
         game_window.draw(text_state);
         game_window.display();
+        previous_state = state;
         return;
     }
 
-    // For START_LEVEL, RUNNING, PAUSED: always draw the board
+    // GAMEPLAY (start_level, running, paused)
     manager.draw(game_window);
-
-    // PLAYER WINS: once when a *new* level starts (not level 0)
-    if (state == game_state::start_level && previous_state != state) {
-        if (current_level > 0) audio.play(sfx_id::player_wins);
-        previous_state = state;
-    }
 
     // PAUSED: draw paused overlay on top
     if (state == game_state::paused) {
@@ -735,6 +766,9 @@ void game::draw_frame() {
 
     // Present the frame
     game_window.display();
+
+    // Track last drawn state
+    previous_state = state;
 }
 
 // Respawn ball if none
@@ -749,8 +783,20 @@ void game::ensure_ball_exists() {
 
     // Spawn the ball from the center of the paddle.
     paddle* p = manager.get_first<paddle>();
+    if (!p) return; // For safety
     spawn_ball({ p->get_position().x,
-                 constants::window_height - constants::paddle_height - 1 }); // To be checked
+                 constants::window_height - constants::paddle_height - 1 }); // FIXME: offset to be checked
+
+    // Reset ball state and velocity
+    manager.apply_all<bouncing_ball>([](bouncing_ball& b) {
+        b.reset_for_serve();
+    });
+    
+    // Set the state to start_level
+    state = game_state::start_level;
+
+    //space_key_active = true; // Optional: avoids instant launch if space is held
+    space_key_active = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
 
     // Decrease the life count
     --lives;
@@ -988,7 +1034,11 @@ std::string game::resolve_collisions() {
 
 // Checks if the player wins, that is, when all bricks are destroyed
 void game::check_win_condition() {
-    
+
+    // A safeguard
+    if (state != game_state::running)
+        return;
+
     //if (manager.has_any<brick>()) return;
     // If at least one brick is destructible, the game continues.
     bool has_destructible = false;
@@ -997,6 +1047,9 @@ void game::check_win_condition() {
             has_destructible = true;
     });
     if (has_destructible) return;
+
+    // Cleared current level
+    audio.play(sfx_id::player_wins);
 
     // Got to next level;
     ++current_level;
@@ -1009,7 +1062,9 @@ void game::check_win_condition() {
 
     // Set up a new level: background, bricks, texts
     setup_level(current_level, false);
-    state = game_state::start_level;
+
+    // Prevent the "advance" Space from also launching the ball later
+    space_key_active = true;
 
 }
 
@@ -1019,14 +1074,19 @@ void game::update_running_frame() {
     // Respawn ball if none
     ensure_ball_exists();
 
-    // Handle ball launch using the space key
-    handle_ball_launch_input();
-
     // The ball should follow the paddle
     stick_unlaunched_balls_to_paddle();
 
-    // Randomly spawn bonus entities
-    spawn_bonuses();
+    // DO NOT spawn bonuses or powerups until ball is launched
+    if (state == game_state::running) {
+
+        // Randomly spawn bonus entities
+        spawn_bonuses();
+
+        // Apply the current active powerup state to entities.
+        apply_one_shot_powerups();     // Spawns extra balls if needed
+        sync_powerups_to_entities();   // Updates ball/paddle properties
+    }
 
     // Update physics / movement
     manager.update();
@@ -1036,10 +1096,6 @@ void game::update_running_frame() {
     
     // Update UI strings once per frame
     update_ui_texts(msg);
-
-    // Apply the current active powerup state to entities.
-    apply_one_shot_powerups();     // Spawns extra balls if needed
-    sync_powerups_to_entities();   // Updates ball/paddle properties
 
     // Cleanup destroyed entities
     manager.refresh();

@@ -10,6 +10,7 @@ enum class color_map_type {
     arcade,
     cosmic,
     planets,
+    tierra,
     starfield,
     alien,
     darkmatter,

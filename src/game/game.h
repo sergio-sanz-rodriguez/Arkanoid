@@ -171,7 +171,15 @@ class game {
 private:
 
     // Enum with allowed values for the game's state
-    enum class game_state { game_over, paused, player_wins, start_screen, start_level, running };
+    enum class game_state {
+        start_screen,
+        level_intro,
+        start_level,
+        running,
+        paused,
+        game_over,
+        player_wins
+    };
 
     // Create the game's window using an object of class RenderWindow
     // The constructor takes an SFML 2D vector with the window dimensions
@@ -202,16 +210,6 @@ private:
     // How many lives does the player have left?
     int lives{ constants::player_lives };
 
-    // Current position and speed of the ball
-    sf::Vector2f current_ball_position{ 
-        constants::window_width / 2.0f,
-        constants::window_height - constants::paddle_height
-    };
-    sf::Vector2f current_ball_velocity{
-        constants::ball_speed,
-        constants::ball_speed
-    };
-
     // Declare some control flags
     bool pause_key_active{ false };
     bool reset_key_active{ false };
@@ -219,7 +217,7 @@ private:
 
     // Bonus spawn control
     sf::Clock bonus_clock;
-    float next_bonus_time = 0.0f;
+    float next_bonus_time{ 0.0f };
     std::mt19937 rng{ std::random_device{}() };
 
     // Bonus timing
@@ -233,16 +231,16 @@ private:
     // sf::Clock plasma_ball_clock;
 
     // X position
-    std::uniform_real_distribution<float> bonus_x_dist{
-        constants::window_width / 16.0f,
-        constants::window_width - (constants::window_width / 16.0f)
-    };
+    //std::uniform_real_distribution<float> bonus_x_dist{
+    //    constants::window_width / 16.0f,
+    //    constants::window_width - (constants::window_width / 16.0f)
+    //};
 
     // Speed jitter for each bonus type
-    std::uniform_real_distribution<float> plasma_ball_jitter{
-       bonus_config::bonus_speed_jitter,
-       1.0f / bonus_config::bonus_speed_jitter
-    };
+    //std::uniform_real_distribution<float> plasma_ball_jitter{
+    //   bonus_config::bonus_speed_jitter,
+    //   1.0f / bonus_config::bonus_speed_jitter
+    //};
     std::uniform_real_distribution<float> life_jitter{ 
         bonus_config::bonus_speed_jitter,
         1.0f / bonus_config::bonus_speed_jitter
@@ -268,13 +266,15 @@ private:
     void spawn_ballstorm();
     powerup_type random_powerup();
     std::optional<powerup_type> last_powerup;
-    bool ballstorm_ui_active = false;       // Ballstorm UI state
-    float ballstorm_time_left = 0.f;        // Seconds remaining
+    bool ballstorm_ui_active{ false };       // Ballstorm UI state
+    float ballstorm_time_left{ 0.f };        // Seconds remaining
 
-    // Resets
+    // Resets and restarts
     void reset_level();
     void reset_powerups();
     void reset_bonus_timers();
+    void reset_game(game_state state);
+    void restart_from_level_intro();
 
     // Spawing player entities: ball and paddle
     void spawn_ball(sf::Vector2f pos);
@@ -327,7 +327,7 @@ public:
     game();
 
     // Reinitialize the game
-    void reset_game(game_state reset_state = game_state::start_screen);
+    void reset_game();
 
     // Game loop
     void run_game();

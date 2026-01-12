@@ -263,7 +263,7 @@ static level_data level1 = {
     assets::img_background_level1_path(), // Background asset
     "\n\n"
     "FIRST MISSION (1/10): NEPTUNE\n\n"
-    "   PRESS ANY KEY TO START" // Intro text
+    "    PRESS SPACE TO START     " // Intro text
 };
 
 
@@ -271,7 +271,7 @@ static level_data level1 = {
 static level_data level2 = {
     brick_config::brick_columns, // columns
     brick_config::brick_rows, // rows
-    4.0f, // width offset, to center the text in the screen
+    3.7f, // width offset, to center the text in the screen
     3.0f, // height offset
     [] {
         const int W = brick_config::brick_columns;
@@ -312,9 +312,11 @@ static level_data level2 = {
     }(),
     color_map_type::arcade, // Color map type
     assets::img_background_level2_path(), // Background asset
-    "     CONTRATULATIONS!\n\n"
-    "NEXT MISSION (2/10): URANUS\n\n"
-    "  PRESS ANY KEY TO START" // Intro text
+    "     CONTRATULATIONS!      "
+    "\n\n"
+    "NEXT MISSION (2/10): URANUS"
+    "\n\n"
+    "   PRESS SPACE TO START    " // Intro text
 };
 
 // Design the arrangement of level 3 (Titan)
@@ -392,7 +394,7 @@ static level_data level3 = {
     "\n\n"
     "NEXT MISSION (3/10): TITAN - SATURN'S MOON"
     "\n\n"
-    "         PRESS ANY KEY TO START          " // Intro text
+    "          PRESS SPACE TO START           "// Intro text
 };
 
 
@@ -584,10 +586,78 @@ static level_data level5 = {
     }(),
     color_map_type::rocks, // Color map type
     assets::img_background_level1_path(), // Background asset
-    "     CONTRATULATIONS!\n\n"
-    "NEXT MISSION (5/10): MARS\n\n"
-    " PRESS ANY KEY TO START" // Intro text
+    "             CONTRATULATIONS!             "
+    "\n\n"
+    "NEXT MISSION (5/10): MARS - THE RED PLANET"
+    "\n\n"
+    "          PRESS ANY KEY TO START          " // Intro text
 };
+
+// Design the arrangement of level 2 (Uranus)
+static level_data level6 = {
+    brick_config::brick_columns, // columns
+    brick_config::brick_rows, // rows
+    4.0f, // width offset, to center the text in the screen
+    3.0f, // height offset
+    [] {
+        const int W = brick_config::brick_columns;
+        const int H = brick_config::brick_rows;
+
+        // Define brick strengths
+        const auto rows_strength = grid_from_strings(W, H, {
+            "...............",
+            ".#############.",
+            ".#11111111111#.",
+            ".#11222222211#.",
+            ".#11222222211#.",
+            ".#11223332211#.",
+            ".#11223332211#.",
+            ".#11223332211#.",
+            "##11223332211##",
+            "  11223332211..",
+            "..11223332211..",
+            "..#122333221#..",
+            "..#122333221#..",
+            "..#122333221#..",
+            "..#122333221#..",
+            "..#122222221#..",
+            "..#111111111#..",
+            "..#3#######3#..",
+        });
+
+        // Define brick colors
+        const auto rows_color = grid_from_strings(W, H, {
+            "...............",
+            ".#############.",
+            ".#00000000000#.",
+            ".#00111111100#.",
+            ".#00111111100#.",
+            ".#00112221100#.",
+            ".#00112221100#.",
+            ".#00112221100#.",
+            "##00112221100##",
+            "  00112221100..",
+            "..00112221100..",
+            "..#011222110#..",
+            "..#011222110#..",
+            "..#011222110#..",
+            "..#011111111#..",
+            "..#011111110#..",
+            "..#000000000#..",
+            "..#3#######3#..",
+            });
+
+        // Parse grid
+        return parse_grid(W, H, rows_strength, rows_color, color_map_type::tierra, false);
+    }(),
+    color_map_type::tierra, // Color map type
+    assets::img_background_level4_path(), // Background asset
+    "             CONTRATULATIONS!             "
+    "\n\n"
+    "NEXT MISSION (5/10): EARTH - HUMANS' HOME"
+    "\n\n"
+    "          PRESS ANY KEY TO START          " // Intro text
+    };
 
 /* Level 5 (Mars)
 ..................
@@ -682,7 +752,7 @@ static level_data level5 = {
 
 // Stack the difficulty levels
 static const level_data* all_levels[] = {
-    &level5,
+    &level2,
     //&level2,
     //&level3
     // add up to 10

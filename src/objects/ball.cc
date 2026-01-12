@@ -64,6 +64,12 @@ void bouncing_ball::stick_to_paddle(sf::Vector2f paddle_pos) {
 
 bool bouncing_ball::is_launched() const noexcept { return launched; }
 
+void bouncing_ball::reset_for_serve()
+{
+    launched = false;
+    velocity = { 0.f, 0.f };
+}
+
 // Set the components of the velocity vector when the ball hits the paddle
 void bouncing_ball::bounce_from_paddle(float dist) noexcept {
 

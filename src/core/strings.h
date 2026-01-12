@@ -39,6 +39,8 @@ namespace strings {
         "\n"
         "- RIGHT ARROW / MOVE MOUSE RIGHT: MOVE PADDLE RIGHT"
         "\n"
+        "- SPACE: CONTINUE / LAUNCH BALL                    "
+        "\n"
         "- P: PAUSE / RESUME                                "
         "\n"
         "- R: RESET                                         "
@@ -47,7 +49,7 @@ namespace strings {
         "\n"
         "- CATCH THE GREEN BALL TO GAIN AN EXTRA LIFE       "
         "\n\n"
-        "            PRESS ANY KEY TO CONTINUE.             "
+        "             PRESS SPACE TO CONTINUE.              "
     };
     inline constexpr std::string_view string_paused{ "PAUSED" };
     inline constexpr std::string_view string_game_over{

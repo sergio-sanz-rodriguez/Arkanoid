@@ -45,6 +45,9 @@ public:
     // Play audio
     void play(sfx_id id);
 
+    // Stop audio
+    void stop(sfx_id id);
+
     //Clean up buffers
     void cleanup();
 
