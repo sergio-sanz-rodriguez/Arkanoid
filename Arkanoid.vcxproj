@@ -50,6 +50,7 @@
     <ClInclude Include="src\objects\brick_config.h" />
     <ClInclude Include="src\objects\levels.h" />
     <ClInclude Include="src\objects\paddle.h" />
+    <ClInclude Include="src\objects\paddle_colors.h" />
     <ClInclude Include="src\systems\interactions.h" />
   </ItemGroup>
   <ItemGroup>

@@ -122,33 +122,42 @@ static std::vector<std::string> random_rows_color(
     const std::vector<std::string>& rows_strength,
     color_map_type color_map
 ) {
+
+    // Random number generator (initialized once)
     static std::mt19937 rng{ std::random_device{}() };
+
+    // Number of available colors in the selected color map
     size_t max_c = get_color_vector(color_map).size();
     
-    std::uniform_int_distribution<int> dist(
-        0,
-        static_cast<int>(max_c)
-    );
+    // Distribution to select a random color index
+    std::uniform_int_distribution<int> dist(0, static_cast<int>(max_c));
 
+    // Container for generated color rows
     std::vector<std::string> rows;
     rows.reserve(H);
 
+    // Iterate over rows
     for (int y = 0; y < H; ++y) {
+
+        // Initialize row with empty cells
         std::string row(W, '.');
 
+        // Iterate over columns
         for (int x = 0; x < W; ++x) {
             char s = rows_strength[y][x];
 
-            // Only bricks get colors
+            // Assign random color index only to destructible bricks
             if (s >= '1' && s <= '3') {
                 row[x] = static_cast<char>('0' + dist(rng));
             }
             // empty '.' and '#' stay '.'
         }
 
+        // Store the generated row
         rows.emplace_back(std::move(row));
     }
 
+    // Return the generated color grid
     return rows;
 }
 
@@ -307,7 +316,6 @@ static level_data level2 = {
     "NEXT MISSION (2/10): URANUS\n\n"
     "  PRESS ANY KEY TO START" // Intro text
 };
-
 
 // Design the arrangement of level 3 (Titan)
 static level_data level3 = {
@@ -472,20 +480,114 @@ static level_data level4 = {
     "           PRESS ANY KEY TO START           " // Intro text
 };
 
-/* Level 4 (Jupiter)
-..................
-......111111......
-.....12222221.....
-....1233333321....
-...123333333321...
-...123333333321...
-...123333333321...
-....1233333321....
-.....12222221.....
-......111111......
-..................
-..................
-*/
+
+// Design the arrangement of level 2 (Uranus)
+static level_data level5 = {
+    brick_config::brick_columns, // columns
+    brick_config::brick_rows, // rows
+    3.5f, // width offset, to center the text in the screen
+    3.0f, // height offset
+    [] {
+        const int W = brick_config::brick_columns;
+        const int H = brick_config::brick_rows;
+
+        // Define brick strengths
+        const auto rows_strength = grid_from_strings(W, H, {
+            "...............",
+            ".2222222222222.",
+            "...............",
+            "111111111111111",
+            "...............",
+            ".2222222222222.",
+            "...............",
+            "111111111111111",
+            "...............",
+            "..33333333333..",
+            "...............",
+            "111111111111111",
+            "...............",
+            ".2222222222222.",
+            "...............",
+            "111111111111111",
+            "...............",
+            "..33333333333..",
+            "...............",
+            ".2222222222222.",
+            "...............",
+            ".2222222222222.",
+            "...............",
+            "111111111111111",
+            "...............",
+            ".2222222222222.",
+            "...............",
+            ".2222222222222.",
+            "...............",
+            "111111111111111",
+            "...............",
+            "111111111111111",
+            "...............",
+            "111111111111111",
+            "...............",
+            "...............",
+            "...............",
+            "...............",
+            "...............",
+            "...............",
+        });
+
+        // Define brick colors
+        const auto rows_color = grid_from_strings(W, H, {
+            "...............",
+            "000000000000000",
+            "...............",
+            "111111111111111",
+            "...............",
+            "222222222222222",
+            "...............",
+            "333333333333333",
+            "...............",
+            "444444444444444",
+            "...............",
+            "555555555555555",
+            "...............",
+            "666666666666666",
+            "...............",
+            "777777777777777",
+            "...............",
+            "888888888888888",
+            "...............",
+            "999999999999999",
+            "...............",
+            "000000000000000",
+            "...............",
+            "111111111111111",
+            "...............",
+            "222222222222222",
+            "...............",
+            "333333333333333",
+            "...............",
+            "444444444444444",
+            "...............",
+            "555555555555555",
+            "...............",
+            "666666666666666",
+            "...............",
+            "...............",
+            "...............",
+            "...............",
+            "...............",
+            "...............",
+            });
+
+        // Parse grid
+        return parse_grid(W, H, rows_strength, rows_color, color_map_type::rocks, true);
+    }(),
+    color_map_type::rocks, // Color map type
+    assets::img_background_level1_path(), // Background asset
+    "     CONTRATULATIONS!\n\n"
+    "NEXT MISSION (5/10): MARS\n\n"
+    " PRESS ANY KEY TO START" // Intro text
+};
 
 /* Level 5 (Mars)
 ..................
@@ -580,7 +682,7 @@ static level_data level4 = {
 
 // Stack the difficulty levels
 static const level_data* all_levels[] = {
-    &level4,
+    &level5,
     //&level2,
     //&level3
     // add up to 10

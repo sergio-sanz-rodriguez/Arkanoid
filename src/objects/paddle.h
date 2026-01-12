@@ -3,6 +3,7 @@
 
 #include "constants.h"
 #include "entity.h"
+#include "paddle_colors.h"
 
 // Class to represent the bouncing ball
 // Inherits from moving_entity
@@ -25,7 +26,7 @@ private:
      // Interface of the class
 
      // Constructor
-     paddle(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col);
+     paddle(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, paddle_colors paddle_color = paddle_colors::light_gray);
 
      // Get the (half) width and height of the paddle
      float get_half_width() const noexcept;

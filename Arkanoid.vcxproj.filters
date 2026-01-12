@@ -107,6 +107,9 @@
     <ClInclude Include="src\objects\ball_colors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\objects\paddle_colors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\ico\arkanoid.ico">

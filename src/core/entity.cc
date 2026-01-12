@@ -29,8 +29,12 @@ void entity::set_scale(sf::Vector2f s) noexcept {
     sprite->scale(s);
 }
 
+// Get and set position
 sf::Vector2f entity::get_position() const noexcept {
     return sprite->getPosition();
+}
+void entity::set_position(sf::Vector2f pos) noexcept {
+    sprite->setPosition(pos);
 }
 
 // Helper functions to get the edges of the sprite

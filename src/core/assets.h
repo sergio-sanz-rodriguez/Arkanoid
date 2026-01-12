@@ -19,7 +19,9 @@ namespace assets {
     inline constexpr std::string_view img_background_level10_filename{ "level_10.png" };
     inline constexpr std::string_view img_ball_filename{ "ball_llwhite.png" };
     inline constexpr std::string_view img_ballstorm_filename{ "burst.png" };
-    inline constexpr std::string_view img_paddle_filename{ "paddle_gray.png" };
+    inline constexpr std::string_view img_paddle_lightg_filename{ "paddle_light_gray.png" };
+    inline constexpr std::string_view img_paddle_darkg_filename{ "paddle_dark_gray.png" };
+    inline constexpr std::string_view img_paddle_gold_filename{ "paddle_gold.png" };
     inline constexpr std::string_view img_brick_filename{ "brick_s.png" };
     inline constexpr std::string_view img_plasma_ball_filename{ "ball_orange.png" };
     inline constexpr std::string_view img_life_filename{ "ball_green.png" };
@@ -43,7 +45,9 @@ namespace assets {
     inline std::string img_background_level4_path() { return std::string(image_dir) + std::string(img_background_level4_filename); }
     inline std::string img_ball_path() { return std::string(image_dir) + std::string(img_ball_filename); }
     inline std::string img_ballstorm_path() { return std::string(image_dir) + std::string(img_ballstorm_filename); }
-    inline std::string img_paddle_path() { return std::string(image_dir) + std::string(img_paddle_filename); }
+    inline std::string img_paddle_lightg_path() { return std::string(image_dir) + std::string(img_paddle_lightg_filename); }
+    inline std::string img_paddle_darkg_path() { return std::string(image_dir) + std::string(img_paddle_darkg_filename); }
+    inline std::string img_paddle_gold_path() { return std::string(image_dir) + std::string(img_paddle_gold_filename); }
     inline std::string img_brick_path() { return std::string(image_dir) + std::string(img_brick_filename); }
     inline std::string img_plasma_ball_path() { return std::string(image_dir) + std::string(img_plasma_ball_filename); }
     inline std::string img_life_path() { return std::string(image_dir) + std::string(img_life_filename); }

@@ -42,6 +42,7 @@ public:
     //float x() const noexcept;
     //float y() const noexcept;
     sf::Vector2f get_position() const noexcept;
+    void set_position(sf::Vector2f pos) noexcept;
 
     // Helper functions to get the edges of the sprite
     float left() const noexcept;

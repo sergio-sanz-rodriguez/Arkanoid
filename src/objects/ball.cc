@@ -45,6 +45,25 @@ bool bouncing_ball::consumed_wall_hit() noexcept {
     return r;
 }
 
+void bouncing_ball::launch() {
+    if (!launched) {
+        launched = true;
+        velocity = { 0.f, -constants::ball_speed };
+    }
+}
+
+void bouncing_ball::stick_to_paddle(sf::Vector2f paddle_pos) {
+    if (!launched) {
+        sprite->setPosition({
+            paddle_pos.x,
+            paddle_pos.y - radius * 2.0f
+            });
+        velocity = { 0.0f, 0.0f };
+    }
+}
+
+bool bouncing_ball::is_launched() const noexcept { return launched; }
+
 // Set the components of the velocity vector when the ball hits the paddle
 void bouncing_ball::bounce_from_paddle(float dist) noexcept {
 

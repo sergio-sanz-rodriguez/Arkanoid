@@ -215,6 +215,7 @@ private:
     // Declare some control flags
     bool pause_key_active{ false };
     bool reset_key_active{ false };
+    bool space_key_active{ false };
 
     // Bonus spawn control
     sf::Clock bonus_clock;
@@ -277,7 +278,7 @@ private:
 
     // Spawing player entities: ball and paddle
     void spawn_ball(sf::Vector2f pos);
-    void spawn_paddle(sf::Vector2f pos);
+    void spawn_paddle(sf::Vector2f pos, int level);
 
     // Logic to manage the difficulty levels of the game
     int current_level = 0;
@@ -287,8 +288,11 @@ private:
     // Check for any events since the last loop iteration: start, close
     void handle_window_events();
 
-    // Function to handle scape, pause, and reset inputs
+    // Functions to handle scape, pause, reset inputs, space
     bool handle_global_inputs();
+    void handle_ball_launch_input();
+    void stick_unlaunched_balls_to_paddle();
+    void update_serve_frame();
 
     // Update state text for the state of the game: paused, game over, player wins
     void update_state_text();

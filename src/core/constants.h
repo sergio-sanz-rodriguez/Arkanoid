@@ -18,6 +18,7 @@ struct constants {
     static constexpr float ball_max_speed{ 16.0f };
     static constexpr float ball_min_speed{ 6.0f };
     static constexpr float ball_speed_step{ 0.5f };
+    static constexpr float ball_radius{ 24.0f };
     static constexpr float ballstorm_speed{ 10.0f };
     static constexpr float ballstorm_interval{ 0.2f }; // fire every 200 ms
     static constexpr float ballstorm_duration_in_sec{ 10.0f }; // lasts 5 secs

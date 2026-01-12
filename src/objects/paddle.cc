@@ -6,11 +6,25 @@
 sf::Texture paddle::texture;
 sf::RenderWindow* paddle::window_ = nullptr;
 
-paddle::paddle(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col) {
+paddle::paddle(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, paddle_colors paddle_color) {
 
     // Load the texture
-    if (!texture.loadFromFile(assets::img_paddle_path())) {
-        throw std::runtime_error("Failed to load the paddle texture.");
+    switch (paddle_color) {
+        case paddle_colors::light_gray:
+            if (!texture.loadFromFile(assets::img_paddle_lightg_path())) {
+                throw std::runtime_error("Failed to load the paddle texture.");
+            }
+            break;
+        case paddle_colors::dark_gray:
+            if (!texture.loadFromFile(assets::img_paddle_darkg_path())) {
+                throw std::runtime_error("Failed to load the paddle texture.");
+            }
+            break;
+        case paddle_colors::gold:
+            if (!texture.loadFromFile(assets::img_paddle_gold_path())) {
+                throw std::runtime_error("Failed to load the paddle texture.");
+            }
+            break;
     }
 
     //sprite.setTexture(texture);

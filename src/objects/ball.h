@@ -14,7 +14,8 @@ private:
     static sf::Texture texture;
     float radius;
     bool plasma_ball{ false };
-    bool hit_wall_this_frame = false;
+    bool hit_wall_this_frame{ false };
+    bool launched{ false };
 
     void process_player_input() override;
 
@@ -41,6 +42,11 @@ private:
 
      // Detecting the hit with the wall
      bool consumed_wall_hit() noexcept;
+
+     // Launch the ball when the user presses the key "Space".
+     void launch();
+     void stick_to_paddle(sf::Vector2f paddle_pos);
+     bool is_launched() const noexcept;
 
      // Set the components of the velocity vector when the ball hits the paddle
      void bounce_from_paddle(float dist) noexcept;

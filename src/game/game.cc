@@ -172,6 +172,10 @@ void game::run_game() {
             update_running_frame();
         }
 
+        //else if (state == game_state::start_level) {
+        //    update_serve_frame();
+        //}
+
         // Otherwise, update the state overlay text (Paused / Game Over / Win screen)
         else {
             update_state_text();
@@ -192,6 +196,7 @@ void game::reset_level() {
     state = game_state::start_level;
 
 }
+
 // Set up current level 
 void game::setup_level(int level, bool full_reset) {
 
@@ -213,7 +218,7 @@ void game::setup_level(int level, bool full_reset) {
 
     // Spawn the bouncing ball
     spawn_ball({ constants::window_width / 2.0f,
-                 constants::window_height - constants::paddle_height });
+                 constants::window_height - constants::paddle_height - constants::ball_radius / 2.0f }); // To be checked, it is hardcoded
 
     // Randomly rotate the ball (optional)
     manager.apply_all<bouncing_ball>([this](bouncing_ball& b) {
@@ -222,7 +227,7 @@ void game::setup_level(int level, bool full_reset) {
 
     // Spawn the paddle
     spawn_paddle({ constants::window_width / 2.0f,
-                   constants::window_height - constants::paddle_height });
+                   constants::window_height - constants::paddle_height }, level);
 
 }
 
@@ -333,7 +338,7 @@ void game::load_level(int level) {
 void game::spawn_ball(sf::Vector2f pos) {
     manager.create<bouncing_ball>(
         pos,
-        sf::Vector2f{ constants::ball_speed, -constants::ball_speed },
+        sf::Vector2f{ 0.0f, 0.0f }, // No movement { constants::ball_speed, -constants::ball_speed },
         constants::ball_scale,
         ball_colors::bouncing_ball,
         false
@@ -341,12 +346,13 @@ void game::spawn_ball(sf::Vector2f pos) {
 }
 
 // Spawn the paddle
-void game::spawn_paddle(sf::Vector2f pos) {
+void game::spawn_paddle(sf::Vector2f pos, int level) {
     manager.create<paddle>(
         pos,
         sf::Vector2f{ constants::paddle_speed, 0.0f },
         constants::paddle_scale,
-        colors::white
+        colors::white,
+        level == 0? paddle_colors::dark_gray : paddle_colors::light_gray
     );
 }
 
@@ -606,6 +612,46 @@ bool game::handle_global_inputs() {
 
 }
 
+// Function to handle space to lauch the ball
+void game::handle_ball_launch_input() {
+
+    const bool space_pressed =
+        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
+
+    // One-shot key press
+    if (space_pressed && !space_key_active) {
+
+        bool launched_any = false;
+
+        manager.apply_all<bouncing_ball>([](bouncing_ball& b) {
+            if (!b.is_launched()) {
+                b.launch();
+            }
+        });
+
+        if (launched_any)
+            state = game_state::running;
+    }
+
+    space_key_active = space_pressed;
+}
+
+void game::stick_unlaunched_balls_to_paddle() {
+    paddle* p = manager.get_first<paddle>();
+    if (!p) return;
+
+    // put the ball centered on the paddle, slightly above it
+    const float y = p->get_position().y - p->get_height() - 1; // or -some offset you like
+
+    manager.apply_all<bouncing_ball>([&](bouncing_ball& b) {
+        if (!b.is_launched()) {
+            b.set_velocity(0.0f ); // keep it still until launch
+            b.set_position({ p->get_position().x, y });
+        }
+    });
+}
+
+
 // Update state text for the state of the game: paused, game over, player wins
 void game::update_state_text() {
     switch (state) {
@@ -653,7 +699,7 @@ void game::draw_frame() {
     }
 
     // GAME OVER / PLAYER WINS: show only the end-screen text
-    if (state == game_state::start_level || state == game_state::player_wins || state == game_state::game_over ) {
+    if (state == game_state::player_wins || state == game_state::game_over) { // (state == game_state::start_level || 
         if (previous_state != state) {
             switch (state) {
                 case game_state::start_level: if (current_level > 0) audio.play(sfx_id::player_wins); break;
@@ -668,8 +714,14 @@ void game::draw_frame() {
         return;
     }
 
-    // RUNNING / PAUSED: draw the game board
+    // For START_LEVEL, RUNNING, PAUSED: always draw the board
     manager.draw(game_window);
+
+    // PLAYER WINS: once when a *new* level starts (not level 0)
+    if (state == game_state::start_level && previous_state != state) {
+        if (current_level > 0) audio.play(sfx_id::player_wins);
+        previous_state = state;
+    }
 
     // PAUSED: draw paused overlay on top
     if (state == game_state::paused) {
@@ -698,7 +750,7 @@ void game::ensure_ball_exists() {
     // Spawn the ball from the center of the paddle.
     paddle* p = manager.get_first<paddle>();
     spawn_ball({ p->get_position().x,
-                 constants::window_height - constants::paddle_height - 10 });
+                 constants::window_height - constants::paddle_height - 1 }); // To be checked
 
     // Decrease the life count
     --lives;
@@ -967,6 +1019,12 @@ void game::update_running_frame() {
     // Respawn ball if none
     ensure_ball_exists();
 
+    // Handle ball launch using the space key
+    handle_ball_launch_input();
+
+    // The ball should follow the paddle
+    stick_unlaunched_balls_to_paddle();
+
     // Randomly spawn bonus entities
     spawn_bonuses();
 
@@ -988,4 +1046,18 @@ void game::update_running_frame() {
 
     // If all bricks are destroyed, then the player wins
     check_win_condition();
+}
+
+// Just allow paddle movement and keep ball attached
+void game::update_serve_frame() {
+    
+    // Let paddle update/move (if paddle reads input in update())
+    manager.update();
+
+    // Space launches (if pressed)
+    handle_ball_launch_input();
+
+    // Keep the ball on the paddle while not launched
+    stick_unlaunched_balls_to_paddle();
+
 }
