@@ -12,7 +12,7 @@
 
 struct constants {
     
-    static constexpr int window_width{ 638 }; //48 - 498
+    static constexpr int window_width{ 628 }; // 638 }; //48 - 498
     static constexpr int window_height{ 860 }; // { 960 };
     static constexpr float ball_speed{ 8.0f };
     static constexpr float ball_max_speed{ 16.0f };
@@ -21,7 +21,7 @@ struct constants {
     static constexpr float ball_radius{ 24.0f };
     static constexpr float ballstorm_speed{ 10.0f };
     static constexpr float ballstorm_interval{ 0.2f }; // fire every 200 ms
-    static constexpr float ballstorm_duration_in_sec{ 10.0f }; // lasts 5 secs
+    static constexpr float ballstorm_duration_in_sec{ 10.0f }; // lasts 10 secs
     static constexpr float paddle_width{ 75.0f };
     static constexpr float paddle_height{ 40.0f };
     static constexpr float paddle_speed{ 10.0f };

@@ -9,16 +9,18 @@
 // Return the color vector corresponding to a given color map
 const std::vector<sf::Color>& get_color_vector(color_map_type map) {
     switch (map) {
-    case color_map_type::arcade: return brick_colors::arcade;
-    case color_map_type::cosmic: return brick_colors::cosmic;
-    case color_map_type::planets: return brick_colors::planets;
+    case color_map_type::arcade:    return brick_colors::arcade;
+    case color_map_type::cosmic:    return brick_colors::cosmic;
+    case color_map_type::planets:   return brick_colors::planets;
     case color_map_type::starfield: return brick_colors::starfield;
-    case color_map_type::alien: return brick_colors::alien;
-    case color_map_type::darkmatter: return brick_colors::darkmatter;
+    case color_map_type::alien:     return brick_colors::alien;
+    case color_map_type::darkmatter:return brick_colors::darkmatter;
     case color_map_type::grayscale: return brick_colors::grayscale;
-    case color_map_type::medal: return brick_colors::medal;
+    case color_map_type::medal:     return brick_colors::medal;
+    case color_map_type::rocks:     return brick_colors::rocks;
+    case color_map_type::tierra:    return brick_colors::tierra;
     }
-    return brick_colors::arcade; // fallback
+    return brick_colors::arcade;
 }
 
 // Convert a vector<string> of ASCII into a vector<level_cell> grid.
@@ -263,7 +265,8 @@ static level_data level1 = {
     assets::img_background_level1_path(), // Background asset
     "\n\n"
     "FIRST MISSION (1/10): NEPTUNE\n\n"
-    "    PRESS SPACE TO START     " // Intro text
+    "    PRESS SPACE TO START     ", // Intro text
+    paddle_colors::light_gray // Paddle color
 };
 
 
@@ -316,7 +319,8 @@ static level_data level2 = {
     "\n\n"
     "NEXT MISSION (2/10): URANUS"
     "\n\n"
-    "   PRESS SPACE TO START    " // Intro text
+    "   PRESS SPACE TO START    ", // Intro text
+    paddle_colors::light_gray // Paddle color
 };
 
 // Design the arrangement of level 3 (Titan)
@@ -394,7 +398,8 @@ static level_data level3 = {
     "\n\n"
     "NEXT MISSION (3/10): TITAN - SATURN'S MOON"
     "\n\n"
-    "          PRESS SPACE TO START           "// Intro text
+    "          PRESS SPACE TO START           ", // Intro text
+    paddle_colors::light_gray // Paddle color
 };
 
 
@@ -479,7 +484,8 @@ static level_data level4 = {
     "\n\n"
     "NEXT MISSION (4/10): EUROPA - JUPITER'S MOON"
     "\n\n"
-    "           PRESS ANY KEY TO START           " // Intro text
+    "           PRESS ANY KEY TO START           ", // Intro text
+    paddle_colors::dark_gray // Paddle color
 };
 
 
@@ -585,19 +591,20 @@ static level_data level5 = {
         return parse_grid(W, H, rows_strength, rows_color, color_map_type::rocks, true);
     }(),
     color_map_type::rocks, // Color map type
-    assets::img_background_level1_path(), // Background asset
+    assets::img_background_level5_path(), // Background asset
     "             CONTRATULATIONS!             "
     "\n\n"
     "NEXT MISSION (5/10): MARS - THE RED PLANET"
     "\n\n"
-    "          PRESS ANY KEY TO START          " // Intro text
+    "          PRESS ANY KEY TO START          ", // Intro text
+    paddle_colors::light_gray // Paddle color
 };
 
-// Design the arrangement of level 2 (Uranus)
+// Design the arrangement of level 6 (Earth)
 static level_data level6 = {
     brick_config::brick_columns, // columns
     brick_config::brick_rows, // rows
-    4.0f, // width offset, to center the text in the screen
+    3.7f, // width offset, to center the text in the screen
     3.0f, // height offset
     [] {
         const int W = brick_config::brick_columns;
@@ -612,14 +619,14 @@ static level_data level6 = {
             ".#11222222211#.",
             ".#11223332211#.",
             ".#11223332211#.",
-            ".#11223332211#.",
             "##11223332211##",
-            "  11223332211..",
+            "#.11223332211.#",
+            ". 11223332211..",
+            "..11223332211..",
             "..11223332211..",
             "..#122333221#..",
             "..#122333221#..",
-            "..#122333221#..",
-            "..#122333221#..",
+            "..#122222221#..",
             "..#122222221#..",
             "..#111111111#..",
             "..#3#######3#..",
@@ -634,29 +641,30 @@ static level_data level6 = {
             ".#00111111100#.",
             ".#00112221100#.",
             ".#00112221100#.",
-            ".#00112221100#.",
             "##00112221100##",
-            "  00112221100..",
+            "#.00112221100.#",
+            ". 00112221100..",
+            "..00112221100..",
             "..00112221100..",
             "..#011222110#..",
             "..#011222110#..",
-            "..#011222110#..",
-            "..#011111111#..",
+            "..#011111110#..",
             "..#011111110#..",
             "..#000000000#..",
-            "..#3#######3#..",
+            "..#2#######2#..",
             });
 
         // Parse grid
         return parse_grid(W, H, rows_strength, rows_color, color_map_type::tierra, false);
     }(),
     color_map_type::tierra, // Color map type
-    assets::img_background_level4_path(), // Background asset
-    "             CONTRATULATIONS!             "
+    assets::img_background_level6_path(), // Background asset
+    "     CONTRATULATIONS!     "
     "\n\n"
-    "NEXT MISSION (5/10): EARTH - HUMANS' HOME"
+    "NEXT MISSION (5/10): EARTH"
     "\n\n"
-    "          PRESS ANY KEY TO START          " // Intro text
+    "  PRESS ANY KEY TO START  ", // Intro text
+    paddle_colors::light_gray // Paddle color
     };
 
 /* Level 5 (Mars)
@@ -752,7 +760,7 @@ static level_data level6 = {
 
 // Stack the difficulty levels
 static const level_data* all_levels[] = {
-    &level2,
+    &level6,
     //&level2,
     //&level3
     // add up to 10

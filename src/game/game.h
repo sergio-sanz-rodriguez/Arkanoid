@@ -256,7 +256,8 @@ private:
     // --- Helper functions --- //
 
     // Set up level
-    void setup_level(int level, bool full_reset);
+    //void setup_level(int level, bool full_reset);
+    void setup_level(const level_data& lvl, int level_index, bool full_reset);
 
     // Powerup logic
     powerups active_powerups;
@@ -278,11 +279,11 @@ private:
 
     // Spawing player entities: ball and paddle
     void spawn_ball(sf::Vector2f pos);
-    void spawn_paddle(sf::Vector2f pos, int level);
+    void spawn_paddle(sf::Vector2f pos, paddle_colors theme);
 
     // Logic to manage the difficulty levels of the game
-    int current_level = 0;
-    void load_level(int level);
+    int current_level{ 1 };
+    //void load_level(int level);
     void spawn_bricks_from_level(const level_data& lvl);
 
     // Check for any events since the last loop iteration: start, close

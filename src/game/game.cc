@@ -158,7 +158,11 @@ void game::restart_from_level_intro() {
 
 // Internal only
 void game::reset_game(game_state reset_state) {
-    setup_level(0, true);
+    //setup_level(0, true);
+    //state = reset_state;
+    const int level_index = 0;
+    const level_data& lvl = get_level(level_index);
+    setup_level(lvl, level_index, true);
     state = reset_state;
 }
 
@@ -189,6 +193,11 @@ void game::run_game() {
             default: break;
         }
 
+        // State might have changed inside update_running_frame()/ensure_ball_exists()
+        if (state != previous_state) {
+            update_state_text();
+        }
+
         // Draw frame: entities and UI
         draw_frame();
     }
@@ -199,11 +208,15 @@ void game::run_game() {
 
 // Reset the current level
 void game::reset_level() {
-    setup_level(current_level, false);
+    //setup_level(current_level, false);
+    const level_data& lvl = get_level(current_level);
+    setup_level(lvl, current_level, false);
 }
 
 // Set up current level 
-void game::setup_level(int level, bool full_reset) {
+//void game::setup_level(int level, bool full_reset) {
+void game::setup_level(const level_data & lvl, int level_index, bool full_reset) {
+
 
     // Clear entity buffers
     manager.clear();
@@ -211,7 +224,7 @@ void game::setup_level(int level, bool full_reset) {
     // Full reset, beginning of the game
     if (full_reset) {
         lives = constants::player_lives;
-        current_level = level;
+        current_level = level_index;
     }
 
     // Reset powerups and timers
@@ -219,20 +232,36 @@ void game::setup_level(int level, bool full_reset) {
     reset_bonus_timers();
     
     // Load the difficulty level
-    load_level(level);
+    //load_level(level);
+    text_level.setString(lvl.level_title);
+    text_level.setPosition(
+        { constants::window_width / lvl.width_offset,
+          constants::window_height / lvl.height_offset });
 
-    // Spawn the bouncing ball
-    spawn_ball({ constants::window_width / 2.0f,
-                 constants::window_height - constants::paddle_height - constants::ball_radius / 2.0f }); // To be checked, it is hardcoded
+    manager.create<background>(0.0f, 0.0f, lvl.background_path);
+    spawn_bricks_from_level(lvl);
+
+    // Spawn the paddle first (NOTE: requires lvl.paddle_theme in level_data)
+    spawn_paddle(
+        { constants::window_width / 2.0f,
+          constants::window_height - constants::paddle_height },
+        lvl.paddle_theme
+    );
+
+    // Spawn the paddle first
+    //spawn_paddle({ constants::window_width / 2.0f,
+    //               constants::window_height - constants::paddle_height }, level);
+
+    // Now spawn the ball relative to the paddle
+    if (auto* p = manager.get_first<paddle>()) {
+        const float y = p->get_position().y - p->get_height() - constants::ball_radius;
+        spawn_ball({ p->get_position().x, y });
+    }
 
     // Randomly rotate the ball (optional)
     manager.apply_all<bouncing_ball>([this](bouncing_ball& b) {
         b.rotate(90.0f, true);
     });
-
-    // Spawn the paddle
-    spawn_paddle({ constants::window_width / 2.0f,
-                   constants::window_height - constants::paddle_height }, level);
 
     // Set velocity to zero and specify the state of the ball as not launched yet.
     manager.apply_all<bouncing_ball>([](bouncing_ball& b) {
@@ -329,22 +358,22 @@ void game::update_view() {
 }
 
 // Load the current difficulty level
-void game::load_level(int level) {
+//void game::load_level(int level) {
 
-    const level_data& lvl = get_level(level);
+//    const level_data& lvl = get_level(level);
     
-    // Show the title of the level
-    text_level.setString(lvl.level_title);
-    text_level.setPosition(
-        { constants::window_width / lvl.width_offset,
-          constants::window_height / lvl.height_offset });
+//    // Show the title of the level
+//    text_level.setString(lvl.level_title);
+//    text_level.setPosition(
+//        { constants::window_width / lvl.width_offset,
+//          constants::window_height / lvl.height_offset });
 
     // Spawn background for this level
-    manager.create<background>(0.0f, 0.0f, lvl.background_path);
+//    manager.create<background>(0.0f, 0.0f, lvl.background_path);
 
     // Spawn brick according to the arrangement of cells
-    spawn_bricks_from_level(lvl);
-}
+//    spawn_bricks_from_level(lvl);
+//}
 
 // Spawn the bouncing ball
 void game::spawn_ball(sf::Vector2f pos) {
@@ -358,13 +387,13 @@ void game::spawn_ball(sf::Vector2f pos) {
 }
 
 // Spawn the paddle
-void game::spawn_paddle(sf::Vector2f pos, int level) {
+void game::spawn_paddle(sf::Vector2f pos, paddle_colors theme) {
     manager.create<paddle>(
         pos,
         sf::Vector2f{ constants::paddle_speed, 0.0f },
         constants::paddle_scale,
         colors::white,
-        level == 0? paddle_colors::dark_gray : paddle_colors::light_gray
+        theme
     );
 }
 
@@ -784,8 +813,8 @@ void game::ensure_ball_exists() {
     // Spawn the ball from the center of the paddle.
     paddle* p = manager.get_first<paddle>();
     if (!p) return; // For safety
-    spawn_ball({ p->get_position().x,
-                 constants::window_height - constants::paddle_height - 1 }); // FIXME: offset to be checked
+    const float y = p->get_position().y - p->get_height() - constants::ball_radius;
+    spawn_ball({ p->get_position().x, y });
 
     // Reset ball state and velocity
     manager.apply_all<bouncing_ball>([](bouncing_ball& b) {
@@ -805,6 +834,7 @@ void game::ensure_ball_exists() {
     // And enable the game-over flag if the player runs out of lives
     if (lives <= 0) {
         state = game_state::game_over;
+        update_state_text(); // Optional
     }
 
 }
@@ -1055,13 +1085,15 @@ void game::check_win_condition() {
     ++current_level;
 
     // If no more levels, player wins the game
-    if (current_level >= level_count()) {
+    if (current_level > level_count()) {
         state = game_state::player_wins;
         return;
     }
 
     // Set up a new level: background, bricks, texts
-    setup_level(current_level, false);
+    //setup_level(current_level, false);
+    const level_data& lvl = get_level(current_level);
+    setup_level(lvl, current_level, false);
 
     // Prevent the "advance" Space from also launching the ball later
     space_key_active = true;

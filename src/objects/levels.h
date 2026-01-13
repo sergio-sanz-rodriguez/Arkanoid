@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <vector>
 #include "constants.h"
+#include "paddle_colors.h"
 
 // Possible color maps
 enum class color_map_type {
@@ -36,7 +37,7 @@ struct level_data {
     color_map_type color_map = color_map_type::arcade;
     std::string background_path;
     std::string level_title;
-    
+    paddle_colors paddle_theme = paddle_colors::light_gray;
 
     const level_cell& at(int x, int y) const {
         return grid[y * columns + x];

@@ -43,6 +43,8 @@ namespace assets {
     inline std::string img_background_level2_path() { return std::string(image_dir) + std::string(img_background_level2_filename); }
     inline std::string img_background_level3_path() { return std::string(image_dir) + std::string(img_background_level3_filename); }
     inline std::string img_background_level4_path() { return std::string(image_dir) + std::string(img_background_level4_filename); }
+    inline std::string img_background_level5_path() { return std::string(image_dir) + std::string(img_background_level5_filename); }
+    inline std::string img_background_level6_path() { return std::string(image_dir) + std::string(img_background_level6_filename); }
     inline std::string img_ball_path() { return std::string(image_dir) + std::string(img_ball_filename); }
     inline std::string img_ballstorm_path() { return std::string(image_dir) + std::string(img_ballstorm_filename); }
     inline std::string img_paddle_lightg_path() { return std::string(image_dir) + std::string(img_paddle_lightg_filename); }

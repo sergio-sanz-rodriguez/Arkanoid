@@ -7,7 +7,7 @@ namespace brick_config {
     inline constexpr int indestructible_strength{ 255 };
     inline constexpr int brick_columns{ 15 };
     inline constexpr int brick_rows{ 45 };
-    inline constexpr float brick_width{ 43.0f };
+    inline constexpr float brick_width{ 42.0f };
     inline constexpr float brick_height{ 20.0f };
     inline constexpr float brick_offset_width{ brick_width * 0.5f };
     inline constexpr float brick_offset_height{ brick_height * 0.5f };

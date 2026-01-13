@@ -39,9 +39,9 @@ namespace brick_colors {
     };
 
     inline const std::vector<sf::Color> tierra = {
-        colors::blue,   // Water
-        colors::brown,  // Rocks
-        colors::orange, // Core
+        sf::Color(20, 70, 140),  // Deep ocean
+        sf::Color(70, 140, 90),  // Earth land
+        sf::Color(230, 120, 40), // Earth core
     };
 
     inline const std::vector<sf::Color> starfield = {
