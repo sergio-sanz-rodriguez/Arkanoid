@@ -16,6 +16,7 @@ enum class powerup_type {
     ball_slower,
     ballstorm,
     plasma_ball,
+    antimatter_ball,
     multiball,
     paddle_wider,
     paddle_narrower,
@@ -28,6 +29,7 @@ struct powerups {
     bool ball_slower = false;
     bool ballstorm = false;
     bool plasma_ball = false;
+    bool antimatter_ball = false;
     bool multiball = false;
     bool paddle_wider = false;
     bool paddle_narrower = false;
@@ -38,6 +40,7 @@ struct powerups {
     void apply(powerup_type bonus) {
         switch (bonus) {
             case powerup_type::plasma_ball:     plasma_ball = true; break;
+            case powerup_type::antimatter_ball: antimatter_ball = true; break;
             case powerup_type::multiball:       multiball = true; break;
             case powerup_type::ballstorm:       ballstorm = true; break;
             case powerup_type::ball_faster:     ball_faster = true; ball_slower = false; break;

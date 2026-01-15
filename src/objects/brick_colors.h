@@ -45,11 +45,11 @@ namespace brick_colors {
     };
 
     inline const std::vector<sf::Color> starfield = {
-        sf::Color(255, 255, 255), // white stars
         sf::Color(255, 255, 0),   // yellow star
         sf::Color(255, 128, 0),   // orange flare
-        sf::Color(0, 255, 255),   // cyan nova
         sf::Color(255, 0, 255),   // purple supernova
+        sf::Color(0, 255, 255),   // cyan nova        
+        sf::Color(255, 255, 255), // white stars
     };
 
     inline const std::vector<sf::Color> alien = {

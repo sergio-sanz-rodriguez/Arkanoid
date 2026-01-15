@@ -958,6 +958,10 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
                 // plasma_ball_clock.restart();
                 break;
 
+            case powerup_type::antimatter_ball:
+                // antimatter_ball can also expire after X seconds:
+                // antimatter_ball_clock.restart();
+                break;
             case powerup_type::multiball:
                 powerup_msg = "Multiball";
                 audio.play(sfx_id::powerup);
@@ -996,7 +1000,9 @@ void game::update_ui_texts(const std::string& powerup_msg) {
     text_lives.setString("Lives: " + std::to_string(lives));
 
     // persistent state
-    text_plasma_ball.setString(active_powerups.plasma_ball ? "Plasma ball" : "");
+    text_plasma_ball.setString(
+        active_powerups.plasma_ball ? "Plasma ball" :
+        active_powerups.antimatter_ball? "Antimatter ball" : "");
 
     // last pickup message (event)
     if (!powerup_msg.empty())

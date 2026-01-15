@@ -7,7 +7,7 @@ namespace ball_colors {
 
     inline constexpr sf::Color bouncing_ball = colors::steel;
     inline constexpr sf::Color plasma_ball = colors::orange;
-
+    inline constexpr sf::Color antimatter_ball = colors::blueviolet;
 }
 
 #endif // BALL_COLORS_H

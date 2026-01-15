@@ -484,7 +484,7 @@ static level_data level4 = {
     "\n\n"
     "NEXT MISSION (4/10): EUROPA - JUPITER'S MOON"
     "\n\n"
-    "           PRESS ANY KEY TO START           ", // Intro text
+    "            PRESS SPACE TO START            ", // Intro text
     paddle_colors::dark_gray // Paddle color
 };
 
@@ -596,7 +596,7 @@ static level_data level5 = {
     "\n\n"
     "NEXT MISSION (5/10): MARS - THE RED PLANET"
     "\n\n"
-    "          PRESS ANY KEY TO START          ", // Intro text
+    "           PRESS SPACE TO START           ", // Intro text
     paddle_colors::light_gray // Paddle color
 };
 
@@ -661,11 +661,185 @@ static level_data level6 = {
     assets::img_background_level6_path(), // Background asset
     "     CONTRATULATIONS!     "
     "\n\n"
-    "NEXT MISSION (5/10): EARTH"
+    "NEXT MISSION (6/10): EARTH"
     "\n\n"
-    "  PRESS ANY KEY TO START  ", // Intro text
+    "   PRESS SPACE TO START   ", // Intro text
     paddle_colors::light_gray // Paddle color
     };
+
+// Design the arrangement of level 7 (Venus)
+static level_data level7 = {
+    brick_config::brick_columns, // columns
+    brick_config::brick_rows, // rows
+    3.7f, // width offset, to center the text in the screen
+    3.0f, // height offset
+    [] {
+        const int W = brick_config::brick_columns;
+        const int H = brick_config::brick_rows;
+
+        // Define brick strengths
+        const auto rows_strength = grid_from_strings(W, H, {
+            "#..............",
+            ".........#.....",
+            "...............",
+            "..#1111#1111#..",
+            "..11121113121.2",
+            "3.11#11#11311..",
+            "..111#2#11111..",
+            "..1211111#2#1..",
+            "3311112321111#3",
+            "..11213#31211..",
+            "..11111311111..",
+            "..1111232#111..",
+            "2.11#23222111..",
+            "..1#111111111..",
+            "..21111#1111#2.",
+            "....11##113....",
+            ".... 123111....",
+            "....113211 ....",
+            "...#22222221...",
+            "....122222#....",
+            "3....1333#..2..",
+            "......#31......",
+            "..3............",
+            ".....1....3....",
+            "#..............",
+            "..............#",
+        });
+
+        // Define brick colors
+        const auto rows_color = grid_from_strings(W, H, {
+            "#..............",
+            ".........#.....",
+            "...............",
+            "..#0000#0000#..",
+            "..00010102010.1",
+            "2.00#00#00200..",
+            "..000#1#00000..",
+            "..0100000#1#0..",
+            "2200001210000#2",
+            "..00102#20100..",
+            "..00000200000..",
+            "..0000121#000..",
+            "1.00#12111000..",
+            "..0#000000000..",
+            "..10000#0000#1.",
+            "....00##002....",
+            ".... 012000....",
+            "....002100 ....",
+            "...#11111110...",
+            "....011111#....",
+            "2....0222#..1..",
+            "......#20......",
+            "..2............",
+            ".....0....2....",
+            "#..............",
+            "..............#",
+        });
+
+        // Parse grid
+        return parse_grid(W, H, rows_strength, rows_color, color_map_type::alien, true);
+    }(),
+    color_map_type::alien, // Color map type
+    assets::img_background_level7_path(), // Background asset
+    "     CONTRATULATIONS!     "
+    "\n\n"
+    "NEXT MISSION (7/10): VENUS"
+    "\n\n"
+    "   PRESS SPACE TO START   ", // Intro text
+    paddle_colors::light_gray // Paddle color
+};
+
+// Design the arrangement of level 7 (Venus)
+static level_data level8 = {
+    brick_config::brick_columns, // columns
+    brick_config::brick_rows, // rows
+    4.5f, // width offset, to center the text in the screen
+    3.0f, // height offset
+    [] {
+        const int W = brick_config::brick_columns;
+        const int H = brick_config::brick_rows;
+
+        // Define brick strengths
+        const auto rows_strength = grid_from_strings(W, H, {
+            "321............",
+            "....#..........",
+            "........1.#....",
+            "1.31331...#11#.",
+            "..33131...#11#.",
+            "..22111.1.#11#.",
+            "#.2232.1..#11#.",
+            "..1112#...#11#.",
+            "..1213112.#11#.",
+            ".#11111...#11#.",
+            "..123123..#11#.",
+            "11113111.1#11#.",
+            "21131213..#11#.",
+            "21331112..#11#.",
+            "331111211.#11#.",
+            "111#11111.#11#.",
+            "221132111.#11#.",
+            "#11332113.#11#.",
+            "11222111..####.",
+            "21131113....1..",
+            "121121123..1...",
+            "3221131111#11#.",
+            "3212121311####.",
+            "111111111313111",
+            "112111223112231",
+            "223112131132111",
+            "...............",
+            "...............",
+            "...............",
+            ".......#.......",
+        });
+
+        // Define brick colors
+        const auto rows_color = grid_from_strings(W, H, {
+            "210............",
+            "....#..........",
+            "........0.#....",
+            "0.20220...#00#.",
+            "..22020...#00#.",
+            "..11000.0.#00#.",
+            "#.1121.0..#00#.",
+            "..0001#...#00#.",
+            "..0102001.#00#.",
+            ".#00000...#00#.",
+            "..012012..#00#.",
+            "00002000.0#00#.",
+            "10020102..#00#.",
+            "10220001..#00#.",
+            "220000101.#00#.",
+            "000#00000.#00#.",
+            "110021000.#00#.",
+            "#00221002.#00#.",
+            "00111000..####.",
+            "10020002....0..",
+            "010010012..0...",
+            "2110020000#00#.",
+            "2101010100####.",
+            "000000000202000",
+            "011010112011120",
+            "112010102021000",
+            "...............",
+            "...............",
+            "...............",
+            ".......#.......",
+        });
+
+        // Parse grid
+        return parse_grid(W, H, rows_strength, rows_color, color_map_type::planets, true);
+    }(),
+    color_map_type::planets, // Color map type
+    assets::img_background_level8_path(), // Background asset
+    "     CONTRATULATIONS!     "
+    "\n\n"
+    "NEXT MISSION (8/10): MERCURY"
+    "\n\n"
+    "   PRESS SPACE TO START   ", // Intro text
+    paddle_colors::light_gray // Paddle color
+};
 
 /* Level 5 (Mars)
 ..................
@@ -760,7 +934,7 @@ static level_data level6 = {
 
 // Stack the difficulty levels
 static const level_data* all_levels[] = {
-    &level6,
+    &level7,
     //&level2,
     //&level3
     // add up to 10
