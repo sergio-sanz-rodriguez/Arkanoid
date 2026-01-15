@@ -16,7 +16,6 @@ namespace assets {
     inline constexpr std::string_view img_background_level7_filename{ "level_7.png" };
     inline constexpr std::string_view img_background_level8_filename{ "level_8.png" };
     inline constexpr std::string_view img_background_level9_filename{ "level_9.png" };
-    inline constexpr std::string_view img_background_level10_filename{ "level_10.png" };
     inline constexpr std::string_view img_ball_filename{ "ball_llwhite.png" };
     inline constexpr std::string_view img_ballstorm_filename{ "burst.png" };
     inline constexpr std::string_view img_paddle_lightg_filename{ "paddle_light_gray.png" };
@@ -47,6 +46,7 @@ namespace assets {
     inline std::string img_background_level6_path() { return std::string(image_dir) + std::string(img_background_level6_filename); }
     inline std::string img_background_level7_path() { return std::string(image_dir) + std::string(img_background_level7_filename); }
     inline std::string img_background_level8_path() { return std::string(image_dir) + std::string(img_background_level8_filename); }
+    inline std::string img_background_level9_path() { return std::string(image_dir) + std::string(img_background_level9_filename); }
     inline std::string img_ball_path() { return std::string(image_dir) + std::string(img_ball_filename); }
     inline std::string img_ballstorm_path() { return std::string(image_dir) + std::string(img_ballstorm_filename); }
     inline std::string img_paddle_lightg_path() { return std::string(image_dir) + std::string(img_paddle_lightg_filename); }
