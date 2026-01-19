@@ -2,7 +2,6 @@
 #define BACKGROUND_H
 
 #include <memory>
-#include "constants.h"
 #include "entity.h"
 
 // Class to represent the background

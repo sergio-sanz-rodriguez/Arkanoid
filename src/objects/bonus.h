@@ -3,10 +3,12 @@
 
 #include "constants.h"
 #include "entity.h"
+#include "bonus_config.h"
 
 // Define the two types of bonuses for the dame
 enum class bonus_type {
     plasma_ball,
+    antimatter_ball,
     life,
     powerup
 };
@@ -39,8 +41,8 @@ struct powerups {
 
     void apply(powerup_type bonus) {
         switch (bonus) {
-            case powerup_type::plasma_ball:     plasma_ball = true; break;
-            case powerup_type::antimatter_ball: antimatter_ball = true; break;
+            case powerup_type::plasma_ball:     plasma_ball = true;  antimatter_ball = false; break;
+            case powerup_type::antimatter_ball: plasma_ball = false; antimatter_ball = true;  break;
             case powerup_type::multiball:       multiball = true; break;
             case powerup_type::ballstorm:       ballstorm = true; break;
             case powerup_type::ball_faster:     ball_faster = true; ball_slower = false; break;
@@ -70,9 +72,10 @@ class bonus : public moving_entity {
 private:
 
     // Private data members
-    static sf::Texture plasma_ball_texture;
-    static sf::Texture life_texture;
     static sf::Texture powerup_texture;
+    static sf::Texture life_texture;
+    static sf::Texture plasma_ball_texture;
+    static sf::Texture antimatter_ball_texture;
     float half_width;
     float half_height;
     bonus_type type;

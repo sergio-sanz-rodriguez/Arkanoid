@@ -80,7 +80,6 @@ namespace strings {
         "\n"
         "         PRESS ESCAPE TO QUIT           "
     };
-
 }
 
 #endif // STRINGS_H

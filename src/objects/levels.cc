@@ -3,24 +3,22 @@
 #include <random>
 #include "levels.h"
 #include "assets.h"
-#include "brick_colors.h"
-#include "brick_config.h"
 
 // Return the color vector corresponding to a given color map
-const std::vector<sf::Color>& get_color_vector(color_map_type map) {
+const std::vector<sf::Color>& get_color_vector(brick_colors map) {
     switch (map) {
-    case color_map_type::arcade:    return brick_colors::arcade;
-    case color_map_type::cosmic:    return brick_colors::cosmic;
-    case color_map_type::planets:   return brick_colors::planets;
-    case color_map_type::starfield: return brick_colors::starfield;
-    case color_map_type::alien:     return brick_colors::alien;
-    case color_map_type::darkmatter:return brick_colors::darkmatter;
-    case color_map_type::grayscale: return brick_colors::grayscale;
-    case color_map_type::medal:     return brick_colors::medal;
-    case color_map_type::rocks:     return brick_colors::rocks;
-    case color_map_type::tierra:    return brick_colors::tierra;
+    case brick_colors::arcade:    return brick_color_maps::arcade;
+    case brick_colors::cosmic:    return brick_color_maps::cosmic;
+    case brick_colors::planets:   return brick_color_maps::planets;
+    case brick_colors::starfield: return brick_color_maps::starfield;
+    case brick_colors::alien:     return brick_color_maps::alien;
+    case brick_colors::darkmatter:return brick_color_maps::darkmatter;
+    case brick_colors::grayscale: return brick_color_maps::grayscale;
+    case brick_colors::medal:     return brick_color_maps::medal;
+    case brick_colors::rocks:     return brick_color_maps::rocks;
+    case brick_colors::tierra:    return brick_color_maps::tierra;
     }
-    return brick_colors::arcade;
+    return brick_color_maps::arcade;
 }
 
 // Convert a vector<string> of ASCII into a vector<level_cell> grid.
@@ -39,7 +37,7 @@ static std::vector<level_cell> parse_grid(
     int H,
     const std::vector<std::string>& rows_strength,
     const std::vector<std::string>& rows_color,
-    color_map_type color_map,
+    brick_colors color_map,
     bool apply_random_idx
 ) {
     // Validate grid height
@@ -122,7 +120,7 @@ static std::vector<std::string> random_rows_color(
     int W,
     int H,
     const std::vector<std::string>& rows_strength,
-    color_map_type color_map
+    brick_colors color_map
 ) {
 
     // Random number generator (initialized once)
@@ -259,14 +257,16 @@ static level_data level1 = {
         });
 
         // Parse grid
-        return parse_grid(W, H, rows_strength, rows_color, color_map_type::arcade, true);
+        return parse_grid(W, H, rows_strength, rows_color, brick_colors::arcade, true);
     }(),
-    color_map_type::arcade, // Color map type
     assets::img_background_level1_path(), // Background asset
     "\n\n"
     "FIRST MISSION (1/10): NEPTUNE\n\n"
     "    PRESS SPACE TO START     ", // Intro text
-    paddle_colors::light_gray // Paddle color
+    "1: NEPTUNE - FROZEN FRONTIER [EASY]\n\n", // Menu text
+    ball_colors::steel, // Ball color
+    paddle_colors::light_gray, // Paddle color
+    brick_colors::arcade // Brick colors
 };
 
 
@@ -308,19 +308,21 @@ static level_data level2 = {
         });
 
         // Define brick colors  (random)
-        const auto rows_color = random_rows_color(W, H, rows_strength, color_map_type::arcade);
+        const auto rows_color = random_rows_color(W, H, rows_strength, brick_colors::arcade);
 
         // Parse grid
-        return parse_grid(W, H, rows_strength, rows_color, color_map_type::arcade, false);
+        return parse_grid(W, H, rows_strength, rows_color, brick_colors::arcade, false);
     }(),
-    color_map_type::arcade, // Color map type
     assets::img_background_level2_path(), // Background asset
     "     CONTRATULATIONS!      "
     "\n\n"
     "NEXT MISSION (2/10): URANUS"
     "\n\n"
     "   PRESS SPACE TO START    ", // Intro text
-    paddle_colors::light_gray // Paddle color
+    "2: URANUS - ICE ANOMALY [EASY]\n\n", // Menu text
+    ball_colors::steel, // Ball color
+    paddle_colors::light_gray, // Paddle color
+    brick_colors::arcade // Brick colors
 };
 
 // Design the arrangement of level 3 (Titan)
@@ -390,18 +392,19 @@ static level_data level3 = {
             });
 
         // Parse grid
-        return parse_grid(W, H, rows_strength, rows_color, color_map_type::medal, true);
+        return parse_grid(W, H, rows_strength, rows_color, brick_colors::medal, true);
     }(),
-    color_map_type::medal, // Color map type
     assets::img_background_level3_path(), //Background asset
     "            CONTRATULATIONS!             "
     "\n\n"
     "NEXT MISSION (3/10): TITAN - SATURN'S MOON"
     "\n\n"
     "          PRESS SPACE TO START           ", // Intro text
-    paddle_colors::light_gray // Paddle color
+    "3: TITAN - SATURN'S MOON [MEDIUM]\n\n", // Menu text
+    ball_colors::steel, // Ball color
+    paddle_colors::light_gray, // Paddle color
+    brick_colors::medal // Brick colors
 };
-
 
 // Design the arrangement of level 4 (Europa)
 static level_data level4 = {
@@ -476,16 +479,18 @@ static level_data level4 = {
             });
 
         // Parse grid
-        return parse_grid(W, H, rows_strength, rows_color, color_map_type::cosmic, true);
+        return parse_grid(W, H, rows_strength, rows_color, brick_colors::cosmic, true);
     }(),
-    color_map_type::cosmic, // Color map type
     assets::img_background_level4_path(), // Background asset
     "              CONTRATULATIONS!              "
     "\n\n"
     "NEXT MISSION (4/10): EUROPA - JUPITER'S MOON"
     "\n\n"
     "            PRESS SPACE TO START            ", // Intro text
-    paddle_colors::dark_gray // Paddle color
+    "4: EUROPA - JUPITER'S MOON [MEDIUM]\n\n", // Menu text
+    ball_colors::steel, // Ball color
+    paddle_colors::dark_gray, // Paddle color
+    brick_colors::cosmic // Brick colors
 };
 
 
@@ -532,9 +537,9 @@ static level_data level5 = {
             "...............",
             "111111111111111",
             "...............",
-            "111111111111111",
             "...............",
-            "111111111111111",
+            "...............",
+            "...............",
             "...............",
             "...............",
             "...............",
@@ -576,9 +581,9 @@ static level_data level5 = {
             "...............",
             "444444444444444",
             "...............",
-            "555555555555555",
             "...............",
-            "666666666666666",
+            "...............",
+            "...............",
             "...............",
             "...............",
             "...............",
@@ -588,16 +593,18 @@ static level_data level5 = {
             });
 
         // Parse grid
-        return parse_grid(W, H, rows_strength, rows_color, color_map_type::rocks, true);
+        return parse_grid(W, H, rows_strength, rows_color, brick_colors::rocks, true);
     }(),
-    color_map_type::rocks, // Color map type
     assets::img_background_level5_path(), // Background asset
     "             CONTRATULATIONS!             "
     "\n\n"
     "NEXT MISSION (5/10): MARS - THE RED PLANET"
     "\n\n"
     "           PRESS SPACE TO START           ", // Intro text
-    paddle_colors::light_gray // Paddle color
+    "5: MARS - THE RED PLANET [MEDIUM]\n\n", // Menu text
+    ball_colors::steel, // Ball color
+    paddle_colors::light_gray, // Paddle color
+    brick_colors::rocks // Brick colors
 };
 
 // Design the arrangement of level 6 (Earth)
@@ -655,16 +662,18 @@ static level_data level6 = {
             });
 
         // Parse grid
-        return parse_grid(W, H, rows_strength, rows_color, color_map_type::tierra, false);
+        return parse_grid(W, H, rows_strength, rows_color, brick_colors::tierra, false);
     }(),
-    color_map_type::tierra, // Color map type
     assets::img_background_level6_path(), // Background asset
     "     CONTRATULATIONS!     "
     "\n\n"
     "NEXT MISSION (6/10): EARTH"
     "\n\n"
     "   PRESS SPACE TO START   ", // Intro text
-    paddle_colors::light_gray // Paddle color
+    "6: EARTH - LAST HUMAN STRONGHOLD [DIFFICULT]\n\n", // Menu text
+    ball_colors::steel, // Ball color
+    paddle_colors::light_gray, // Paddle color
+    brick_colors::tierra // Brick colors
     };
 
 // Design the arrangement of level 7 (Venus)
@@ -738,19 +747,21 @@ static level_data level7 = {
         });
 
         // Parse grid
-        return parse_grid(W, H, rows_strength, rows_color, color_map_type::alien, true);
+        return parse_grid(W, H, rows_strength, rows_color, brick_colors::alien, true);
     }(),
-    color_map_type::alien, // Color map type
     assets::img_background_level7_path(), // Background asset
     "     CONTRATULATIONS!     "
     "\n\n"
     "NEXT MISSION (7/10): VENUS"
     "\n\n"
     "   PRESS SPACE TO START   ", // Intro text
-    paddle_colors::light_gray // Paddle color
+    "7: VENUS - 400°C INFERNO [DIFFICULT]\n\n", // Menu text
+    ball_colors::steel, // Ball color
+    paddle_colors::light_gray, // Paddle color
+    brick_colors::alien // Brick colors
 };
 
-// Design the arrangement of level 7 (Venus)
+// Design the arrangement of level 8 (Mercury)
 static level_data level8 = {
     brick_config::brick_columns, // columns
     brick_config::brick_rows, // rows
@@ -829,115 +840,144 @@ static level_data level8 = {
         });
 
         // Parse grid
-        return parse_grid(W, H, rows_strength, rows_color, color_map_type::planets, true);
+        return parse_grid(W, H, rows_strength, rows_color, brick_colors::planets, true);
     }(),
-    color_map_type::planets, // Color map type
     assets::img_background_level8_path(), // Background asset
     "     CONTRATULATIONS!     "
     "\n\n"
     "NEXT MISSION (8/10): MERCURY"
     "\n\n"
     "   PRESS SPACE TO START   ", // Intro text
-    paddle_colors::light_gray // Paddle color
+    "8: MERCURY - THE BURNING ROCK [DIFFICULT]\n\n", // Menu text
+    ball_colors::steel, // Ball color
+    paddle_colors::light_gray, // Paddle color
+    brick_colors::planets // Brick colors
 };
 
-/* Level 5 (Mars)
-..................
-...###......###...
-...#1111111111#...
-...#1222222221#...
-...#1233333321#...
-...#1233333321#...
-...#1233333321#...
-...#1222222221#...
-...#1111111111#...
-...###......###...
-..................
-..................
-*/
+// Design the arrangement of level 9 (Sun)
+static level_data level9 = {
+    brick_config::brick_columns, // columns
+    brick_config::brick_rows, // rows
+    5.0f, // width offset, to center the text in the screen
+    3.0f, // height offset
+    [] {
+        const int W = brick_config::brick_columns;
+        const int H = brick_config::brick_rows;
 
-/* Level 6 (Earth)
-..................
-...11111##11111...
-...11111##11111...
-...11111##11111...
-...############...
-...############...
-...############...
-...11111##11111...
-...11111##11111...
-...11111##11111...
-..................
-..................
-*/
+        // Define brick strengths
+        const auto rows_strength = grid_from_strings(W, H, {
+            "111111111111111",
+            "222222222222222",
+            "222222222222222",
+            "333333333333333",
+            "333333333333333",
+            "333333333333333",
+            "...............",
+            "...............",
+            "#....#.....#...",
+            "...............",
+            "...............",
+            "...##...##...##",
+            "...............",
+            "...............",
+            "333333333333333",
+            "222222222222222",
+            "222222222222222",
+            "222222222222222",
+            "111111111111111",
+            "111111111111111",
+            "111111111111111",
+            "...............",
+            "...............",
+            "...............",
+            "#..##..##..##..",
+            "...............",
+            "...............",
+            ".##..##..##..##",
+            "...............",
+            "...............",
+            "..##..##..##..#",
+            "...............",
+            "...............",
+            "##..##..##..##.",
+            "...............",
+            "...............",
+            "...............",
+            "...............",
+            "...............",
+            "...............",
+        });
 
+        // Define brick colors
+        const auto rows_color = grid_from_strings(W, H, {
+            "000000000000000",
+            "111111111111111",
+            "111111111111111",
+            "222222222222222",
+            "222222222222222",
+            "222222222222222",
+            "...............",
+            "...............",
+            "#....#.....#...",
+            "...............",
+            "...............",
+            "...##...##...##",
+            "...............",
+            "...............",
+            "222222222222222",
+            "111111111111111",
+            "111111111111111",
+            "111111111111111",
+            "000000000000000",
+            "000000000000000",
+            "000000000000000",
+            "...............",
+            "...............",
+            "...............",
+            "#..##..##..##..",
+            "...............",
+            "...............",
+            ".##..##..##..##",
+            "...............",
+            "...............",
+            "..##..##..##..#",
+            "...............",
+            "...............",
+            "##..##..##..##.",
+            "...............",
+            "...............",
+            "...............",
+            "...............",
+            "...............",
+            "...............",
+        });
 
-/* Level 7 (Venus)
-..................
-...############...
-...#111....111#...
-...#111.##.111#...
-....333.##.222....
-........##........
-....333.##.222....
-...#111.##.111#...
-...#111....111#...
-...############...
-..................
-..................
-*/
-
-/* Level 8 (Mercury)
-..................
-...111111..111111...
-...122221..122221...
-...123321..123321...
-...123321..123321...
-...123321..123321...
-...123321..123321...
-...123321..123321...
-...122221..122221...
-...111111..111111...
-..................
-..................
-*/
-
-/* Level 9 (Sun)
-..................
-...333333333333...
-...322222222223...
-...321111111123...
-...321111111123...
-...#####....#####...
-...#####....#####...
-...321111111123...
-...321111111123...
-...322222222223...
-...333333333333...
-..................
-*/
-
-/* Level 10 (A*)
-..................
-...333333333333...
-...322222222223...
-...321111111123...
-...321##..##123...
-...321##..##123...
-...321######123...
-...321######123...
-...321111111123...
-...322222222223...
-...333333333333...
-..................
-*/
+        // Parse grid
+        return parse_grid(W, H, rows_strength, rows_color, brick_colors::starfield, true);
+    }(),
+    assets::img_background_level9_path(), // Background asset
+    "   CONTRATULATIONS!    "
+    "\n\n"
+    "NEXT MISSION (9/9): SUN"
+    "\n\n"
+    " PRESS SPACE TO START  ", // Intro text
+    "9: SUN - CORE ASSAULT [VERY DIFFICULT]", // Menu text
+    ball_colors::gold, // Ball color
+    paddle_colors::gold, // Paddle color
+    brick_colors::starfield // Brick colors
+};
 
 // Stack the difficulty levels
 static const level_data* all_levels[] = {
+    &level1,
+    &level2,
+    &level3,
+    &level4,
+    &level5,
+    &level6,
     &level7,
-    //&level2,
-    //&level3
-    // add up to 10
+    &level8,
+    &level9
 };
 
 // Helper function to get the level

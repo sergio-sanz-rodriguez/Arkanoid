@@ -11,6 +11,7 @@ void brick::set_indestructible(bool value) noexcept { indestructible = value; }
 bool brick::is_indestructible() const noexcept { return indestructible; }
 void brick::weaken() noexcept { --strength;  }
 bool brick::is_too_weak() const noexcept { return strength <= 0;  }
+bool brick::is_solid() const noexcept { return is_indestructible() || strength > 0; }
 
 //brick::brick(float x, float y, sf::Color c) : color(c) {
 brick::brick(sf::Vector2f pos, sf::Vector2f sca, sf::Color col) {

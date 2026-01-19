@@ -23,6 +23,7 @@ namespace assets {
     inline constexpr std::string_view img_paddle_gold_filename{ "paddle_gold.png" };
     inline constexpr std::string_view img_brick_filename{ "brick_s.png" };
     inline constexpr std::string_view img_plasma_ball_filename{ "ball_orange.png" };
+    inline constexpr std::string_view img_antimatter_ball_filename{ "ball_blueviolet.png" };
     inline constexpr std::string_view img_life_filename{ "ball_green.png" };
     inline constexpr std::string_view img_powerup_filename{ "ball_blue.png" };
     inline constexpr std::string_view sfx_ball_brick_filename{ "ball_brick.wav" };
@@ -54,6 +55,7 @@ namespace assets {
     inline std::string img_paddle_gold_path() { return std::string(image_dir) + std::string(img_paddle_gold_filename); }
     inline std::string img_brick_path() { return std::string(image_dir) + std::string(img_brick_filename); }
     inline std::string img_plasma_ball_path() { return std::string(image_dir) + std::string(img_plasma_ball_filename); }
+    inline std::string img_antimatter_ball_path() { return std::string(image_dir) + std::string(img_antimatter_ball_filename); }
     inline std::string img_life_path() { return std::string(image_dir) + std::string(img_life_filename); }
     inline std::string img_powerup_path() { return std::string(image_dir) + std::string(img_powerup_filename); }
     inline std::string sfx_ball_brick_path() { return std::string(sfx_dir) + std::string(sfx_ball_brick_filename); }

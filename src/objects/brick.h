@@ -32,6 +32,7 @@ public:
     bool is_indestructible() const noexcept;
     void weaken() noexcept;
     bool is_too_weak() const noexcept;
+    bool is_solid() const noexcept;
 
     // Implement the pure virtual functions
     void update() override;

@@ -1,5 +1,5 @@
-#ifndef PADDLE_COLORS_H
-#define PADDLE_COLORS_H
+#ifndef PADDLE_CONFIG_H
+#define PADDLE_CONFIG_H
 
 enum class paddle_colors {
     light_gray,
@@ -7,5 +7,5 @@ enum class paddle_colors {
     gold
 };
 
-#endif // PADDLE_COLORS_H
+#endif // PADDLE_CONFIG_H
 #pragma once

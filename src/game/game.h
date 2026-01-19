@@ -12,8 +12,10 @@
 #include <sstream>
 #include <iomanip>
 
+#include "assets.h"
 #include "constants.h"
 #include "background.h"
+#include "colors.h"
 #include "ball.h"
 #include "brick.h"
 #include "entity.h"
@@ -22,7 +24,8 @@
 #include "audio.h"
 #include "levels.h"
 #include "strings.h"
-#include "bonus_config.h"
+#include "bonus.h"
+#include "interactions.h"
 
 // A class to manage the entities in the game
 // It stores the entities in a vector of std::unique_ptr
@@ -173,7 +176,8 @@ private:
     // Enum with allowed values for the game's state
     enum class game_state {
         start_screen,
-        level_intro,
+        level_select,
+        //level_intro,
         start_level,
         running,
         paused,
@@ -194,10 +198,12 @@ private:
     sf::Font font;
     sf::Text text_state;
     sf::Text text_plasma_ball;
+    sf::Text text_antimatter_ball;
     sf::Text text_lives;
     sf::Text text_powerup;
     sf::Text text_instructions;
-    sf::Text text_level;
+    sf::Text level_menu_header;
+    std::vector<sf::Text> level_menu_items; // Num levels with texts
 
     // Logic to define what region is show on screen and update it if user scales it.
     sf::View view;
@@ -230,17 +236,6 @@ private:
     // plasma_ball clock
     // sf::Clock plasma_ball_clock;
 
-    // X position
-    //std::uniform_real_distribution<float> bonus_x_dist{
-    //    constants::window_width / 16.0f,
-    //    constants::window_width - (constants::window_width / 16.0f)
-    //};
-
-    // Speed jitter for each bonus type
-    //std::uniform_real_distribution<float> plasma_ball_jitter{
-    //   bonus_config::bonus_speed_jitter,
-    //   1.0f / bonus_config::bonus_speed_jitter
-    //};
     std::uniform_real_distribution<float> life_jitter{ 
         bonus_config::bonus_speed_jitter,
         1.0f / bonus_config::bonus_speed_jitter
@@ -275,16 +270,21 @@ private:
     void reset_powerups();
     void reset_bonus_timers();
     void reset_game(game_state state);
-    void restart_from_level_intro();
+    //void restart_from_level_intro();
 
     // Spawing player entities: ball and paddle
-    void spawn_ball(sf::Vector2f pos);
-    void spawn_paddle(sf::Vector2f pos, paddle_colors theme);
+    void spawn_ball(sf::Vector2f pos, ball_colors color);
+    void spawn_paddle(sf::Vector2f pos, paddle_colors color);
 
     // Logic to manage the difficulty levels of the game
-    int current_level{ 1 };
-    //void load_level(int level);
+    std::vector<uint8_t> level_achieved;
+    int current_level{ 0 };
+    //int num_levels{ 0 }; // Store the number of levels achieved
+    //void reset_progress();
+    bool is_level_achieved(std::size_t i) const noexcept;
+    void mark_level_achieved(std::size_t i);
     void spawn_bricks_from_level(const level_data& lvl);
+    void update_level_menu_colors();
 
     // Check for any events since the last loop iteration: start, close
     void handle_window_events();
@@ -318,6 +318,7 @@ private:
 
     // Checks if the player wins, when all bricks are destroyed
     void check_win_condition();
+    void check_win_condition_old();
 
     // Draw entities + UI
     void draw_frame();

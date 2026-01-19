@@ -3,7 +3,7 @@
 
 #include "constants.h"
 #include "entity.h"
-#include "paddle_colors.h"
+#include "paddle_config.h"
 
 // Class to represent the bouncing ball
 // Inherits from moving_entity

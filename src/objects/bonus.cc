@@ -3,9 +3,10 @@
 #include "bonus_config.h"
 
 // Initialize static data
-sf::Texture bonus::plasma_ball_texture;
-sf::Texture bonus::life_texture;
 sf::Texture bonus::powerup_texture;
+sf::Texture bonus::life_texture;
+sf::Texture bonus::plasma_ball_texture;
+sf::Texture bonus::antimatter_ball_texture;
 
 bonus::bonus(bonus_type type, sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col) : type(type) {
 
@@ -14,6 +15,9 @@ bonus::bonus(bonus_type type, sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f s
     if (!loaded) {
         if (!plasma_ball_texture.loadFromFile(assets::img_plasma_ball_path())) {
             throw std::runtime_error("Failed to load the plasma_ball texture.");
+        }
+        if (!antimatter_ball_texture.loadFromFile(assets::img_antimatter_ball_path())) {
+            throw std::runtime_error("Failed to load the antimatter_ball texture.");
         }
         if (!life_texture.loadFromFile(assets::img_life_path())) {
             throw std::runtime_error("Failed to load the life texture.");
@@ -24,11 +28,26 @@ bonus::bonus(bonus_type type, sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f s
         loaded = true;
     }
 
-    // Create sprite using the correct textrue
-    sprite = std::make_unique<sf::Sprite>(
-        (type == bonus_type::plasma_ball) ? plasma_ball_texture :
-        (type == bonus_type::life)     ? life_texture     : powerup_texture
-    );
+    //Select texture by bonus type
+    const sf::Texture* texture = &powerup_texture;
+    switch (type) {
+    case bonus_type::plasma_ball:
+        texture = &plasma_ball_texture;
+        break;
+    case bonus_type::life:
+        texture = &life_texture;
+        break;
+    case bonus_type::antimatter_ball:
+        texture = &antimatter_ball_texture;
+        break;
+    case bonus_type::powerup:
+    default:
+        texture = &powerup_texture;
+        break;
+    }
+
+    // Create sprite
+    sprite = std::make_unique<sf::Sprite>(*texture);
 
     // Set the initial position, velocity, and color of the live object
     // Use (x, y) for the initial position of the live object

@@ -3,24 +3,13 @@
 
 #include <cstdint>
 #include <vector>
+#include <string>
 #include "constants.h"
-#include "paddle_colors.h"
+#include "paddle_config.h"
+#include "ball_config.h"
+#include "brick_config.h"
 
-// Possible color maps
-enum class color_map_type {
-    arcade,
-    cosmic,
-    planets,
-    tierra,
-    starfield,
-    alien,
-    darkmatter,
-    rocks,
-    grayscale,
-    medal
-};
-
-const std::vector<sf::Color>& get_color_vector(color_map_type map);
+const std::vector<sf::Color>& get_color_vector(brick_colors map);
 
 // Cell struct specifying brick properties
 struct level_cell {
@@ -34,19 +23,21 @@ struct level_data {
     float width_offset = 4.0f;
     float height_offset = 3.0f;
     std::vector<level_cell> grid; // size = columns * rows
-    color_map_type color_map = color_map_type::arcade;
     std::string background_path;
     std::string level_title;
-    paddle_colors paddle_theme = paddle_colors::light_gray;
+    std::string menu_label;
+    ball_colors ball_color = ball_colors::steel;
+    paddle_colors paddle_color = paddle_colors::light_gray;
+    brick_colors brick_color_map = brick_colors::arcade;
 
     const level_cell& at(int x, int y) const {
         return grid[y * columns + x];
     }
+
 };
 
 const level_data& get_level(int index);
 int level_count();
-
 
 #endif // LEVELS_H
 #pragma once

@@ -1,12 +1,11 @@
 #include "assets.h"
 #include "ball.h"
-#include "ball_colors.h"
 
 // Initialize static data
 sf::Texture bouncing_ball::texture;
 sf::Texture ballstorm::texture;
 
-bouncing_ball::bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool plasma_ball) : plasma_ball(plasma_ball) {
+bouncing_ball::bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, ball_type type) : type(type) {
 
     // Load the texture
     if (!texture.loadFromFile(assets::img_ball_path())) {
@@ -24,27 +23,43 @@ bouncing_ball::bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sc
 
     // Set the radius of the ball
     radius = get_bounding_box().size.x / 2.0f;
+
+    // Set the color based on type
+    set_ball_type(type, 1.0f);
 }
 
 // Get the radius of the ball
 float bouncing_ball::get_radius() const noexcept { return radius; }
 
 // Get and set the state of the plasma_ball feature
-bool bouncing_ball::get_plasma_ball() const noexcept { return plasma_ball; }
-void bouncing_ball::set_plasma_ball(bool on, float factor) noexcept {
-    plasma_ball = on;
-    sprite->setColor(on ? ball_colors::plasma_ball : ball_colors::bouncing_ball);
-    sprite->setScale(on ? factor * sf::Vector2f{ 0.5f, 0.5f } : sf::Vector2f{ 0.5f, 0.5f });
+ball_type bouncing_ball::get_ball_type() const noexcept { return type; }
+
+void bouncing_ball::set_ball_type(ball_type new_type, float factor) noexcept {
+    type = new_type;
+    switch (type) {
+    case ball_type::plasma:
+        sprite->setColor(ball_color_maps::plasma_ball);
+        sprite->setScale(factor * sf::Vector2f{ 0.5f, 0.5f });
+        break;
+    case ball_type::antimatter:
+        sprite->setColor(ball_color_maps::antimatter_ball);
+        sprite->setScale(factor * sf::Vector2f{ 0.5f, 0.5f });
+        break;
+    default:
+        break;
+    }
+
     radius = get_bounding_box().size.x / 2.0f;
 }
 
-// Function to detect if the ball hits the any wall
+// Function to detect if the ball hits  any wall
 bool bouncing_ball::consumed_wall_hit() noexcept {
     bool r = hit_wall_this_frame;
     hit_wall_this_frame = false;   // consume it
     return r;
 }
 
+// Launch the ball upward if it has not been launched yet
 void bouncing_ball::launch() {
     if (!launched) {
         launched = true;
@@ -52,6 +67,7 @@ void bouncing_ball::launch() {
     }
 }
 
+// Keep the ball attached to the paddle before launch
 void bouncing_ball::stick_to_paddle(sf::Vector2f paddle_pos) {
     if (!launched) {
         sprite->setPosition({
@@ -62,12 +78,25 @@ void bouncing_ball::stick_to_paddle(sf::Vector2f paddle_pos) {
     }
 }
 
+// Check whether the ball has already been launched
 bool bouncing_ball::is_launched() const noexcept { return launched; }
 
+// Reset the ball state for a new serve
 void bouncing_ball::reset_for_serve()
 {
     launched = false;
     velocity = { 0.f, 0.f };
+}
+
+// Function to map ball types to colors
+sf::Color bouncing_ball::to_sf_color(ball_colors color) {
+    switch (color) {
+        case ball_colors::steel:      return ball_color_maps::bouncing_ball;
+        case ball_colors::gold:       return ball_color_maps::bouncing_gold_ball;
+        case ball_colors::orange:     return ball_color_maps::plasma_ball;
+        case ball_colors::blueviolet: return ball_color_maps::antimatter_ball;
+        default:                      return sf::Color::White;
+    }
 }
 
 // Set the components of the velocity vector when the ball hits the paddle
@@ -96,37 +125,46 @@ void bouncing_ball::draw(sf::RenderWindow& window) {
 }
 
 // Update velocities
+
+// Up
 void bouncing_ball::move_up() noexcept {
     velocity.y = -std::abs(velocity.y);
 }
 
+// Down
 void bouncing_ball::move_down() noexcept {
     velocity.y = std::abs(velocity.y);
 }
 
+// Left
 void bouncing_ball::move_left() noexcept {
     velocity.x = -std::abs(velocity.x);
 }
 
+// Right
 void bouncing_ball::move_right() noexcept {
     velocity.x = std::abs(velocity.x);
 }
 
+// Up with a rotation angle
 void bouncing_ball::move_up(float angle) noexcept {
     velocity.y = -std::abs(velocity.y);
     rotate(angle);
 }
 
+// Down with a rotation angle
 void bouncing_ball::move_down(float angle) noexcept {
     velocity.y = std::abs(velocity.y);
     rotate(angle);
 }
 
+// Left with a rotation angle
 void bouncing_ball::move_left(float angle) noexcept {
     velocity.x = -std::abs(velocity.x);
     rotate(angle);
 }
 
+// Right with a rotation angle
 void bouncing_ball::move_right(float angle) noexcept {
     velocity.x = std::abs(velocity.x);
     rotate(angle);
@@ -164,6 +202,7 @@ void bouncing_ball::update() {
     if ((get_position().y - radius) <= 0.0f) {
         sprite->setPosition({ get_position().x, radius });
         velocity.y = std::abs(velocity.y); // ensure moving down
+        rotate(constants::rotation_angle * 0.5f); // to avoid completelly vertical bounces.
         hit_wall_this_frame = true;
     }
     else if ((get_position().y + radius) >= constants::window_height) {

@@ -3,6 +3,7 @@
 
 #include "constants.h"
 #include "entity.h"
+#include "ball_config.h"
 
 // Class to represent the bouncing ball
 // Inherits from moving_entity
@@ -13,9 +14,9 @@ private:
     // Private data members
     static sf::Texture texture;
     float radius;
-    bool plasma_ball{ false };
     bool hit_wall_this_frame{ false };
     bool launched{ false };
+    ball_type type{ ball_type::regular };
 
     void process_player_input() override;
 
@@ -31,14 +32,16 @@ private:
      // vel: current speed of the ball
      // sca: current scale of the ball
      // col: current color of the ball
-     bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, bool plasma_ball = false);
+     bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, ball_type type = ball_type::regular);
 
      // Get the radius of the ball
      float get_radius() const noexcept;
 
      // Get and set the state of the plasma_ball feature
-     bool get_plasma_ball() const noexcept;
-     void set_plasma_ball(bool on, float factor) noexcept;
+     //bool get_plasma_ball() const noexcept;
+     //void set_plasma_ball(bool on, float factor) noexcept;
+     ball_type get_ball_type() const noexcept;
+     void set_ball_type(ball_type new_type, float factor) noexcept;
 
      // Detecting the hit with the wall
      bool consumed_wall_hit() noexcept;
@@ -48,6 +51,9 @@ private:
      void stick_to_paddle(sf::Vector2f paddle_pos);
      bool is_launched() const noexcept;
      void reset_for_serve();
+
+     // Color mapping
+     static sf::Color to_sf_color(ball_colors color);
 
      // Set the components of the velocity vector when the ball hits the paddle
      void bounce_from_paddle(float dist) noexcept;

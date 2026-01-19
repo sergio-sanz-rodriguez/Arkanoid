@@ -7,6 +7,8 @@
 namespace colors {
 
     inline constexpr sf::Color anthracite{ 53, 60, 64 };
+    inline constexpr sf::Color black{ 0, 0, 0 };
+    inline constexpr sf::Color dark_gray{ 64, 64, 64 };
     inline constexpr sf::Color white{ 255, 255, 255 };
     inline constexpr sf::Color red{ 205, 92, 92 };
     inline constexpr sf::Color orange{ 255, 129, 24 };
@@ -21,6 +23,7 @@ namespace colors {
     inline constexpr sf::Color brown{ 139, 90, 43 }; // Asteroid Brown
     inline constexpr sf::Color copper{ 184, 115, 51 }; // Copper Strong bricks
     inline constexpr sf::Color gold{ 212, 175, 55 };   // Gold Strong bricks
+    inline constexpr sf::Color gold_ball{ 216, 172, 99 };   // Gold for ball
     inline constexpr sf::Color silver{ 187, 198, 204 };
     //inline constexpr sf::Color bronze{ 205, 127, 50 };
     inline constexpr sf::Color bronze{ 176, 116, 59 };

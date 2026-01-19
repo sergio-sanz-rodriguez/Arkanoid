@@ -1,10 +1,4 @@
 ﻿#include "game.h"
-#include "assets.h"
-#include "ball_colors.h"
-#include "brick_colors.h"
-#include "colors.h"
-#include "interactions.h"
-#include "strings.h"
 
 // Function to scan all entities and clean up the destroyed ones
 void entity_manager::refresh() {
@@ -53,10 +47,12 @@ game::game() :
     rng(std::random_device{}()),
     text_state(font),
     text_plasma_ball(font),
+    text_antimatter_ball(font),
     text_lives(font),
     text_powerup(font),
     text_instructions(font),
-    text_level(font) {
+    level_menu_header(font),
+    level_achieved(static_cast<size_t>(level_count()), 0) {
 
     // Limit the framerate
     game_window.setFramerateLimit(60);      // Max rate is 60 frames per second
@@ -78,6 +74,10 @@ game::game() :
     // state = game_state::start_screen; Already initalized in .h
     previous_state = game_state::running;
 
+    // Initialize level_achieved buffer
+    if (!level_achieved.empty())
+        level_achieved[0] = 0;
+
     // Load a font from file
     if (!font.openFromFile(assets::font_consola)) {
         std::cerr << "Failed to load font!" << std::endl;
@@ -98,8 +98,16 @@ game::game() :
         { (constants::window_width / 2.0f) - std::ceilf(constants::window_width / 20.0f),
         constants::window_height - std::ceilf(constants::window_height / 31.8f) });
     text_plasma_ball.setCharacterSize(13);
-    text_plasma_ball.setFillColor(ball_colors::plasma_ball);
+    text_plasma_ball.setFillColor(ball_color_maps::plasma_ball);
     text_plasma_ball.setString("");
+
+    text_antimatter_ball.setFont(font);
+    text_antimatter_ball.setPosition(
+        { (constants::window_width / 2.0f) - std::ceilf(constants::window_width / 12.0f),
+        constants::window_height - std::ceilf(constants::window_height / 31.8f) });
+    text_antimatter_ball.setCharacterSize(13);
+    text_antimatter_ball.setFillColor(ball_color_maps::antimatter_ball);
+    text_antimatter_ball.setString("");
 
     text_lives.setFont(font);
     text_lives.setPosition(
@@ -125,13 +133,30 @@ game::game() :
     text_instructions.setFillColor(colors::white);
     text_instructions.setString(static_cast<std::string>(strings::string_instructions));
 
-    text_level.setFont(font);
-    text_level.setPosition(
-        { constants::window_width / 4.0f,
-          constants::window_height / 3.0f });
-    text_level.setCharacterSize(20);
-    text_level.setFillColor(colors::white);
-    text_level.setString(""); // To be set when the level is loaded
+    // Build level menu window
+    level_menu_header.setFont(font);
+    level_menu_header.setCharacterSize(20);
+    level_menu_header.setFillColor(colors::white);
+    level_menu_header.setString("PRESS ONE OF THESE KEYS TO SELECT THE LEVEL:");
+    level_menu_header.setPosition({ constants::window_width / 8.5f, constants::window_height / 6.0f });
+
+    level_menu_items.clear();
+    level_menu_items.reserve(static_cast<size_t>(level_count()));
+
+    float x = constants::window_width / 8.5f;
+    float y = constants::window_height / 6.0f + 80.0f; // below header
+    float line_step = 52.0f;
+
+    for (int i = 0; i < level_count(); ++i) {
+        const auto& lvl = get_level(i);
+        sf::Text t(font);
+        t.setCharacterSize(20);
+        t.setString(lvl.menu_label);
+        t.setPosition({ x, y + static_cast<float>(i) * line_step });
+        t.setFillColor(colors::white);
+
+        level_menu_items.push_back(t);
+    }
 
     // Load sound effects
     audio.load(sfx_id::ball_brick,  assets::sfx_ball_brick_path());
@@ -149,11 +174,6 @@ game::game() :
 // Full reset to start screen
 void game::reset_game() {
     reset_game(game_state::start_screen);
-}
-
-// Start level 0 intro
-void game::restart_from_level_intro() {
-    reset_game(game_state::level_intro);
 }
 
 // Internal only
@@ -206,20 +226,33 @@ void game::run_game() {
 
 // ********** PRIVATE AND HELPER FUNCTIONS **********//
 
+// Determine if a level has been achieved
+bool game::is_level_achieved(std::size_t i) const noexcept {
+    return i < level_achieved.size() && level_achieved[i];
+}
+
+// Mark level as achieved
+void game::mark_level_achieved(std::size_t i) {
+    if (i < level_achieved.size())
+        level_achieved[i] = 1;
+}
+
 // Reset the current level
 void game::reset_level() {
-    //setup_level(current_level, false);
     const level_data& lvl = get_level(current_level);
     setup_level(lvl, current_level, false);
 }
 
 // Set up current level 
-//void game::setup_level(int level, bool full_reset) {
 void game::setup_level(const level_data & lvl, int level_index, bool full_reset) {
-
 
     // Clear entity buffers
     manager.clear();
+
+    // Safely check level_index
+    const int num_levels = static_cast<int>(bonus_config::level_probs.size());
+    if (level_index < 0) level_index = 0;
+    if (level_index >= num_levels) level_index = num_levels - 1;
 
     // Full reset, beginning of the game
     if (full_reset) {
@@ -230,13 +263,6 @@ void game::setup_level(const level_data & lvl, int level_index, bool full_reset)
     // Reset powerups and timers
     reset_powerups();
     reset_bonus_timers();
-    
-    // Load the difficulty level
-    //load_level(level);
-    text_level.setString(lvl.level_title);
-    text_level.setPosition(
-        { constants::window_width / lvl.width_offset,
-          constants::window_height / lvl.height_offset });
 
     manager.create<background>(0.0f, 0.0f, lvl.background_path);
     spawn_bricks_from_level(lvl);
@@ -245,17 +271,13 @@ void game::setup_level(const level_data & lvl, int level_index, bool full_reset)
     spawn_paddle(
         { constants::window_width / 2.0f,
           constants::window_height - constants::paddle_height },
-        lvl.paddle_theme
+        lvl.paddle_color
     );
-
-    // Spawn the paddle first
-    //spawn_paddle({ constants::window_width / 2.0f,
-    //               constants::window_height - constants::paddle_height }, level);
 
     // Now spawn the ball relative to the paddle
     if (auto* p = manager.get_first<paddle>()) {
         const float y = p->get_position().y - p->get_height() - constants::ball_radius;
-        spawn_ball({ p->get_position().x, y });
+        spawn_ball({ p->get_position().x, y }, lvl.ball_color);
     }
 
     // Randomly rotate the ball (optional)
@@ -268,8 +290,15 @@ void game::setup_level(const level_data & lvl, int level_index, bool full_reset)
         b.reset_for_serve();
     });
 
-    state = game_state::level_intro;
+}
 
+// Update level menu colors: black/dark_gray if the level is achieved, white if doesn't
+void game::update_level_menu_colors() {
+    for (size_t i = 0; i < level_menu_items.size(); ++i) {
+        // your levels are 0..8 internally, menu shows 1..9
+        bool achieved = is_level_achieved(i);
+        level_menu_items[i].setFillColor(achieved ? colors::dark_gray : colors::white);
+    }
 }
 
 // Function to reset powerups including UI texts
@@ -278,6 +307,7 @@ void game::reset_powerups() {
     active_powerups.reset();
 
     text_plasma_ball.setString("");
+    text_antimatter_ball.setString("");
     text_powerup.setString("");
 
     // Ballstorm UI
@@ -357,43 +387,25 @@ void game::update_view() {
 
 }
 
-// Load the current difficulty level
-//void game::load_level(int level) {
-
-//    const level_data& lvl = get_level(level);
-    
-//    // Show the title of the level
-//    text_level.setString(lvl.level_title);
-//    text_level.setPosition(
-//        { constants::window_width / lvl.width_offset,
-//          constants::window_height / lvl.height_offset });
-
-    // Spawn background for this level
-//    manager.create<background>(0.0f, 0.0f, lvl.background_path);
-
-    // Spawn brick according to the arrangement of cells
-//    spawn_bricks_from_level(lvl);
-//}
-
 // Spawn the bouncing ball
-void game::spawn_ball(sf::Vector2f pos) {
+void game::spawn_ball(sf::Vector2f pos, ball_colors color) {
     manager.create<bouncing_ball>(
         pos,
         sf::Vector2f{ 0.0f, 0.0f }, // No movement { constants::ball_speed, -constants::ball_speed },
         constants::ball_scale,
-        ball_colors::bouncing_ball,
-        false
+        bouncing_ball::to_sf_color(color),
+        ball_type::regular
     );
 }
 
 // Spawn the paddle
-void game::spawn_paddle(sf::Vector2f pos, paddle_colors theme) {
+void game::spawn_paddle(sf::Vector2f pos, paddle_colors color) {
     manager.create<paddle>(
         pos,
         sf::Vector2f{ constants::paddle_speed, 0.0f },
         constants::paddle_scale,
         colors::white,
-        theme
+        color
     );
 }
 
@@ -416,9 +428,9 @@ void game::spawn_bricks_from_level(const level_data& lvl) {
             float py = brick_config::brick_offset_height + y * brick_config::brick_height;
 
             // Define colors
-            const auto& colors = get_color_vector(lvl.color_map);
+            const auto& colors = get_color_vector(lvl.brick_color_map);
             const bool is_indestructible = cell.strength == brick_config::indestructible_strength;
-            sf::Color color = is_indestructible ? brick_colors::indestructible : colors[cell.color_idx];
+            sf::Color color = is_indestructible ? brick_color_maps::indestructible : colors[cell.color_idx];
             //sf::Color c = vcolor[color_dist(rng)]; // Pick a random color
 
             auto& b = manager.create<brick>(
@@ -447,12 +459,26 @@ void game::spawn_multiball() {
     const size_t ball_count = manager.count<bouncing_ball>();
     if (ball_count >= target_total) return;
 
-    // Reference ball
+    // Set reference ball
     auto* ref = manager.get_first<bouncing_ball>();
     if (!ref) return;
 
+    // Determine position, velocity, and scale of the reference ball
     const sf::Vector2f pos = ref->get_position();
     const sf::Vector2f vel = ref->get_velocity();
+    const sf::Vector2f scale = constants::ball_scale;
+
+    // Determine ball type and color based on active powerups
+    ball_type type = ball_type::regular;
+    sf::Color color = ball_color_maps::bouncing_ball;
+    if (active_powerups.plasma_ball) {
+        type = ball_type::plasma;
+        color = ball_color_maps::plasma_ball;
+    }
+    else if (active_powerups.antimatter_ball) {
+        type = ball_type::antimatter;
+        color = ball_color_maps::antimatter_ball;
+    }
 
     // How many new balls we need
     const size_t needed = target_total - ball_count;
@@ -467,13 +493,7 @@ void game::spawn_multiball() {
     // Spawn needed balls with symmetric angle offsets around 0°
     for (size_t i = 0; i < needed; ++i) {
 
-        auto& b = manager.create<bouncing_ball>(
-            pos,
-            vel,
-            constants::ball_scale,
-            active_powerups.plasma_ball ? ball_colors::plasma_ball : ball_colors::bouncing_ball,
-            active_powerups.plasma_ball
-        );
+        auto& b = manager.create<bouncing_ball>(pos, vel, scale, color, type);
 
         // Compute symmetric offset around 0°
         const float offset = static_cast<float>(i) - center;
@@ -535,20 +555,21 @@ void game::apply_one_shot_powerups() {
     }
 }
 
-// Sync powerups modify entities continuously and remain active until they are deactivated or replaced
+// Sync powerups to modify entities continuously and remain active until they are deactivated or replaced
 void game::sync_powerups_to_entities() {
 
     // Ball effects
     manager.apply_all<bouncing_ball>([this](bouncing_ball& b) {
 
-        // plasma_ball flag controls color + scale internally
-        b.set_plasma_ball(active_powerups.plasma_ball, 1.0f);
+        // Determine ball type based on active powerups: color + scale internally
+        if (active_powerups.plasma_ball)          b.set_ball_type(ball_type::plasma, 1.0f);
+        else if (active_powerups.antimatter_ball) b.set_ball_type(ball_type::antimatter, 1.0f);
+        else                                      b.set_ball_type(ball_type::regular, 1.0f);
 
         // Adjust speed WITHOUT changing direction
-        float target_ball_speed = constants::ball_speed;
-        if (active_powerups.ball_faster)      target_ball_speed = constants::ball_max_speed;
-        else if (active_powerups.ball_slower) target_ball_speed = constants::ball_min_speed;
-        b.set_velocity(target_ball_speed);
+        if (active_powerups.ball_faster)          b.set_velocity(constants::ball_max_speed);
+        else if (active_powerups.ball_slower)     b.set_velocity(constants::ball_min_speed);
+        else                                      b.set_velocity(constants::ball_speed);
 
     });
 
@@ -609,26 +630,66 @@ void game::handle_window_events() {
         // Use Space to continue the game
         if (auto* kp = event->getIf<sf::Event::KeyPressed>()) {
 
-            // Only Space is used to advance
-            const bool pressed_space = (kp->code == sf::Keyboard::Key::Space);
-            if (!pressed_space) continue;
-
-            // ONLY handle Space-to-advance in these non-gameplay screens
+            // START SCREEN: Space -> level_select
             if (state == game_state::start_screen) {
-                state = game_state::level_intro;
-                space_key_active = true;
-                continue;
-            }
-            if (state == game_state::level_intro) {
-                if (current_level == 0) {
-                    audio.stop(sfx_id::welcome);
+                if (kp->code == sf::Keyboard::Key::Space) {
+                    state = game_state::level_select;
+                    space_key_active = true;
+                    update_level_menu_colors();
                 }
-                state = game_state::start_level;
-                space_key_active = true;  // latch: don't launch immediately
                 continue;
             }
+            
+            // Allow ESC to quit is already in handle_global_inputs()
+            if (state == game_state::level_select) {
+
+                int chosen = -1;
+                switch (kp->code) {
+                    case sf::Keyboard::Key::Num1: chosen = 0; break;
+                    case sf::Keyboard::Key::Num2: chosen = 1; break;
+                    case sf::Keyboard::Key::Num3: chosen = 2; break;
+                    case sf::Keyboard::Key::Num4: chosen = 3; break;
+                    case sf::Keyboard::Key::Num5: chosen = 4; break;
+                    case sf::Keyboard::Key::Num6: chosen = 5; break;
+                    case sf::Keyboard::Key::Num7: chosen = 6; break;
+                    case sf::Keyboard::Key::Num8: chosen = 7; break;
+                    case sf::Keyboard::Key::Num9: chosen = 8; break;
+
+                    // Optional: also support Numpad
+                    case sf::Keyboard::Key::Numpad1: chosen = 0; break;
+                    case sf::Keyboard::Key::Numpad2: chosen = 1; break;
+                    case sf::Keyboard::Key::Numpad3: chosen = 2; break;
+                    case sf::Keyboard::Key::Numpad4: chosen = 3; break;
+                    case sf::Keyboard::Key::Numpad5: chosen = 4; break;
+                    case sf::Keyboard::Key::Numpad6: chosen = 5; break;
+                    case sf::Keyboard::Key::Numpad7: chosen = 6; break;
+                    case sf::Keyboard::Key::Numpad8: chosen = 7; break;
+                    case sf::Keyboard::Key::Numpad9: chosen = 8; break;
+                    default: break;
+                }
+
+                if (chosen != -1) {
+                    current_level = chosen;
+
+                    // Start from selected level with full lives (usually what you want)
+                    lives = constants::player_lives;
+                    reset_powerups();
+                    reset_bonus_timers();
+
+                    const level_data& lvl = get_level(current_level);
+                    setup_level(lvl, current_level, /*full_reset=*/false);
+
+                    //state = game_state::level_intro;
+                    state = game_state::start_level;
+                    space_key_active = true;
+                }
+
+                continue;
+            }
+
             if (state == game_state::game_over || state == game_state::player_wins) {
-                reset_game(game_state::level_intro);
+                //reset_game(game_state::level_intro);
+                reset_game(game_state::level_select);
                 space_key_active = true;
                 continue;
             }
@@ -708,7 +769,6 @@ void game::stick_unlaunched_balls_to_paddle() {
     });
 }
 
-
 // Update state text for the state of the game: paused, game over, player wins
 void game::update_state_text() {
     switch (state) {
@@ -729,14 +789,9 @@ void game::update_state_text() {
         text_state.setString(static_cast<std::string>(strings::string_player_wins));
         break;
     case game_state::start_level:
-        text_state.setPosition(text_level.getPosition());
-        text_state.setCharacterSize(20);
-        text_state.setString(text_level.getString());
-        break;
-    case game_state::level_intro:
-        text_state.setPosition(text_level.getPosition());
-        text_state.setCharacterSize(20);
-        text_state.setString(text_level.getString());
+        //text_state.setPosition(level_menu_header.getPosition());
+        //text_state.setCharacterSize(20);
+        text_state.setString(""); // level_menu_header.getString());
         break;
     default:
         text_state.setString("");
@@ -760,9 +815,10 @@ void game::draw_frame() {
         return;
     }
 
-    // LEVEL INTRO: show only level title on black background
-    if (state == game_state::level_intro) {
-        game_window.draw(text_state);
+    // LEVEL SELECT: show the level list
+    if (state == game_state::level_select) {
+        game_window.draw(level_menu_header);
+        for (auto& t : level_menu_items) game_window.draw(t);
         game_window.display();
         previous_state = state;
         return;
@@ -791,6 +847,7 @@ void game::draw_frame() {
     // UI texts are always visible
     game_window.draw(text_lives);
     game_window.draw(text_plasma_ball);
+    game_window.draw(text_antimatter_ball);
     game_window.draw(text_powerup);
 
     // Present the frame
@@ -814,7 +871,8 @@ void game::ensure_ball_exists() {
     paddle* p = manager.get_first<paddle>();
     if (!p) return; // For safety
     const float y = p->get_position().y - p->get_height() - constants::ball_radius;
-    spawn_ball({ p->get_position().x, y });
+    const level_data& lvl = get_level(current_level);
+    spawn_ball({ p->get_position().x, y }, lvl.ball_color);
 
     // Reset ball state and velocity
     manager.apply_all<bouncing_ball>([](bouncing_ball& b) {
@@ -835,6 +893,7 @@ void game::ensure_ball_exists() {
     if (lives <= 0) {
         state = game_state::game_over;
         update_state_text(); // Optional
+        lives = constants::player_lives;
     }
 
 }
@@ -854,19 +913,27 @@ void game::spawn_bonuses() {
     if (bonus_clock.getElapsedTime().asSeconds() < next_bonus_time)
         return;
 
-    // Spawn LIFE or plasma_ball
-    if (life_plasma_ball_count == 0 && std::bernoulli_distribution(1.0f - bonus_config::powerup_prob)(rng)) {
+    // Use the probability distribution for the current level for selecting the bonuses
+    const auto& probs = bonus_config::level_probs[current_level];
+    const float powerup_prob = probs[0];
+    const float special_prob = probs[1];
 
-        static std::bernoulli_distribution spawn_plasma_ball(0.5);
-        const bool is_plasma_ball = spawn_plasma_ball(rng);
+    // Spawn LIFE, PLASMA BALL or ANTIMATTER BALL
+    if (life_plasma_ball_count == 0 && std::bernoulli_distribution(special_prob)(rng)) {
 
-        const bonus_type type = is_plasma_ball ? bonus_type::plasma_ball : bonus_type::life;
+        std::discrete_distribution<int> pick(probs.begin(), probs.end());
+        int idx = pick(rng);
+        bonus_type type =
+            (idx == 0) ? bonus_type::life :
+            (idx == 1) ? bonus_type::plasma_ball :
+            bonus_type::antimatter_ball;
 
         float x = std::uniform_real_distribution<float>(
             bonus::half_width_for(type),
             constants::window_width - bonus::half_width_for(type)
         )(rng);
 
+        // Create the bonus
         manager.create<bonus>(
             type,
             sf::Vector2f{ x, 0.f },
@@ -877,13 +944,15 @@ void game::spawn_bonuses() {
     }
 
     // Spawn POWERUP
-    if (powerup_count == 0 && std::bernoulli_distribution(bonus_config::powerup_prob)(rng)) {
+    if (powerup_count == 0 && std::bernoulli_distribution(powerup_prob)(rng)) {
 
+        // Randomly select an X position to spawn the powerup bonus
         float x = std::uniform_real_distribution<float>(
             bonus::half_width_for(bonus_type::powerup),
             constants::window_width - bonus::half_width_for(bonus_type::powerup)
         )(rng);
 
+        // Create the bonus
         manager.create<bonus>(
             bonus_type::powerup,
             sf::Vector2f{ x, 0.f },
@@ -899,32 +968,49 @@ void game::spawn_bonuses() {
 
 }
 
-// Powerup logic + message
+// Handling bonus pickups: logic + message
 std::string game::handle_bonus_pickups(paddle& the_paddle) {
 
     std::string powerup_msg;
+    bool picked = false;
 
     // There is only one paddle
-    manager.apply_all<bonus>([this, &powerup_msg, &the_paddle](bonus& the_bonus) {
+    manager.apply_all<bonus>([&](bonus& the_bonus) {
+
+        // Only one pickup per frame
+        if (picked)
+            return;
 
         // If bonus and paddle are not interacting, do nothing
         if (!handle_collision(the_bonus, the_paddle))
             return;
 
-        // LIFE bonus: increase lives
-        if (the_bonus.get_type() == bonus_type::life) {
-            ++lives;
-            audio.play(sfx_id::powerup);
-            return;
-        }
+        picked = true;
 
-        // plasma_ball bonus: set plasma_ball powerup and change the message color
-        if (the_bonus.get_type() == bonus_type::plasma_ball) {
-            active_powerups.apply(powerup_type::plasma_ball);
-            // Optional: restart a plasma_ball timer
-            // plasma_ball_clock.restart();
-            audio.play(sfx_id::powerup);
-            return;
+        switch (the_bonus.get_type())
+        {
+            // LIFE bonus: increase lives
+            case bonus_type::life:
+                ++lives;
+                audio.play(sfx_id::powerup);
+                return;
+
+            // PLASMA BALL bonus: set plasma_ball powerup and change the message color
+            case bonus_type::plasma_ball:
+                active_powerups.apply(powerup_type::plasma_ball);
+                // Optional: restart a plasma_ball timer
+                // plasma_ball_clock.restart();
+                audio.play(sfx_id::powerup);
+                return;
+
+            // ANTIMATTER BALL bonus: set antimatter_ball powerup and change the message color
+            case bonus_type::antimatter_ball:
+                active_powerups.apply(powerup_type::antimatter_ball);
+                audio.play(sfx_id::powerup);
+                return;
+
+            case bonus_type::powerup:
+                break; // handled below
         }
 
         // POWERUP bonus: apply a random powerup type and choose a user-friendly message for the UI
@@ -999,12 +1085,21 @@ void game::update_ui_texts(const std::string& powerup_msg) {
 
     text_lives.setString("Lives: " + std::to_string(lives));
 
-    // persistent state
-    text_plasma_ball.setString(
-        active_powerups.plasma_ball ? "Plasma ball" :
-        active_powerups.antimatter_ball? "Antimatter ball" : "");
+    // Persistent state
+    if (active_powerups.plasma_ball) {
+        text_plasma_ball.setString("Plasma ball");
+        text_antimatter_ball.setString("");
+    }
+    else if (active_powerups.antimatter_ball) {
+        text_plasma_ball.setString("");
+        text_antimatter_ball.setString("Antimatter ball");
+    }
+    else {
+        text_plasma_ball.setString("");
+        text_antimatter_ball.setString("");
+    }
 
-    // last pickup message (event)
+    // Last pickup message (event)
     if (!powerup_msg.empty())
         text_powerup.setString(powerup_msg);
 
@@ -1069,7 +1164,7 @@ std::string game::resolve_collisions() {
 }
 
 // Checks if the player wins, that is, when all bricks are destroyed
-void game::check_win_condition() {
+void game::check_win_condition_old() {
 
     // A safeguard
     if (state != game_state::running)
@@ -1104,6 +1199,55 @@ void game::check_win_condition() {
     // Prevent the "advance" Space from also launching the ball later
     space_key_active = true;
 
+}
+
+// Checks if the player wins (level cleared), i.e. when all DESTRUCTIBLE bricks are destroyed
+void game::check_win_condition() {
+
+    // Only check victory while actively running
+    if (state != game_state::running)
+        return;
+
+    // If at least one brick is destructible, the level is NOT finished yet.
+    bool has_destructible = false;
+    manager.apply_all<brick>([&](const brick& b) {
+        if (!b.is_indestructible())
+            has_destructible = true;
+    });
+    if (has_destructible)
+        return;
+
+    // Cleared current level
+    audio.play(sfx_id::player_wins);
+
+    // ---- LEVEL CLEARED ----
+    // Mark this level as achieved (so the menu can render it differently)
+    mark_level_achieved(static_cast<std::size_t>(current_level));
+
+    // Optional: update menu colors (if you implemented per-line menu text coloring)
+    // Remove if you don't have this helper.
+    update_level_menu_colors();
+
+    // If ALL levels are achieved -> game finished
+    bool all_done = true;
+    for (int i = 0; i < level_count(); ++i) {
+        if (!is_level_achieved(static_cast<std::size_t>(i))) {
+            all_done = false;
+            break;
+        }
+    }
+
+    if (all_done) {
+        state = game_state::player_wins;
+        space_key_active = true; // avoid accidental input carryover
+        return;
+    }
+
+    // Otherwise: go back to level selection (player picks next)
+    state = game_state::level_select;
+
+    // Prevent key carry-over (Space held down etc.)
+    space_key_active = true;
 }
 
 // Running game function
