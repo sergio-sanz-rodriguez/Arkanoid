@@ -28,6 +28,13 @@ namespace colors {
     inline constexpr sf::Color bronze{ 176, 116, 59 };
     inline constexpr sf::Color steel_blue_tint(180, 180, 200);
 
+    // Text fonts
+    inline constexpr sf::Color off_white{ 230, 230, 240 };
+    inline constexpr sf::Color light_blue{ 120, 200, 255 };
+    inline constexpr sf::Color soft_green{ 120, 220, 140 };
+    inline constexpr sf::Color game_over{ 220, 100, 100 };
+    inline constexpr sf::Color soft_yellow{ 160, 160, 180 };
+
     // True color
     inline constexpr sf::Color true_red{ 250, 0, 0 };
     inline constexpr sf::Color true_green{ 0, 255, 0 };
@@ -39,6 +46,17 @@ namespace colors {
     inline constexpr sf::Color gold_shadow{ 184, 134, 11 };
 
 }
+
+namespace ui_colors {
+    inline constexpr sf::Color off_white{ 230, 230, 240 }; // Main
+    inline constexpr sf::Color dark_gray{ 64, 64, 64 }; // Disable levels
+    inline constexpr sf::Color light_blue{ 120, 200, 255 }; // Accent
+    inline constexpr sf::Color soft_green{ 120, 220, 140 }; // Success
+    inline constexpr sf::Color game_over{ 220, 100, 100 }; // Danger
+    inline constexpr sf::Color soft_yellow{ 160, 160, 180 }; // Dim
+    inline constexpr sf::Color warm_amber{ 255, 210, 120 }; // Pause
+}
+
 
 #endif // COLORS_H
 #pragma once

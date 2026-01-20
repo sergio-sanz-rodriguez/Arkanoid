@@ -177,7 +177,6 @@ private:
     enum class game_state {
         start_screen,
         level_select,
-        //level_intro,
         start_level,
         running,
         paused,
@@ -201,9 +200,14 @@ private:
     sf::Text text_antimatter_ball;
     sf::Text text_lives;
     sf::Text text_powerup;
+    sf::Text text_press_space;
     sf::Text text_instructions;
     sf::Text level_menu_header;
     std::vector<sf::Text> level_menu_items; // Num levels with texts
+
+    // For text background
+    sf::Texture tex_ui_bg;
+    sf::Sprite  spr_ui_bg;
 
     // Logic to define what region is show on screen and update it if user scales it.
     sf::View view;

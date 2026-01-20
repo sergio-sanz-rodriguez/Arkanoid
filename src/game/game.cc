@@ -50,8 +50,10 @@ game::game() :
     text_antimatter_ball(font),
     text_lives(font),
     text_powerup(font),
+    text_press_space(font),
     text_instructions(font),
     level_menu_header(font),
+    spr_ui_bg(tex_ui_bg),
     level_achieved(static_cast<size_t>(level_count()), 0) {
 
     // Limit the framerate
@@ -79,13 +81,29 @@ game::game() :
         // Handle font loading failure (could exit, use default font, etc.)
     }
 
+    // Load the background texture for the texts
+    if (!tex_ui_bg.loadFromFile(assets::txt_background_path())) {
+        std::cerr << "Failed to load ui background\n";
+    }
+    else {
+        spr_ui_bg.setTexture(tex_ui_bg, true);
+
+        const auto ts = tex_ui_bg.getSize();
+        if (ts.x > 0 && ts.y > 0) {
+            const float sx = constants::window_width / static_cast<float>(ts.x);
+            const float sy = constants::window_height / static_cast<float>(ts.y);
+            spr_ui_bg.setScale({ sx, sy });
+            spr_ui_bg.setPosition({ 0.f, 0.f });
+        }
+    }
+
     // Configure text objects with default values
     text_state.setFont(font);
     text_state.setPosition(
         { (constants::window_width / 2.0f) - std::ceilf(constants::window_width / 5.1f),
         (constants::window_height / 2.0f) - std::ceilf(constants::window_height / 8.6f) });
     text_state.setCharacterSize(35);
-    text_state.setFillColor(colors::white);
+    text_state.setFillColor(ui_colors::off_white);
     text_state.setString("");
 
     text_plasma_ball.setFont(font);
@@ -120,18 +138,26 @@ game::game() :
     text_powerup.setFillColor(colors::true_blue);
     text_powerup.setString("");
 
+    text_press_space.setFont(font);
+    text_press_space.setPosition(
+        { std::ceilf(constants::window_width / 25.0f),
+        constants::window_height - std::ceilf(constants::window_height / 31.8f) });
+    text_press_space.setCharacterSize(13);
+    text_press_space.setFillColor(ui_colors::light_blue);
+    text_press_space.setString("PRESS SPACE TO START");
+
     text_instructions.setFont(font);
     text_instructions.setPosition(
         { constants::window_width / 16.0f,
         constants::window_height / 9.0f });
     text_instructions.setCharacterSize(20);
-    text_instructions.setFillColor(colors::white);
+    text_instructions.setFillColor(ui_colors::off_white);
     text_instructions.setString(static_cast<std::string>(strings::string_instructions));
 
     // Build level menu window
     level_menu_header.setFont(font);
     level_menu_header.setCharacterSize(20);
-    level_menu_header.setFillColor(colors::white);
+    level_menu_header.setFillColor(ui_colors::off_white);
     level_menu_header.setString(static_cast<std::string>(strings::string_first_level_keys));
     level_menu_header.setPosition({ constants::window_width / 6.0f, constants::window_height / 10.0f });
 
@@ -148,7 +174,7 @@ game::game() :
         t.setCharacterSize(20);
         t.setString(lvl.menu_label);
         t.setPosition({ x, y + static_cast<float>(i) * line_step });
-        t.setFillColor(colors::white);
+        t.setFillColor(ui_colors::off_white);
 
         level_menu_items.push_back(t);
     }
@@ -176,6 +202,7 @@ void game::reset_game(game_state reset_state) {
     const int level_index = 0;
     const level_data& lvl = get_level(level_index);
     setup_level(lvl, level_index, true);
+    level_menu_header.setString(static_cast<std::string>(strings::string_first_level_keys));
     state = reset_state;
 }
 
@@ -294,7 +321,7 @@ void game::setup_level(const level_data & lvl, int level_index, bool full_reset)
 void game::update_level_menu_colors() {
     for (size_t i = 0; i < level_menu_items.size(); ++i) {
         bool achieved = is_level_achieved(i);
-        level_menu_items[i].setFillColor(achieved ? colors::dark_gray : colors::white);
+        level_menu_items[i].setFillColor(achieved ? ui_colors::dark_gray : ui_colors::off_white);
     }
 }
 
@@ -694,7 +721,8 @@ void game::handle_window_events() {
                     audio.stop(sfx_id::welcome);
 
                     state = game_state::start_level;
-                    space_key_active = true;
+                    //space_key_active = true;
+                    space_key_active = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
                 }
 
                 continue;
@@ -713,7 +741,8 @@ void game::handle_window_events() {
                 }
 
                 // Back to intro story/instructions or level select
-                reset_game(game_state::level_select);
+                //reset_game(game_state::level_select);
+                reset_game();
 
                 // Avoid immediate re-triggering / accidental launch
                 space_key_active = true;
@@ -741,7 +770,6 @@ bool game::handle_global_inputs() {
     bool rpressed = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R);
     if (rpressed && !reset_key_active) {
         reset_level();
-        //state = game_state::running;
     }
     reset_key_active = rpressed;
 
@@ -802,17 +830,20 @@ void game::update_state_text() {
         text_state.setPosition({ constants::window_width / 2.0f - 65.0f, (constants::window_height / 2.0f) - (constants::window_height / 8.6f) });
         text_state.setCharacterSize(30);
         text_state.setString(static_cast<std::string>(strings::string_paused));
+        text_state.setFillColor(ui_colors::warm_amber);
         break;
     case game_state::game_over:
         text_state.setPosition({ constants::window_width / 16.0f, (constants::window_height / 2.0f) - (constants::window_height / 5.7f) });
         text_state.setCharacterSize(20);
         text_state.setString(static_cast<std::string>(strings::string_game_over));
+        text_state.setFillColor(ui_colors::game_over);
         break;
     case game_state::player_wins:
         //text_state.setPosition({ constants::window_width / 2.0f - 100.0f, constants::window_height / 2.0f - 100.0f });
         text_state.setPosition({ constants::window_width / 10.0f, (constants::window_height / 2.0f) - (constants::window_height / 5.7f) });
         text_state.setCharacterSize(22);
         text_state.setString(static_cast<std::string>(strings::string_player_wins));
+        text_state.setFillColor(ui_colors::soft_green);
         break;
     case game_state::start_level:
         //text_state.setPosition(level_menu_header.getPosition());
@@ -824,6 +855,7 @@ void game::update_state_text() {
         break;
     }
 }
+
 // Draw entities + UI
 void game::draw_frame() {
 
@@ -835,6 +867,7 @@ void game::draw_frame() {
         if (previous_state != state) {
             audio.play(sfx_id::welcome);
         }
+        game_window.draw(spr_ui_bg);
         game_window.draw(text_instructions);
         game_window.display();
         previous_state = state;
@@ -843,6 +876,7 @@ void game::draw_frame() {
 
     // LEVEL SELECT: show the level list
     if (state == game_state::level_select) {
+        game_window.draw(spr_ui_bg);
         game_window.draw(level_menu_header);
         for (auto& t : level_menu_items) game_window.draw(t);
         game_window.display();
@@ -856,6 +890,7 @@ void game::draw_frame() {
             if (state == game_state::player_wins) audio.play(sfx_id::player_wins);
             else                                  audio.play(sfx_id::game_over);
         }
+        game_window.draw(spr_ui_bg);
         game_window.draw(text_state);
         game_window.display();
         previous_state = state;
@@ -875,6 +910,11 @@ void game::draw_frame() {
     game_window.draw(text_plasma_ball);
     game_window.draw(text_antimatter_ball);
     game_window.draw(text_powerup);
+
+    // START LEVEL: show a messange to press space to begin
+    if (state == game_state::start_level) {
+        game_window.draw(text_press_space);
+    }
 
     // Present the frame
     game_window.display();

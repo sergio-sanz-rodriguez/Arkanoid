@@ -7,6 +7,7 @@ namespace assets {
 
     inline constexpr std::string_view image_dir{ "..\\..\\assets\\images\\" };
     inline constexpr std::string_view sfx_dir{ "..\\..\\assets\\sfx\\" };
+    inline constexpr std::string_view txt_background_filename{ "background.png" };
     inline constexpr std::string_view img_background_level1_filename{ "level_1.png" };
     inline constexpr std::string_view img_background_level2_filename{ "level_2.png" };
     inline constexpr std::string_view img_background_level3_filename{ "level_3.png" };
@@ -39,6 +40,7 @@ namespace assets {
     //inline constexpr std::string_view font_filename{ "/usr/local/share/fonts/webfonts/verdana.ttf" };
     inline constexpr std::string_view font_verdana{ "..\\..\\assets\\fonts\\verdana.ttf" };
     inline constexpr std::string_view font_consola{ "..\\..\\assets\\fonts\\consola.ttf" };
+    inline std::string txt_background_path()        { return std::string(image_dir) + std::string(txt_background_filename); }
     inline std::string img_background_level1_path() { return std::string(image_dir) + std::string(img_background_level1_filename); }
     inline std::string img_background_level2_path() { return std::string(image_dir) + std::string(img_background_level2_filename); }
     inline std::string img_background_level3_path() { return std::string(image_dir) + std::string(img_background_level3_filename); }
