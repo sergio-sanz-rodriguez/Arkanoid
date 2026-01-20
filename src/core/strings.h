@@ -53,15 +53,15 @@ namespace strings {
     };
     inline constexpr std::string_view string_paused{ "PAUSED" };
     inline constexpr std::string_view string_game_over{
-        "  GAME OVER!"
+        "                     GAME OVER!                    "
         "\n\n"
-        "  YOUR MISSION TO RECLAIM THE SOLAR SYSTEM FAILED."
+        " YOUR MISSION TO RECLAIM THE SOLAR SYSTEM FAILED.  "
         "\n"
-        "  THE SUN IS STILL UNDER THREAT."
+        "           THE SUN IS STILL UNDER THREAT.          "
         "\n\n"
-        "  - PRESS ANY KEY TO TRY AGAIN AND SAVE THE SUN"
-        "\n"
-        "  - PRESS ESCAPE TO QUIT"
+        " - PRESS SPACE TO TRY AGAIN AND SAVE THE SUN     "
+        "\n\n"
+        " - PRESS ESCAPE TO QUIT                          "
     };
     inline constexpr std::string_view string_player_wins{
         "          SUCESSFULL MISSION!           "
@@ -81,14 +81,13 @@ namespace strings {
         "         PRESS ESCAPE TO QUIT           "
     };
     inline constexpr std::string_view string_first_level_keys{
-        ""
-        "\n\n"
-        "CHOOSE YOUR FIRST TARGET (1-9):"
+        "\n\n\n"
+        "    CHOOSE YOUR FIRST TARGET (1-9):     "
     };
     inline constexpr std::string_view string_next_level_keys{
-        "MISSION COMPLETE!"
+        "           OBJECTIVE CLEARED!           "
         "\n\n"
-        "CHOOSE YOUR NEXT TARGET (1-9):"
+        "     CHOOSE YOUR NEXT TARGET (1-9):     "
     };
 }
 

@@ -24,14 +24,14 @@ namespace brick_color_maps {
     inline const std::vector<sf::Color> arcade = {
         colors::red,
         colors::orange,
-        colors::gold,
         colors::yellow,
         colors::green,
         colors::cyan,
         colors::steel,
         colors::blue,
         colors::purple,
-        colors::pink
+        colors::pink,
+        colors::copper
     };
 
     inline const std::vector<sf::Color> cosmic = {

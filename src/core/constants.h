@@ -38,7 +38,7 @@ struct constants {
     static constexpr int   multiball_total_balls{ 3 };
     static constexpr float pi{ 3.14159265358979323846f };
 
-    static constexpr int player_lives{ 3 };
+    static constexpr int player_lives{ 5 };
     static constexpr int max_sounds{ 16 };
     static constexpr sf::Vector2f ball_scale{ 0.5f, 0.5f };
     static constexpr sf::Vector2f ballstorm_scale{ 0.5f, 0.5f };

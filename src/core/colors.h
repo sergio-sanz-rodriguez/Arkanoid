@@ -25,7 +25,6 @@ namespace colors {
     inline constexpr sf::Color gold{ 212, 175, 55 };   // Gold Strong bricks
     inline constexpr sf::Color gold_ball{ 216, 172, 99 };   // Gold for ball
     inline constexpr sf::Color silver{ 187, 198, 204 };
-    //inline constexpr sf::Color bronze{ 205, 127, 50 };
     inline constexpr sf::Color bronze{ 176, 116, 59 };
     inline constexpr sf::Color steel_blue_tint(180, 180, 200);
 

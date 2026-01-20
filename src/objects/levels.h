@@ -24,7 +24,6 @@ struct level_data {
     float height_offset = 3.0f;
     std::vector<level_cell> grid; // size = columns * rows
     std::string background_path;
-    std::string level_title;
     std::string menu_label;
     ball_colors ball_color = ball_colors::steel;
     paddle_colors paddle_color = paddle_colors::light_gray;

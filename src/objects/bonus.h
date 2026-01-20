@@ -55,14 +55,14 @@ struct powerups {
     }
 };
 
-inline constexpr std::array<powerup_type, 1> powerup_candidates = {
+inline constexpr std::array<powerup_type, 7> powerup_candidates = {
     powerup_type::multiball,
-    //powerup_type::ballstorm,
-    //powerup_type::ball_faster,
-    //powerup_type::ball_slower,
-    //powerup_type::paddle_wider,
-    //powerup_type::paddle_narrower,
-    //powerup_type::reset_powerups
+    powerup_type::ballstorm,
+    powerup_type::ball_faster,
+    powerup_type::ball_slower,
+    powerup_type::paddle_wider,
+    powerup_type::paddle_narrower,
+    powerup_type::reset_powerups
 };
 
 // Class to represent a bonus object

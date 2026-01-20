@@ -133,7 +133,7 @@ game::game() :
     level_menu_header.setCharacterSize(20);
     level_menu_header.setFillColor(colors::white);
     level_menu_header.setString(static_cast<std::string>(strings::string_first_level_keys));
-    level_menu_header.setPosition({ constants::window_width / 8.5f, constants::window_height / 10.0f });
+    level_menu_header.setPosition({ constants::window_width / 6.0f, constants::window_height / 10.0f });
 
     level_menu_items.clear();
     level_menu_items.reserve(static_cast<size_t>(level_count()));
@@ -702,12 +702,20 @@ void game::handle_window_events() {
 
             // Handle the GAME OVER and PLAYER WINS status
             if (state == game_state::game_over || state == game_state::player_wins) {
-                // Reset the level list
+
+                // Only Space restarts
+                if (kp->code != sf::Keyboard::Key::Space)
+                    continue;
+
+                // Reset the level list only if the player finished the whole game
                 if (state == game_state::player_wins) {
                     reset_progress();
                 }
-                // Back to intro story/instructions
+
+                // Back to intro story/instructions or level select
                 reset_game(game_state::level_select);
+
+                // Avoid immediate re-triggering / accidental launch
                 space_key_active = true;
                 continue;
             }

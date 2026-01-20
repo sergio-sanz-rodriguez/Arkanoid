@@ -253,16 +253,13 @@ static level_data level1 = {
             "..44444444444..",
             "..11111111111..",
             "..88888888888..",
-            "..77777777777..",
+            "..33333333333.."
         });
 
         // Parse grid
         return parse_grid(W, H, rows_strength, rows_color, brick_colors::arcade, true);
     }(),
     assets::img_background_level1_path(), // Background asset
-    "\n\n"
-    "FIRST MISSION (1/10): NEPTUNE\n\n"
-    "    PRESS SPACE TO START     ", // Intro text
     "1: NEPTUNE - FROZEN FRONTIER [EASY]\n\n", // Menu text
     ball_colors::steel, // Ball color
     paddle_colors::light_gray, // Paddle color
@@ -314,11 +311,6 @@ static level_data level2 = {
         return parse_grid(W, H, rows_strength, rows_color, brick_colors::arcade, false);
     }(),
     assets::img_background_level2_path(), // Background asset
-    "     CONTRATULATIONS!      "
-    "\n\n"
-    "NEXT MISSION (2/10): URANUS"
-    "\n\n"
-    "   PRESS SPACE TO START    ", // Intro text
     "2: URANUS - ICE ANOMALY [EASY]\n\n", // Menu text
     ball_colors::steel, // Ball color
     paddle_colors::light_gray, // Paddle color
@@ -395,11 +387,6 @@ static level_data level3 = {
         return parse_grid(W, H, rows_strength, rows_color, brick_colors::medal, true);
     }(),
     assets::img_background_level3_path(), //Background asset
-    "            CONTRATULATIONS!             "
-    "\n\n"
-    "NEXT MISSION (3/10): TITAN - SATURN'S MOON"
-    "\n\n"
-    "          PRESS SPACE TO START           ", // Intro text
     "3: TITAN - SATURN'S MOON [MEDIUM]\n\n", // Menu text
     ball_colors::steel, // Ball color
     paddle_colors::light_gray, // Paddle color
@@ -482,11 +469,6 @@ static level_data level4 = {
         return parse_grid(W, H, rows_strength, rows_color, brick_colors::cosmic, true);
     }(),
     assets::img_background_level4_path(), // Background asset
-    "              CONTRATULATIONS!              "
-    "\n\n"
-    "NEXT MISSION (4/10): EUROPA - JUPITER'S MOON"
-    "\n\n"
-    "            PRESS SPACE TO START            ", // Intro text
     "4: EUROPA - JUPITER'S MOON [MEDIUM]\n\n", // Menu text
     ball_colors::steel, // Ball color
     paddle_colors::dark_gray, // Paddle color
@@ -596,11 +578,6 @@ static level_data level5 = {
         return parse_grid(W, H, rows_strength, rows_color, brick_colors::rocks, true);
     }(),
     assets::img_background_level5_path(), // Background asset
-    "             CONTRATULATIONS!             "
-    "\n\n"
-    "NEXT MISSION (5/10): MARS - THE RED PLANET"
-    "\n\n"
-    "           PRESS SPACE TO START           ", // Intro text
     "5: MARS - THE RED PLANET [MEDIUM]\n\n", // Menu text
     ball_colors::steel, // Ball color
     paddle_colors::light_gray, // Paddle color
@@ -665,11 +642,6 @@ static level_data level6 = {
         return parse_grid(W, H, rows_strength, rows_color, brick_colors::tierra, false);
     }(),
     assets::img_background_level6_path(), // Background asset
-    "     CONTRATULATIONS!     "
-    "\n\n"
-    "NEXT MISSION (6/10): EARTH"
-    "\n\n"
-    "   PRESS SPACE TO START   ", // Intro text
     "6: EARTH - LAST HUMAN STRONGHOLD [DIFFICULT]\n\n", // Menu text
     ball_colors::steel, // Ball color
     paddle_colors::light_gray, // Paddle color
@@ -750,12 +722,7 @@ static level_data level7 = {
         return parse_grid(W, H, rows_strength, rows_color, brick_colors::alien, true);
     }(),
     assets::img_background_level7_path(), // Background asset
-    "     CONTRATULATIONS!     "
-    "\n\n"
-    "NEXT MISSION (7/10): VENUS"
-    "\n\n"
-    "   PRESS SPACE TO START   ", // Intro text
-    "7: VENUS - 400°C INFERNO [DIFFICULT]\n\n", // Menu text
+    "7: VENUS - 500°C INFERNO [DIFFICULT]\n\n", // Menu text
     ball_colors::steel, // Ball color
     paddle_colors::light_gray, // Paddle color
     brick_colors::alien // Brick colors
@@ -843,11 +810,6 @@ static level_data level8 = {
         return parse_grid(W, H, rows_strength, rows_color, brick_colors::planets, true);
     }(),
     assets::img_background_level8_path(), // Background asset
-    "     CONTRATULATIONS!     "
-    "\n\n"
-    "NEXT MISSION (8/10): MERCURY"
-    "\n\n"
-    "   PRESS SPACE TO START   ", // Intro text
     "8: MERCURY - THE BURNING ROCK [DIFFICULT]\n\n", // Menu text
     ball_colors::steel, // Ball color
     paddle_colors::light_gray, // Paddle color
@@ -956,11 +918,6 @@ static level_data level9 = {
         return parse_grid(W, H, rows_strength, rows_color, brick_colors::starfield, true);
     }(),
     assets::img_background_level9_path(), // Background asset
-    "   CONTRATULATIONS!    "
-    "\n\n"
-    "NEXT MISSION (9/9): SUN"
-    "\n\n"
-    " PRESS SPACE TO START  ", // Intro text
     "9: SUN - CORE ASSAULT [VERY DIFFICULT]", // Menu text
     ball_colors::gold, // Ball color
     paddle_colors::gold, // Paddle color
