@@ -67,6 +67,17 @@ void bouncing_ball::launch() {
     }
 }
 
+// Keep velocity (needed for multiball)
+void bouncing_ball::launch_keep_velocity() {
+    if (!launched) {
+        launched = true;
+        const float len2 = velocity.x * velocity.x + velocity.y * velocity.y;
+        if (len2 < 0.0001f) {
+            velocity = { 0.f, -constants::ball_speed };
+        }
+    }
+}
+
 // Keep the ball attached to the paddle before launch
 void bouncing_ball::stick_to_paddle(sf::Vector2f paddle_pos) {
     if (!launched) {

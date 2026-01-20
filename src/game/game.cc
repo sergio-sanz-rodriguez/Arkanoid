@@ -70,13 +70,8 @@ game::game() :
     // Apply the view with correct letterboxing for the current window size.
     update_view();
 
-    // Initialize states
-    // state = game_state::start_screen; Already initalized in .h
+    // Initialize game state
     previous_state = game_state::running;
-
-    // Initialize level_achieved buffer
-    if (!level_achieved.empty())
-        level_achieved[0] = 0;
 
     // Load a font from file
     if (!font.openFromFile(assets::font_consola)) {
@@ -137,8 +132,8 @@ game::game() :
     level_menu_header.setFont(font);
     level_menu_header.setCharacterSize(20);
     level_menu_header.setFillColor(colors::white);
-    level_menu_header.setString("PRESS ONE OF THESE KEYS TO SELECT THE LEVEL:");
-    level_menu_header.setPosition({ constants::window_width / 8.5f, constants::window_height / 6.0f });
+    level_menu_header.setString(static_cast<std::string>(strings::string_first_level_keys));
+    level_menu_header.setPosition({ constants::window_width / 8.5f, constants::window_height / 10.0f });
 
     level_menu_items.clear();
     level_menu_items.reserve(static_cast<size_t>(level_count()));
@@ -178,8 +173,6 @@ void game::reset_game() {
 
 // Internal only
 void game::reset_game(game_state reset_state) {
-    //setup_level(0, true);
-    //state = reset_state;
     const int level_index = 0;
     const level_data& lvl = get_level(level_index);
     setup_level(lvl, level_index, true);
@@ -243,6 +236,11 @@ void game::reset_level() {
     setup_level(lvl, current_level, false);
 }
 
+void game::reset_progress() {
+    std::fill(level_achieved.begin(), level_achieved.end(), 0);
+    update_level_menu_colors();
+}
+
 // Set up current level 
 void game::setup_level(const level_data & lvl, int level_index, bool full_reset) {
 
@@ -295,7 +293,6 @@ void game::setup_level(const level_data & lvl, int level_index, bool full_reset)
 // Update level menu colors: black/dark_gray if the level is achieved, white if doesn't
 void game::update_level_menu_colors() {
     for (size_t i = 0; i < level_menu_items.size(); ++i) {
-        // your levels are 0..8 internally, menu shows 1..9
         bool achieved = is_level_achieved(i);
         level_menu_items[i].setFillColor(achieved ? colors::dark_gray : colors::white);
     }
@@ -450,7 +447,7 @@ void game::spawn_bricks_from_level(const level_data& lvl) {
 void game::spawn_multiball() {
 
     // How many balls are allowed in total after multiball?
-    const size_t target_total = constants::multiball_extra_balls;
+    const size_t target_total = static_cast<size_t>(constants::multiball_total_balls);
 
     // Safety: if target_total is 0 or 1, multiball makes no sense
     if (target_total < 2) return;
@@ -468,7 +465,11 @@ void game::spawn_multiball() {
     const sf::Vector2f vel = ref->get_velocity();
     const sf::Vector2f scale = constants::ball_scale;
 
-    // Determine ball type and color based on active powerups
+    // If ref ball isn't moving for any reason, abort (or set a default upward vel)
+    const float len2 = vel.x * vel.x + vel.y * vel.y;
+    if (len2 < 0.0001f) return;
+
+    // Decide ball type and color based on active powerups
     ball_type type = ball_type::regular;
     sf::Color color = ball_color_maps::bouncing_ball;
     if (active_powerups.plasma_ball) {
@@ -488,7 +489,7 @@ void game::spawn_multiball() {
     const float step = 2.0f * constants::multiball_angle / divisor;
 
     // Center offset for symmetric distribution (-... 0 ... +)
-    const float center = (static_cast<float>(needed) - 1.f) / 2.f;
+    const float center = std::fmaxf(((float)needed - 1.f) / 2.f, 0.5f);
 
     // Spawn needed balls with symmetric angle offsets around 0°
     for (size_t i = 0; i < needed; ++i) {
@@ -498,6 +499,7 @@ void game::spawn_multiball() {
         // Compute symmetric offset around 0°
         const float offset = static_cast<float>(i) - center;
         const float angle = offset * step;
+        b.launch_keep_velocity();
         b.rotate(angle, false);
     }
 }
@@ -669,6 +671,12 @@ void game::handle_window_events() {
                 }
 
                 if (chosen != -1) {
+
+                    // DISABLE achieved levels
+                    if (is_level_achieved(static_cast<std::size_t>(chosen))) {
+                        continue;
+                    }
+
                     current_level = chosen;
 
                     // Start from selected level with full lives (usually what you want)
@@ -676,10 +684,15 @@ void game::handle_window_events() {
                     reset_powerups();
                     reset_bonus_timers();
 
+                    // Update level list header
+                    level_menu_header.setString(static_cast<std::string>(strings::string_next_level_keys));
+
                     const level_data& lvl = get_level(current_level);
                     setup_level(lvl, current_level, /*full_reset=*/false);
 
-                    //state = game_state::level_intro;
+                    // Stop welcome audio
+                    audio.stop(sfx_id::welcome);
+
                     state = game_state::start_level;
                     space_key_active = true;
                 }
@@ -687,8 +700,13 @@ void game::handle_window_events() {
                 continue;
             }
 
+            // Handle the GAME OVER and PLAYER WINS status
             if (state == game_state::game_over || state == game_state::player_wins) {
-                //reset_game(game_state::level_intro);
+                // Reset the level list
+                if (state == game_state::player_wins) {
+                    reset_progress();
+                }
+                // Back to intro story/instructions
                 reset_game(game_state::level_select);
                 space_key_active = true;
                 continue;
@@ -921,7 +939,7 @@ void game::spawn_bonuses() {
     // Spawn LIFE, PLASMA BALL or ANTIMATTER BALL
     if (life_plasma_ball_count == 0 && std::bernoulli_distribution(special_prob)(rng)) {
 
-        std::discrete_distribution<int> pick(probs.begin(), probs.end());
+        std::discrete_distribution<int> pick(probs.begin()+2, probs.end());
         int idx = pick(rng);
         bonus_type type =
             (idx == 0) ? bonus_type::life :
@@ -1163,44 +1181,6 @@ std::string game::resolve_collisions() {
 
 }
 
-// Checks if the player wins, that is, when all bricks are destroyed
-void game::check_win_condition_old() {
-
-    // A safeguard
-    if (state != game_state::running)
-        return;
-
-    //if (manager.has_any<brick>()) return;
-    // If at least one brick is destructible, the game continues.
-    bool has_destructible = false;
-    manager.apply_all<brick>([&](const brick& b) {
-        if (!b.is_indestructible())
-            has_destructible = true;
-    });
-    if (has_destructible) return;
-
-    // Cleared current level
-    audio.play(sfx_id::player_wins);
-
-    // Got to next level;
-    ++current_level;
-
-    // If no more levels, player wins the game
-    if (current_level > level_count()) {
-        state = game_state::player_wins;
-        return;
-    }
-
-    // Set up a new level: background, bricks, texts
-    //setup_level(current_level, false);
-    const level_data& lvl = get_level(current_level);
-    setup_level(lvl, current_level, false);
-
-    // Prevent the "advance" Space from also launching the ball later
-    space_key_active = true;
-
-}
-
 // Checks if the player wins (level cleared), i.e. when all DESTRUCTIBLE bricks are destroyed
 void game::check_win_condition() {
 
@@ -1220,12 +1200,9 @@ void game::check_win_condition() {
     // Cleared current level
     audio.play(sfx_id::player_wins);
 
-    // ---- LEVEL CLEARED ----
+    // LEVEL CLEARED
     // Mark this level as achieved (so the menu can render it differently)
     mark_level_achieved(static_cast<std::size_t>(current_level));
-
-    // Optional: update menu colors (if you implemented per-line menu text coloring)
-    // Remove if you don't have this helper.
     update_level_menu_colors();
 
     // If ALL levels are achieved -> game finished

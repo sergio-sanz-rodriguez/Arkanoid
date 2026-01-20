@@ -277,12 +277,11 @@ private:
     void spawn_paddle(sf::Vector2f pos, paddle_colors color);
 
     // Logic to manage the difficulty levels of the game
-    std::vector<uint8_t> level_achieved;
     int current_level{ 0 };
-    //int num_levels{ 0 }; // Store the number of levels achieved
-    //void reset_progress();
+    std::vector<uint8_t> level_achieved;
     bool is_level_achieved(std::size_t i) const noexcept;
     void mark_level_achieved(std::size_t i);
+    void reset_progress();
     void spawn_bricks_from_level(const level_data& lvl);
     void update_level_menu_colors();
 
@@ -318,7 +317,6 @@ private:
 
     // Checks if the player wins, when all bricks are destroyed
     void check_win_condition();
-    void check_win_condition_old();
 
     // Draw entities + UI
     void draw_frame();

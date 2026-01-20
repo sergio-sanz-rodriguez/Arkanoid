@@ -48,6 +48,7 @@ private:
 
      // Launch the ball when the user presses the key "Space".
      void launch();
+     void launch_keep_velocity();
      void stick_to_paddle(sf::Vector2f paddle_pos);
      bool is_launched() const noexcept;
      void reset_for_serve();

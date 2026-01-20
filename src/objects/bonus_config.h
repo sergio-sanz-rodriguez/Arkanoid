@@ -26,7 +26,7 @@ namespace bonus_config {
 
             // Probabilites for life, plasma, antimatter are with respect to the special probability
             // powerup, special, life,  plasma, antimatter
-            {  0.70f,   0.30f,   0.50f, 0.25f,  0.25f }, // Level 1
+            {  0.70f,   0.30f,   0.50f, 0.50f,  0.00f }, // Level 1
             {  0.70f,   0.30f,   0.50f, 0.40f,  0.10f }, // Level 2
             {  0.70f,   0.30f,   0.50f, 0.30f,  0.20f }, // Level 3
             {  0.70f,   0.30f,   0.50f, 0.20f,  0.30f }, // Level 4

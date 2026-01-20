@@ -56,8 +56,8 @@ struct powerups {
 };
 
 inline constexpr std::array<powerup_type, 1> powerup_candidates = {
-    //powerup_type::multiball,
-    powerup_type::ballstorm,
+    powerup_type::multiball,
+    //powerup_type::ballstorm,
     //powerup_type::ball_faster,
     //powerup_type::ball_slower,
     //powerup_type::paddle_wider,

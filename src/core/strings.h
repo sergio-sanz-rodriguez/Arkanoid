@@ -80,6 +80,16 @@ namespace strings {
         "\n"
         "         PRESS ESCAPE TO QUIT           "
     };
+    inline constexpr std::string_view string_first_level_keys{
+        ""
+        "\n\n"
+        "CHOOSE YOUR FIRST TARGET (1-9):"
+    };
+    inline constexpr std::string_view string_next_level_keys{
+        "MISSION COMPLETE!"
+        "\n\n"
+        "CHOOSE YOUR NEXT TARGET (1-9):"
+    };
 }
 
 #endif // STRINGS_H
