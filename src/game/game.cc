@@ -259,8 +259,17 @@ void game::mark_level_achieved(std::size_t i) {
 
 // Reset the current level
 void game::reset_level() {
+
+    // Set up level
     const level_data& lvl = get_level(current_level);
     setup_level(lvl, current_level, false);
+
+    // Change the state of the game
+    state = game_state::start_level;
+
+    // Avoid immediat lauch if space is already held
+    space_key_active = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
+
 }
 
 void game::reset_progress() {
@@ -328,11 +337,20 @@ void game::update_level_menu_colors() {
 // Function to reset powerups including UI texts
 void game::reset_powerups() {
 
+    // Rest all powerups
     active_powerups.reset();
 
+    // Clean strings
+    multiball_ui_active = false;
+    multiball_has_spawned = false;
     text_plasma_ball.setString("");
     text_antimatter_ball.setString("");
     text_powerup.setString("");
+
+    // Change the bouncing ball(s) to original color
+    manager.apply_all<bouncing_ball>([](bouncing_ball& b) {
+        b.set_ball_type(ball_type::regular, 1.0f);
+    });
 
     // Ballstorm UI
     ballstorm_ui_active = false;
@@ -473,6 +491,9 @@ void game::spawn_bricks_from_level(const level_data& lvl) {
 // Function to spawn a multiball object
 void game::spawn_multiball() {
 
+    // Get current ball count
+    const size_t before = manager.count<bouncing_ball>();
+
     // How many balls are allowed in total after multiball?
     const size_t target_total = static_cast<size_t>(constants::multiball_total_balls);
 
@@ -529,6 +550,11 @@ void game::spawn_multiball() {
         b.launch_keep_velocity();
         b.rotate(angle, false);
     }
+
+    const size_t after = manager.count<bouncing_ball>();
+    if (after > 1 && after > before) {
+        multiball_has_spawned = true;
+    }
 }
 
 // Function to spaw the storm of balls
@@ -566,6 +592,8 @@ void game::apply_one_shot_powerups() {
     // Multiball: spawn extra balls only once when collected
     if (active_powerups.multiball) {
         spawn_multiball();
+        if (manager.count<bouncing_ball>() > 1)
+            multiball_has_spawned = true;
         active_powerups.multiball = false; // Consume the powerup
     }
 
@@ -1083,6 +1111,10 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
         powerup_type chosen = random_powerup();
         active_powerups.apply(chosen);
 
+        // Disable multiball message when required
+        if (chosen != powerup_type::multiball)
+            multiball_ui_active = false;
+
         // Set game mesages and play sound effects
         switch (chosen) {
 
@@ -1116,6 +1148,8 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
                 break;
             case powerup_type::multiball:
                 powerup_msg = "Multiball";
+                multiball_ui_active = true;
+                multiball_has_spawned = false;
                 audio.play(sfx_id::powerup);
                 break;
 
@@ -1168,6 +1202,20 @@ void game::update_ui_texts(const std::string& powerup_msg) {
     // Last pickup message (event)
     if (!powerup_msg.empty())
         text_powerup.setString(powerup_msg);
+    
+    // Multiball UI lifetime:
+    // show after pickup until:
+    // 1) only one ball is left (AFTER multiball actually produced >1 ball at least once)
+    // 2) another powerup is caught except the one-shot ones (life, plasma, antimatter)
+    // 3) a life is gone (reset_powerups already clears it)
+    if (multiball_ui_active && multiball_has_spawned) {
+        if (manager.count<bouncing_ball>() <= 1) {
+            multiball_ui_active = false;
+            multiball_has_spawned = false;
+            if (text_powerup.getString() == "Multiball")
+                text_powerup.setString("");
+        }
+    }
 
     // If no new powerup message this frame, show burst countdown (if active)
     if (!ballstorm_ui_active) return;
@@ -1191,7 +1239,7 @@ void game::update_ui_texts(const std::string& powerup_msg) {
 // Ball-brick, ball-paddle, bonus-paddle
 std::string game::resolve_collisions() {
 
-    // Bouncing ball vs brick
+    // Bouncing ball vs brick.
     manager.apply_all<bouncing_ball>([this](bouncing_ball& the_ball) {
         manager.apply_all<brick>([&](brick& the_brick) {
             if (handle_collision(the_ball, the_brick) == sfx_id::ball_brick) {

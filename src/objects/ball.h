@@ -4,6 +4,7 @@
 #include "constants.h"
 #include "entity.h"
 #include "ball_config.h"
+#include "brick.h"
 
 // Class to represent the bouncing ball
 // Inherits from moving_entity
@@ -17,7 +18,7 @@ private:
     bool hit_wall_this_frame{ false };
     bool launched{ false };
     ball_type type{ ball_type::regular };
-
+    const brick* ignore_brick_ = nullptr;
     void process_player_input() override;
 
  public:
@@ -52,6 +53,11 @@ private:
      void stick_to_paddle(sf::Vector2f paddle_pos);
      bool is_launched() const noexcept;
      void reset_for_serve();
+
+     //Logic to pass through the brick when plasma ball or antimatter ball is enabled
+     void set_ignore_brick(const brick* b) noexcept { ignore_brick_ = b; }
+     const brick* ignore_brick() const noexcept { return ignore_brick_; }
+     void clear_ignore_brick() noexcept { ignore_brick_ = nullptr; }
 
      // Color mapping
      static sf::Color to_sf_color(ball_colors color);

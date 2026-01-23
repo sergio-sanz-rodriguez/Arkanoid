@@ -45,6 +45,9 @@ void bouncing_ball::set_ball_type(ball_type new_type, float factor) noexcept {
         sprite->setColor(ball_color_maps::antimatter_ball);
         sprite->setScale(factor * sf::Vector2f{ 0.5f, 0.5f });
         break;
+    case ball_type::regular:
+        sprite->setColor(ball_color_maps::bouncing_ball);
+        sprite->setScale(factor * sf::Vector2f{ 0.5f, 0.5f });
     default:
         break;
     }

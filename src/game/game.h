@@ -230,6 +230,15 @@ private:
     float next_bonus_time{ 0.0f };
     std::mt19937 rng{ std::random_device{}() };
 
+    // Handling multiball
+    // Controls whether the Multiball UI message should be displayed
+    bool multiball_ui_active = false;
+
+    // True if only once multiball actually creates extra balls,
+    // so the message is not auto-cleared while the game still
+    // has only one ball and multiball hasn’t taken effect yet
+    bool multiball_has_spawned = false;
+
     // Bonus timing
     std::uniform_real_distribution<float> bonus_delay_dist{ 5.0f, 15.0f };
 

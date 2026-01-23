@@ -34,7 +34,7 @@ struct constants {
     static constexpr float paddle_scale_height{ 0.25f };
     static constexpr float rotation_angle{ 1.0f };
     static constexpr float max_angle{ 60.0f };
-    static constexpr float multiball_angle{ 2.0f };
+    static constexpr float multiball_angle{ 4.0f };
     static constexpr int   multiball_total_balls{ 3 };
     static constexpr float pi{ 3.14159265358979323846f };
 
