@@ -14,6 +14,7 @@ enum class sfx_id {
     ball_paddle,
     ball_wall,
     ballstorm,
+    enlarge,
     game_over,
     life_minus,
     player_wins,
@@ -34,6 +35,10 @@ private:
 
     std::unordered_map<sfx_id, sf::SoundBuffer, sfx_id_hash> buffers;
     std::vector<sf::Sound> active_sounds;
+    std::unordered_map<sfx_id, float, sfx_id_hash> sfx_volume = {
+        { sfx_id::enlarge, constants::sfx_enlarge_volume },
+        // everything else will default to 80.0f
+    };
 
 public:
 

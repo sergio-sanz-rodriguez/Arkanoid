@@ -11,7 +11,7 @@
 // Uses the SFML graphics & audio library
 
 struct constants {
-    
+
     static constexpr int window_width{ 628 }; // 638 }; //48 - 498
     static constexpr int window_height{ 860 }; // { 960 };
     static constexpr float ball_speed{ 8.0f };
@@ -28,7 +28,7 @@ struct constants {
     static constexpr float paddle_max_speed{ 20.0f }; // { 21.33f };
     static constexpr float paddle_min_speed{ 8.0f };
     static constexpr float paddle_speed_step{
-        ball_speed_step * (paddle_max_speed - paddle_min_speed) / (ball_max_speed - ball_min_speed) 
+        ball_speed_step * (paddle_max_speed - paddle_min_speed) / (ball_max_speed - ball_min_speed)
     };
     static constexpr float paddle_scale_width{ 0.411f };
     static constexpr float paddle_scale_height{ 0.25f };
@@ -40,11 +40,14 @@ struct constants {
 
     static constexpr int player_lives{ 5 };
     static constexpr int max_sounds{ 16 };
+    static constexpr float sfx_default_volume{  50.0f };
+    static constexpr float sfx_enlarge_volume{ 100.0f };
     static constexpr sf::Vector2f ball_scale{ 0.5f, 0.5f };
     static constexpr sf::Vector2f ballstorm_scale{ 0.5f, 0.5f };
     static constexpr sf::Vector2f brick_scale{ 1.0f, 1.0f };
     static constexpr sf::Vector2f bonus_scale{ 1.0f, 1.0f };
     static constexpr sf::Vector2f paddle_scale{ 0.411f, 0.25f };
+
 };
 
 #endif // CONSTANTS_H

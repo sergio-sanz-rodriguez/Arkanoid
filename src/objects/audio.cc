@@ -21,6 +21,15 @@ void audio_manager::play(sfx_id id) {
 
     // Sound must be constructed with a buffer
     active_sounds.emplace_back(it->second);
+
+    // Default volume for all sounds
+    float vol = constants::sfx_default_volume;
+
+    // Override if explicitly set (e.g., enlarge = 100)
+    if (auto itv = sfx_volume.find(id); itv != sfx_volume.end())
+        vol = itv->second;
+
+    active_sounds.back().setVolume(std::clamp(vol, 0.f, 100.f));
     active_sounds.back().play();
 }
 

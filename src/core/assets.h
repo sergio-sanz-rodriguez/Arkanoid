@@ -31,6 +31,7 @@ namespace assets {
     inline constexpr std::string_view sfx_ball_paddle_filename{ "ball_paddle.wav" };
     inline constexpr std::string_view sfx_ball_wall_filename{ "ball_wall.wav" };
     inline constexpr std::string_view sfx_ballstorm_filename{ "ballstorm.wav" };
+    inline constexpr std::string_view sfx_paddle_enlarge_filename{ "enlarge.wav" };
     inline constexpr std::string_view sfx_game_over_filename{ "game_over.wav" };
     inline constexpr std::string_view sfx_life_minus_filename{ "life_minus.wav" };
     inline constexpr std::string_view sfx_player_wins_filename{ "player_wins.wav" };
@@ -64,6 +65,7 @@ namespace assets {
     inline std::string sfx_ball_paddle_path() { return std::string(sfx_dir) + std::string(sfx_ball_paddle_filename); }
     inline std::string sfx_ball_wall_path() { return std::string(sfx_dir) + std::string(sfx_ball_wall_filename); }
     inline std::string sfx_ballstorm_path() { return std::string(sfx_dir) + std::string(sfx_ballstorm_filename); }
+    inline std::string sfx_paddle_enlarge_path() { return std::string(sfx_dir) + std::string(sfx_paddle_enlarge_filename); }
     inline std::string sfx_game_over_path() { return std::string(sfx_dir) + std::string(sfx_game_over_filename); }
     inline std::string sfx_life_minus_path() { return std::string(sfx_dir) + std::string(sfx_life_minus_filename); }
     inline std::string sfx_player_wins_path() { return std::string(sfx_dir) + std::string(sfx_player_wins_filename); }

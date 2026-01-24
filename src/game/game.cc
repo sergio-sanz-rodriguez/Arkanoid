@@ -186,6 +186,7 @@ game::game() :
     audio.load(sfx_id::ballstorm,   assets::sfx_ballstorm_path());
     audio.load(sfx_id::game_over,   assets::sfx_game_over_path());
     audio.load(sfx_id::life_minus,  assets::sfx_life_minus_path());
+    audio.load(sfx_id::enlarge,     assets::sfx_paddle_enlarge_path());
     audio.load(sfx_id::player_wins, assets::sfx_player_wins_path());
     audio.load(sfx_id::powerdown,   assets::sfx_powerdown_path());
     audio.load(sfx_id::powerup,     assets::sfx_powerup_path());
@@ -1155,7 +1156,8 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
 
             case powerup_type::paddle_wider:
                 powerup_msg = "Wider paddle";
-                audio.play(sfx_id::powerup);
+                //audio.play(sfx_id::powerup);
+                audio.play(sfx_id::enlarge);
                 break;
 
             case powerup_type::paddle_narrower:
