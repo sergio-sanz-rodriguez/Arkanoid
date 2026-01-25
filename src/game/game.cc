@@ -56,8 +56,15 @@ game::game() :
     spr_ui_bg(tex_ui_bg),
     level_achieved(static_cast<size_t>(level_count()), 0) {
 
+    // Set fullscreen mode by default
+    game_window.create(
+        sf::VideoMode::getDesktopMode(),
+        strings::arkanoid_title,
+        sf::Style::None
+    );
+
     // Limit the framerate
-    game_window.setFramerateLimit(60);      // Max rate is 60 frames per second
+    game_window.setFramerateLimit(60); // Max rate is 60 frames per second
     
     // Hide system cursor inside the game window
     game_window.setMouseCursorVisible(false);
@@ -69,7 +76,10 @@ game::game() :
     view.setSize({ constants::window_width, constants::window_height });
     view.setCenter({ constants::window_width / 2.f, constants::window_height / 2.f });
 
-    // Apply the view with correct letterboxing for the current window size.
+    // Set fullscreen mode
+    //set_fullscreen(true);
+
+    // Apply the view with correct letterboxing for the current window size
     update_view();
 
     // Initialize game state
@@ -315,11 +325,6 @@ void game::setup_level(const level_data & lvl, int level_index, bool full_reset)
         spawn_ball({ p->get_position().x, y }, lvl.ball_color);
     }
 
-    // Randomly rotate the ball (optional)
-    manager.apply_all<bouncing_ball>([this](bouncing_ball& b) {
-        b.rotate(90.0f, true);
-    });
-
     // Set velocity to zero and specify the state of the ball as not launched yet.
     manager.apply_all<bouncing_ball>([](bouncing_ball& b) {
         b.reset_for_serve();
@@ -350,7 +355,13 @@ void game::reset_powerups() {
 
     // Change the bouncing ball(s) to original color
     manager.apply_all<bouncing_ball>([](bouncing_ball& b) {
+        //b.set_scale(constants::paddle_scale),
         b.set_ball_type(ball_type::regular, 1.0f);
+    });
+
+    // Set scale of paddel to original
+    manager.apply_all<paddle>([this](paddle& p) {
+        p.set_scale(false, 1.0f);
     });
 
     // Ballstorm UI
@@ -737,8 +748,8 @@ void game::handle_window_events() {
 
                     // Start from selected level with full lives (usually what you want)
                     lives = constants::player_lives;
-                    reset_powerups();
-                    reset_bonus_timers();
+                    //reset_powerups();
+                    //reset_bonus_timers();
 
                     // Update level list header
                     level_menu_header.setString(static_cast<std::string>(strings::string_next_level_keys));
@@ -982,6 +993,8 @@ void game::ensure_ball_exists() {
 
     // Decrease the life count
     --lives;
+
+    // Update sound effect
     audio.play(sfx_id::life_minus);
 
     // And enable the game-over flag if the player runs out of lives

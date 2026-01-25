@@ -5,7 +5,8 @@
 sf::Texture bouncing_ball::texture;
 sf::Texture ballstorm::texture;
 
-bouncing_ball::bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, ball_type type) : type(type) {
+bouncing_ball::bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col, ball_type type)
+    : type(type), base_color(col) {
 
     // Load the texture
     if (!texture.loadFromFile(assets::img_ball_path())) {
@@ -18,7 +19,6 @@ bouncing_ball::bouncing_ball(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sc
     sprite->setOrigin(get_centre());
     sprite->setPosition(pos);
     sprite->scale(sca);
-    sprite->setColor(col);
     velocity = vel;
 
     // Set the radius of the ball
@@ -46,9 +46,12 @@ void bouncing_ball::set_ball_type(ball_type new_type, float factor) noexcept {
         sprite->setScale(factor * constants::ball_scale);
         break;
     case ball_type::regular:
-        sprite->setColor(ball_color_maps::bouncing_ball);
+        sprite->setColor(base_color);
         sprite->setScale(factor * constants::ball_scale);
+        break;
     default:
+        sprite->setColor(base_color);
+        sprite->setScale(factor * constants::ball_scale);
         break;
     }
 
@@ -105,7 +108,7 @@ void bouncing_ball::reset_for_serve()
 // Function to map ball types to colors
 sf::Color bouncing_ball::to_sf_color(ball_colors color) {
     switch (color) {
-        case ball_colors::steel:      return ball_color_maps::bouncing_ball;
+    case ball_colors::steel:          return ball_color_maps::bouncing_ball;
         case ball_colors::gold:       return ball_color_maps::bouncing_gold_ball;
         case ball_colors::orange:     return ball_color_maps::plasma_ball;
         case ball_colors::blueviolet: return ball_color_maps::antimatter_ball;

@@ -38,6 +38,9 @@ private:
      // Get the radius of the ball
      float get_radius() const noexcept;
 
+     // Define base color
+     sf::Color base_color{ ball_color_maps::bouncing_ball };
+
      // Get and set the state of the plasma_ball feature
      //bool get_plasma_ball() const noexcept;
      //void set_plasma_ball(bool on, float factor) noexcept;
