@@ -282,8 +282,6 @@ private:
     void reset_level();
     void reset_powerups();
     void reset_bonus_timers();
-    void reset_game(game_state state);
-    //void restart_from_level_intro();
 
     // Spawing player entities: ball and paddle
     void spawn_ball(sf::Vector2f pos, ball_colors color);

@@ -927,14 +927,14 @@ static level_data level9 = {
 // Stack the difficulty levels
 static const level_data* all_levels[] = {
     &level1,
-    &level2,
-    &level3,
-    &level4,
-    &level5,
-    &level6,
-    &level7,
-    &level8,
-    &level9
+    //&level2,
+    //&level3,
+    //&level4,
+    //&level5,
+    //&level6,
+    //&level7,
+    //&level8,
+    //&level9
 };
 
 // Helper function to get the level

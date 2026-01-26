@@ -76,7 +76,7 @@ namespace strings {
         "\n"
         "       HERO FROM ALPHA CENTAURI!        "
         "\n\n"
-        "      PRESS ANY KEY TO PLAY AGAIN       "
+        "       PRESS SPACE TO PLAY AGAIN        "
         "\n"
         "         PRESS ESCAPE TO QUIT           "
     };

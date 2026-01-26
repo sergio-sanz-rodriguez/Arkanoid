@@ -205,16 +205,12 @@ game::game() :
 
 // Full reset to start screen
 void game::reset_game() {
-    reset_game(game_state::start_screen);
-}
-
-// Internal only
-void game::reset_game(game_state reset_state) {
-    const int level_index = 0;
-    const level_data& lvl = get_level(level_index);
-    setup_level(lvl, level_index, true);
+    //const int level_index = 0;
+    //const level_data& lvl = get_level(level_index);
+    //setup_level(lvl, level_index, true);
+    reset_progress();
     level_menu_header.setString(static_cast<std::string>(strings::string_first_level_keys));
-    state = reset_state;
+    state = game_state::start_screen;
 }
 
 // (Re)start the game
@@ -776,9 +772,9 @@ void game::handle_window_events() {
                     continue;
 
                 // Reset the level list only if the player finished the whole game
-                if (state == game_state::player_wins) {
-                    reset_progress();
-                }
+                //if (state == game_state::player_wins) {
+                //    reset_progress();
+                //}
 
                 // Back to intro story/instructions or level select
                 //reset_game(game_state::level_select);
