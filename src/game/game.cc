@@ -57,11 +57,11 @@ game::game() :
     level_achieved(static_cast<size_t>(level_count()), 0) {
 
     // Set fullscreen mode by default
-    game_window.create(
-        sf::VideoMode::getDesktopMode(),
-        strings::arkanoid_title,
-        sf::Style::None
-    );
+    //game_window.create(
+    //    sf::VideoMode::getDesktopMode(),
+    //    strings::arkanoid_title,
+    //    sf::Style::None
+    //);
 
     // Limit the framerate
     game_window.setFramerateLimit(60); // Max rate is 60 frames per second
@@ -75,9 +75,6 @@ game::game() :
     // Define the view with the default size and center it
     view.setSize({ constants::window_width, constants::window_height });
     view.setCenter({ constants::window_width / 2.f, constants::window_height / 2.f });
-
-    // Set fullscreen mode
-    //set_fullscreen(true);
 
     // Apply the view with correct letterboxing for the current window size
     update_view();
