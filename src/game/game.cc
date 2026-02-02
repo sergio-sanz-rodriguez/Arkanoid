@@ -86,7 +86,7 @@ game::game() :
     previous_state = game_state::running;
 
     // Load a font from file
-    if (!font.openFromFile(assets::font_consola)) {
+    if (!font.openFromFile(assets::font_consola_path())) {
         std::cerr << "Failed to load font!" << std::endl;
         // Handle font loading failure (could exit, use default font, etc.)
     }
@@ -201,13 +201,14 @@ game::game() :
     audio.load(sfx_id::powerdown,   assets::sfx_powerdown_path());
     audio.load(sfx_id::powerup,     assets::sfx_powerup_path());
     audio.load(sfx_id::welcome,     assets::sfx_welcome_path());
+    
+    // Force audio backend/device initialization at startup to avoid first-play frame hitch
+    audio.warmup_all();
+
 }
 
 // Full reset to start screen
 void game::reset_game() {
-    //const int level_index = 0;
-    //const level_data& lvl = get_level(level_index);
-    //setup_level(lvl, level_index, true);
     reset_progress();
     level_menu_header.setString(static_cast<std::string>(strings::string_first_level_keys));
     state = game_state::start_screen;
@@ -248,7 +249,6 @@ void game::run_game() {
         // Draw frame: entities and UI
         draw_frame();
     }
-
 }
 
 // ********** PRIVATE AND HELPER FUNCTIONS **********//
@@ -276,7 +276,6 @@ void game::reset_level() {
 
     // Avoid immediat lauch if space is already held
     space_key_active = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
-
 }
 
 void game::reset_progress() {
@@ -317,7 +316,7 @@ void game::setup_level(const level_data & lvl, int level_index, bool full_reset)
 
     // Now spawn the ball relative to the paddle
     if (auto* p = manager.get_first<paddle>()) {
-        const float y = p->get_position().y - p->get_height() - constants::ball_radius;
+        const float y = p->get_position().y - p->get_height() - 1; // constants::ball_radius;
         spawn_ball({ p->get_position().x, y }, lvl.ball_color);
     }
 
@@ -325,7 +324,6 @@ void game::setup_level(const level_data & lvl, int level_index, bool full_reset)
     manager.apply_all<bouncing_ball>([](bouncing_ball& b) {
         b.reset_for_serve();
     });
-
 }
 
 // Update level menu colors: black/dark_gray if the level is achieved, white if doesn't
@@ -367,7 +365,6 @@ void game::reset_powerups() {
     // Restart powerup clocks
     ballstorm_clock.restart();
     ballstorm_duration_clock.restart();
-
 }
 
 // Function to reset bonus timers
@@ -434,7 +431,6 @@ void game::update_view() {
 
     //Update the game board (or window)
     game_window.setView(view);
-
 }
 
 // Spawn the bouncing ball
@@ -590,7 +586,6 @@ void game::spawn_ballstorm() {
 
     // Play the sound effect
     audio.play(sfx_id::ballstorm);
-
 }
 
 // Helper functions to handle powerups in the game
@@ -659,7 +654,6 @@ void game::sync_powerups_to_entities() {
         p.set_velocity(target_paddle_speed);
 
     });
-
 }
 
 // Randomly choose one of the available powerups when the bonus object is picked up
@@ -810,7 +804,6 @@ bool game::handle_global_inputs() {
     reset_key_active = rpressed;
 
     return false;
-
 }
 
 // Function to handle space to lauch the ball
@@ -972,7 +965,7 @@ void game::ensure_ball_exists() {
     // Spawn the ball from the center of the paddle.
     paddle* p = manager.get_first<paddle>();
     if (!p) return; // For safety
-    const float y = p->get_position().y - p->get_height() - constants::ball_radius;
+    const float y = p->get_position().y - p->get_height() - 1; // -constants::ball_radius;
     const level_data& lvl = get_level(current_level);
     spawn_ball({ p->get_position().x, y }, lvl.ball_color);
 
@@ -999,7 +992,6 @@ void game::ensure_ball_exists() {
         update_state_text(); // Optional
         lives = constants::player_lives;
     }
-
 }
 
 // Spawn bonus entities
@@ -1069,7 +1061,6 @@ void game::spawn_bonuses() {
     // Reset timer
     bonus_clock.restart();
     next_bonus_time = bonus_delay_dist(rng);
-
 }
 
 // Handling bonus pickups: logic + message
@@ -1244,16 +1235,18 @@ void game::update_ui_texts(const std::string& powerup_msg) {
     std::ostringstream oss;
     oss << "Ballstorm (" << std::fixed << std::setprecision(0) << remaining << "s)";
     text_powerup.setString(oss.str());
-
 }
 
 // Ball-brick, ball-paddle, bonus-paddle
 std::string game::resolve_collisions() {
 
-    // Bouncing ball vs brick.
+    // Bouncing ball vs brick
     manager.apply_all<bouncing_ball>([this](bouncing_ball& the_ball) {
+        bool hit_brick = false;
         manager.apply_all<brick>([&](brick& the_brick) {
+            if (hit_brick) return;
             if (handle_collision(the_ball, the_brick) == sfx_id::ball_brick) {
+                hit_brick = true;
                 audio.play(sfx_id::ball_brick);
             }
         });
@@ -1261,14 +1254,18 @@ std::string game::resolve_collisions() {
 
     // Bouncing ball vs wall
     manager.apply_all<bouncing_ball>([this](bouncing_ball& the_ball) {
-        if (the_ball.consumed_wall_hit())
+        if (the_ball.consumed_wall_hit()) {
             audio.play(sfx_id::ball_wall);
+        }
     });
 
     // Burst ball vs brick
     manager.apply_all<ballstorm>([this](ballstorm& the_ball) {
+        bool hit_brick = false;
         manager.apply_all<brick>([&](brick& the_brick) {
+            if (hit_brick) return;
             if (handle_collision(the_ball, the_brick) == sfx_id::ball_brick) {
+                hit_brick = true;
                 audio.play(sfx_id::ball_brick);
             }
         });
@@ -1285,7 +1282,6 @@ std::string game::resolve_collisions() {
 
     // Bonus vs paddle (returns the powerup message)
     return handle_bonus_pickups(*the_paddle);
-
 }
 
 // Checks if the player wins (level cleared), i.e. when all DESTRUCTIBLE bricks are destroyed
@@ -1359,7 +1355,7 @@ void game::update_running_frame() {
 
     // Resolve all collisions
     const std::string msg = resolve_collisions();
-    
+
     // Update UI strings once per frame
     update_ui_texts(msg);
 
@@ -1381,5 +1377,4 @@ void game::update_serve_frame() {
 
     // Keep the ball on the paddle while not launched
     stick_unlaunched_balls_to_paddle();
-
 }

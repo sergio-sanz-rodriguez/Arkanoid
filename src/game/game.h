@@ -123,7 +123,8 @@ public:
     T* get_first() {
         auto& group = get_all<T>();
         if (group.empty()) return nullptr;
-        return dynamic_cast<T*>(group.front());
+        //return dynamic_cast<T*>(group.front());
+        return static_cast<T*>(group.front());
     }
     // This version is used when the manager is const, like:
     // const entity_manager& manager_ref = manager;
@@ -132,7 +133,8 @@ public:
     const T* get_first() const {
         auto it = grouped_entities.find(typeid(T).hash_code());
         if (it == grouped_entities.end() || it->second.empty()) return nullptr;
-        return dynamic_cast<const T*>(it->second.front());
+        //return dynamic_cast<const T*>(it->second.front());
+        return static_cast<const T*>(it->second.front());
     }
 
     // True if there is at least one entity of type T
@@ -157,9 +159,9 @@ public:
     template <typename T, typename Func>
     void apply_all(const Func& func) {
         auto& entity_group{ get_all<T>() };
-
         for (auto ptr : entity_group)
-            func(*dynamic_cast<T*>(ptr));
+            //func(*dynamic_cast<T*>(ptr));
+            func(*static_cast<T*>(ptr));
     }
 
     // Function to update all the entities
