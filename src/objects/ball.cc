@@ -108,7 +108,7 @@ void bouncing_ball::reset_for_serve()
 // Function to map ball types to colors
 sf::Color bouncing_ball::to_sf_color(ball_colors color) {
     switch (color) {
-    case ball_colors::steel:          return ball_color_maps::bouncing_ball;
+        case ball_colors::steel:      return ball_color_maps::bouncing_ball;
         case ball_colors::gold:       return ball_color_maps::bouncing_gold_ball;
         case ball_colors::orange:     return ball_color_maps::plasma_ball;
         case ball_colors::blueviolet: return ball_color_maps::antimatter_ball;
@@ -189,6 +189,9 @@ void bouncing_ball::move_right(float angle) noexcept {
 
 // Compute the ball's new position
 void bouncing_ball::update() {
+    update(1.f);
+}
+void bouncing_ball::update(float stepScale) {
 
     // Respond to user input as this will affect how the ball moves
     //process_player_input();
@@ -197,7 +200,8 @@ void bouncing_ball::update() {
     hit_wall_this_frame = false;
 
     // Move the position of the ball
-    sprite->move(velocity);
+    //sprite->move(velocity);
+    sprite->move(velocity * stepScale);
 
     // We check if the ball has moved off the left hand side of the window
     // If so, we change sign of the x-component of the velocity
@@ -277,6 +281,9 @@ ballstorm::ballstorm(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::C
 
 // Compute the ball's new position
 void ballstorm::update() {
+    update(1.f);
+}
+void ballstorm::update(float stepScale) {
 
     sprite->move(velocity);
 

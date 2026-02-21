@@ -311,7 +311,18 @@ private:
     void update_state_text();
 
     // Update everything when running
-    void update_running_frame();
+    void update_running_frame();    
+
+    // Substep refactor helpers(NEW)
+
+    // Updates entities that should tick once per frame
+    void update_non_ball_entities_once();
+
+    // Computes the maximum absolute ball velocity component among all balls.
+    float compute_max_ball_axis_speed();
+
+    // Moves balls in small increments ("substeps") and resolves collisions after each increment.
+    std::string simulate_balls_with_substeps();
 
     // Respawn ball if none
     void ensure_ball_exists();

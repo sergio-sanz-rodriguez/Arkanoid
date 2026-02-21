@@ -2,10 +2,27 @@
 
 // Determine whether two entities overlap
 bool is_interacting(const entity& entity1, const entity& entity2) {
-    auto box1 = entity1.get_bounding_box();
-    auto box2 = entity2.get_bounding_box();
-    auto intersection = box1.findIntersection(box2);
-    return intersection.has_value();
+    //auto box1 = entity1.get_bounding_box();
+    //auto box2 = entity2.get_bounding_box();
+    //auto intersection = box1.findIntersection(box2);
+    //return intersection.has_value();
+    const sf::FloatRect a = entity1.get_bounding_box();
+    const sf::FloatRect b = entity2.get_bounding_box();
+
+    constexpr float eps = 0.05f; // small tolerance for seam cases
+
+    const float aL = a.position.x;
+    const float aR = a.position.x + a.size.x;
+    const float aT = a.position.y;
+    const float aB = a.position.y + a.size.y;
+
+    const float bL = b.position.x;
+    const float bR = b.position.x + b.size.x;
+    const float bT = b.position.y;
+    const float bB = b.position.y + b.size.y;
+
+    return (aL <= bR + eps) && (aR >= bL - eps) &&
+        (aT <= bB + eps) && (aB >= bT - eps);
 }
 
 // Resolve potential collision between the ball and the paddle

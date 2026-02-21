@@ -80,6 +80,7 @@ private:
 
      // Implement the pure virtual functions
      void update() override;
+     void update(float stepScale);
      void draw(sf::RenderWindow& window) override;
 
 };
@@ -98,6 +99,7 @@ public:
     ballstorm(sf::Vector2f pos, sf::Vector2f vel, sf::Vector2f sca, sf::Color col);
 
     void update() override;
+    void update(float stepScale);
     void draw(sf::RenderWindow& w) override;
 
     void move_up() noexcept override {}

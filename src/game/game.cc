@@ -57,11 +57,11 @@ game::game() :
     level_achieved(static_cast<size_t>(level_count()), 0) {
 
     // Set fullscreen mode by default
-    //game_window.create(
-    //    sf::VideoMode::getDesktopMode(),
-    //    strings::arkanoid_title,
-    //    sf::Style::None
-    //);
+    game_window.create(
+        sf::VideoMode::getDesktopMode(),
+        strings::arkanoid_title,
+        sf::Style::None
+    );
 
     // Limit the framerate
     game_window.setFramerateLimit(60); // Max rate is 60 frames per second
@@ -520,7 +520,7 @@ void game::spawn_multiball() {
 
     // Decide ball type and color based on active powerups
     ball_type type = ball_type::regular;
-    sf::Color color = ball_color_maps::bouncing_ball;
+    sf::Color color = ref->get_color();
     if (active_powerups.plasma_ball) {
         type = ball_type::plasma;
         color = ball_color_maps::plasma_ball;
@@ -1327,6 +1327,103 @@ void game::check_win_condition() {
     space_key_active = true;
 }
 
+// Computes the maximum "axis speed" among all balls
+// Axis speed = max(|vx|, |vy|)
+// Use this value to decide how many substeps are needed to prevent tunneling
+float game::compute_max_ball_axis_speed()
+{
+    // Track the largest speed component seen so far
+    float maxMove = 0.f;
+
+    // Loop over all bouncing_ball entities managed by the entity_manager
+    manager.apply_all<bouncing_ball>([&](const bouncing_ball& b) {
+        const sf::Vector2f v = b.get_velocity();                      // Read the ball velocity
+        const float axisMax = std::max(std::abs(v.x), std::abs(v.y)); // Largest component of this velocity
+        maxMove = std::max(maxMove, axisMax);                         // Keep the maximum over all balls
+    });
+
+    // Loop over all ballstorm entities too (if you have this extra ball type)
+    manager.apply_all<ballstorm>([&](const ballstorm& b) {
+        const sf::Vector2f v = b.get_velocity();                      // Read the ballstorm velocity
+        const float axisMax = std::max(std::abs(v.x), std::abs(v.y)); // Largest component
+        maxMove = std::max(maxMove, axisMax);                         // Update global max
+    });
+
+    // Return the maximum axis speed found
+    return maxMove;
+}
+
+// Updates all entities that should be updated once per frame (NOT substepped)
+void game::update_non_ball_entities_once()
+{
+    // Background might animate / scroll
+    manager.apply_all<background>([](background& bg) {
+        bg.update(); // Update background once per frame
+    });
+
+    // Paddle movement and input response should happen once per frame
+    manager.apply_all<paddle>([](paddle& p) {
+        p.update(); // Update paddle once per frame
+    });
+
+    // Bonuses often fall downward; they should update once per frame
+    manager.apply_all<bonus>([](bonus& b) {
+        b.update(); // Update bonus once per frame
+    });
+
+    // If bricks have no update logic, you can remove this
+    // Keeping it is safe if brick::update() exists and is cheap
+    manager.apply_all<brick>([](brick& br) {
+        br.update(); // Update bricks once per frame (optional)
+    });
+}
+
+// Moves balls in several substeps and resolves collisions after each substep
+// This prevents tunneling through thin features (like the seam between two bricks)
+std::string game::simulate_balls_with_substeps()
+{
+
+    // Max movement allowed per substep (in pixels per frame units)
+    // Smaller = safer but more CPU; larger = faster but more tunneling risk
+    constexpr float maxMovePerSubstep = 4.f;
+
+    // Compute how fast the fastest ball is moving along an axis this frame
+    const float maxMove = compute_max_ball_axis_speed();
+
+    // Decide how many substeps we need so that each substep moves at most maxMovePerSubstep
+    // If maxMove <= maxMovePerSubstep => steps = 1 (no extra work).
+    const int steps = std::max(1, (int)std::ceil(maxMove / maxMovePerSubstep));
+
+    // Scale factor applied to ball velocity each substep so that total movement matches original
+    // Example: steps=4 => stepScale=0.25, we move 4 times by 0.25*velocity = 1*velocity total
+    const float stepScale = 1.f / steps;
+
+    // Store the collision/powerup message returned by resolve_collisions()
+    // Overwrite it each substep and return the last one (same idea as before, but per-substep)
+    std::string msg;
+
+    // Run substeps
+    for (int i = 0; i < steps; ++i) {
+
+        // Move each bouncing_ball by a fraction of its velocity
+        manager.apply_all<bouncing_ball>([&](bouncing_ball& b) {
+            b.update(stepScale); // This must exist in bouncing_ball (you already added it)
+        });
+
+        // Move each ballstorm ball by a fraction of its velocity too
+        manager.apply_all<ballstorm>([&](ballstorm& b) {
+            b.update(stepScale); // This must exist in ballstorm
+        });
+
+        // Resolve collisions immediately after the small movement
+        // This is what prevents the ball from skipping across brick seams in one frame
+        msg = resolve_collisions();
+    }
+
+    // Return the last collision/powerup message (used for UI text)
+    return msg;
+}
+
 // Running game function
 void game::update_running_frame() {
 
@@ -1347,11 +1444,12 @@ void game::update_running_frame() {
         sync_powerups_to_entities();   // Updates ball/paddle properties
     }
 
-    // Update physics / movement
-    manager.update();
+    // Update all non-ball entities once per frame (paddle, bonuses, background, etc.).
+    update_non_ball_entities_once();
 
-    // Resolve all collisions
-    const std::string msg = resolve_collisions();
+    // Move balls in substeps and resolve collisions after each substep.
+    // This prevents tunneling through seams between adjacent bricks.
+    const std::string msg = simulate_balls_with_substeps();
 
     // Update UI strings once per frame
     update_ui_texts(msg);
