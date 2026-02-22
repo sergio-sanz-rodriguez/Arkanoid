@@ -9,7 +9,7 @@ bool is_interacting(const entity& entity1, const entity& entity2) {
     const sf::FloatRect a = entity1.get_bounding_box();
     const sf::FloatRect b = entity2.get_bounding_box();
 
-    constexpr float eps = 0.05f; // small tolerance for seam cases
+    constexpr float eps = 0.001f; // small tolerance for seam cases
 
     const float aL = a.position.x;
     const float aR = a.position.x + a.size.x;

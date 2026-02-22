@@ -346,7 +346,6 @@ void game::reset_powerups() {
 
     // Change the bouncing ball(s) to original color
     manager.apply_all<bouncing_ball>([](bouncing_ball& b) {
-        //b.set_scale(constants::paddle_scale),
         b.set_ball_type(ball_type::regular, 1.0f);
     });
 
@@ -735,8 +734,6 @@ void game::handle_window_events() {
 
                     // Start from selected level with full lives (usually what you want)
                     lives = constants::player_lives;
-                    //reset_powerups();
-                    //reset_bonus_timers();
 
                     // Update level list header
                     level_menu_header.setString(static_cast<std::string>(strings::string_next_level_keys));
@@ -748,7 +745,6 @@ void game::handle_window_events() {
                     audio.stop(sfx_id::welcome);
 
                     state = game_state::start_level;
-                    //space_key_active = true;
                     space_key_active = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
                 }
 
@@ -762,13 +758,7 @@ void game::handle_window_events() {
                 if (kp->code != sf::Keyboard::Key::Space)
                     continue;
 
-                // Reset the level list only if the player finished the whole game
-                //if (state == game_state::player_wins) {
-                //    reset_progress();
-                //}
-
                 // Back to intro story/instructions or level select
-                //reset_game(game_state::level_select);
                 reset_game();
 
                 // Avoid immediate re-triggering / accidental launch
@@ -834,6 +824,7 @@ void game::handle_ball_launch_input() {
     space_key_active = space_pressed;
 }
 
+// While the player hasn’t launched the ball yet, “glue” the ball to the paddle so it moves with it
 void game::stick_unlaunched_balls_to_paddle() {
     paddle* p = manager.get_first<paddle>();
     if (!p) return;
@@ -865,15 +856,12 @@ void game::update_state_text() {
         text_state.setFillColor(ui_colors::game_over);
         break;
     case game_state::player_wins:
-        //text_state.setPosition({ constants::window_width / 2.0f - 100.0f, constants::window_height / 2.0f - 100.0f });
         text_state.setPosition({ constants::window_width / 10.0f, (constants::window_height / 2.0f) - (constants::window_height / 5.7f) });
         text_state.setCharacterSize(22);
         text_state.setString(static_cast<std::string>(strings::string_player_wins));
         text_state.setFillColor(ui_colors::soft_green);
         break;
     case game_state::start_level:
-        //text_state.setPosition(level_menu_header.getPosition());
-        //text_state.setCharacterSize(20);
         text_state.setString(""); // level_menu_header.getString());
         break;
     default:
@@ -974,7 +962,7 @@ void game::ensure_ball_exists() {
     // Set the state to start_level
     state = game_state::start_level;
 
-    //space_key_active = true; // Optional: avoids instant launch if space is held
+    //Update space_key_active
     space_key_active = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
 
     // Decrease the life count
@@ -1069,6 +1057,10 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
     // There is only one paddle
     manager.apply_all<bonus>([&](bonus& the_bonus) {
 
+        // Do not process bonuses already marked for destruction
+        if (the_bonus.is_destroyed())
+            return;
+
         // Only one pickup per frame
         if (picked)
             return;
@@ -1091,7 +1083,6 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
             case bonus_type::plasma_ball:
                 active_powerups.apply(powerup_type::plasma_ball);
                 // Optional: restart a plasma_ball timer
-                // plasma_ball_clock.restart();
                 audio.play(sfx_id::powerup);
                 return;
 
@@ -1153,7 +1144,6 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
 
             case powerup_type::paddle_wider:
                 powerup_msg = "Wider paddle";
-                //audio.play(sfx_id::powerup);
                 audio.play(sfx_id::enlarge);
                 break;
 
@@ -1167,7 +1157,6 @@ std::string game::handle_bonus_pickups(paddle& the_paddle) {
                 audio.play(sfx_id::powerdown);
                 ballstorm_clock.restart();
                 ballstorm_duration_clock.restart();
-                // plasma_ball_clock.restart();
                 break;
 
             default:
@@ -1234,8 +1223,8 @@ void game::update_ui_texts(const std::string& powerup_msg) {
     text_powerup.setString(oss.str());
 }
 
-// Ball-brick, ball-paddle, bonus-paddle
-std::string game::resolve_collisions() {
+// Ball-brick, ball-paddle, ball-wall
+void game::resolve_physics_collisions() {
 
     // Bouncing ball vs brick
     manager.apply_all<bouncing_ball>([this](bouncing_ball& the_ball) {
@@ -1270,14 +1259,19 @@ std::string game::resolve_collisions() {
 
     // Ball vs paddle (we assume exactly one paddle exists)
     paddle* the_paddle = manager.get_first<paddle>();
-    if (!the_paddle) return {}; // Something went wrong
+    if (!the_paddle) return; // {}; // Something went wrong
     manager.apply_all<bouncing_ball>([this, the_paddle](bouncing_ball& the_ball) {
         if (handle_collision(the_ball, *the_paddle) == sfx_id::ball_paddle) {
             audio.play(sfx_id::ball_paddle);
         }
     });
+}
 
-    // Bonus vs paddle (returns the powerup message)
+// bonus - paddle
+std::string game::resolve_bonus_pickups_once()
+{
+    paddle* the_paddle = manager.get_first<paddle>();
+    if (!the_paddle) return {};
     return handle_bonus_pickups(*the_paddle);
 }
 
@@ -1376,11 +1370,18 @@ void game::update_non_ball_entities_once()
     manager.apply_all<brick>([](brick& br) {
         br.update(); // Update bricks once per frame (optional)
     });
+
+    // Keep existing storm projectiles moving while waiting for Space
+    if (state == game_state::start_level) {
+        manager.apply_all<ballstorm>([](ballstorm& s) {
+            s.update(1.f);
+        });
+    }
 }
 
 // Moves balls in several substeps and resolves collisions after each substep
 // This prevents tunneling through thin features (like the seam between two bricks)
-std::string game::simulate_balls_with_substeps()
+void game::simulate_balls_with_substeps()
 {
 
     // Max movement allowed per substep (in pixels per frame units)
@@ -1398,10 +1399,6 @@ std::string game::simulate_balls_with_substeps()
     // Example: steps=4 => stepScale=0.25, we move 4 times by 0.25*velocity = 1*velocity total
     const float stepScale = 1.f / steps;
 
-    // Store the collision/powerup message returned by resolve_collisions()
-    // Overwrite it each substep and return the last one (same idea as before, but per-substep)
-    std::string msg;
-
     // Run substeps
     for (int i = 0; i < steps; ++i) {
 
@@ -1417,11 +1414,8 @@ std::string game::simulate_balls_with_substeps()
 
         // Resolve collisions immediately after the small movement
         // This is what prevents the ball from skipping across brick seams in one frame
-        msg = resolve_collisions();
+        resolve_physics_collisions();
     }
-
-    // Return the last collision/powerup message (used for UI text)
-    return msg;
 }
 
 // Running game function
@@ -1430,26 +1424,32 @@ void game::update_running_frame() {
     // Respawn ball if none
     ensure_ball_exists();
 
+    // If ensure_ball_exists() changed the state (life lost -> start_level, or game_over),
+    // stop processing the "running" frame immediately.
+    if (state != game_state::running)
+        return;
+
     // The ball should follow the paddle
     stick_unlaunched_balls_to_paddle();
 
-    // DO NOT spawn bonuses or powerups until ball is launched
-    if (state == game_state::running) {
-
-        // Randomly spawn bonus entities
-        spawn_bonuses();
-
-        // Apply the current active powerup state to entities.
-        apply_one_shot_powerups();     // Spawns extra balls if needed
-        sync_powerups_to_entities();   // Updates ball/paddle properties
-    }
+    // Randomly spawn bonus entities (only when actively running)
+    spawn_bonuses();
 
     // Update all non-ball entities once per frame (paddle, bonuses, background, etc.).
     update_non_ball_entities_once();
 
-    // Move balls in substeps and resolve collisions after each substep.
-    // This prevents tunneling through seams between adjacent bricks.
-    const std::string msg = simulate_balls_with_substeps();
+    // Improved collistion detection: 
+    // - Balls are moved in substeps and collisions are resolved after each substep
+    // - This prevents tunneling through seams between adjacent bricks
+    simulate_balls_with_substeps();
+
+    // Bonus pickups: exactly once per frame (prevents double powerups / ballstorm refresh)
+    const std::string msg = resolve_bonus_pickups_once();
+
+    // Apply one-shot/timed powerups once per frame (multiball spawn, ballstorm periodic spawn)
+    // and sync continuous powerup effects to entities (speed/scale/colors)
+    apply_one_shot_powerups();
+    sync_powerups_to_entities();
 
     // Update UI strings once per frame
     update_ui_texts(msg);
@@ -1465,7 +1465,13 @@ void game::update_running_frame() {
 void game::update_serve_frame() {
     
     // Let paddle update/move (if paddle reads input in update())
-    manager.update();
+    update_non_ball_entities_once();
+
+    // Let storm projectiles collide with bricks
+    resolve_physics_collisions();
+
+    // Remove destroyed stormballs / bricks during serve
+    manager.refresh();
 
     // Space launches (if pressed)
     handle_ball_launch_input();

@@ -100,6 +100,7 @@ public:
 
     void update() override;
     void update(float stepScale);
+
     void draw(sf::RenderWindow& w) override;
 
     void move_up() noexcept override {}

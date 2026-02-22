@@ -311,9 +311,7 @@ private:
     void update_state_text();
 
     // Update everything when running
-    void update_running_frame();    
-
-    // Substep refactor helpers(NEW)
+    void update_running_frame();
 
     // Updates entities that should tick once per frame
     void update_non_ball_entities_once();
@@ -322,7 +320,7 @@ private:
     float compute_max_ball_axis_speed();
 
     // Moves balls in small increments ("substeps") and resolves collisions after each increment.
-    std::string simulate_balls_with_substeps();
+    void simulate_balls_with_substeps();
 
     // Respawn ball if none
     void ensure_ball_exists();
@@ -331,7 +329,8 @@ private:
     void spawn_bonuses();
 
     // Ball-brick, ball-paddle, bonus-paddle
-    std::string resolve_collisions();
+    void resolve_physics_collisions();
+    std::string resolve_bonus_pickups_once();
 
     // Powerup logic + message
     std::string handle_bonus_pickups(paddle& the_paddle);

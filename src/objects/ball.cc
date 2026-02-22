@@ -285,11 +285,18 @@ void ballstorm::update() {
 }
 void ballstorm::update(float stepScale) {
 
-    sprite->move(velocity);
+    sprite->move(velocity * stepScale);
 
     // If it leaves the screen (top), destroy it
     if (get_position().y + radius < 0.f) {
         destroy();
+        return;
+    }
+
+    // If it leaves the screen (bottom), destroy it (safety)
+    if (get_position().y - radius > constants::window_height) {
+        destroy();
+        return;
     }
 }
 
