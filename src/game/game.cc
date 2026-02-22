@@ -208,7 +208,11 @@ game::game() :
 void game::reset_game() {
     reset_progress();
     level_menu_header.setString(static_cast<std::string>(strings::string_first_level_keys));
+    lives = constants::player_lives;
     state = game_state::start_screen;
+    
+    // Optional: keep UI consistent immediately
+    update_ui_texts({});
 }
 
 // (Re)start the game
@@ -730,20 +734,20 @@ void game::handle_window_events() {
                         continue;
                     }
 
+                    // Set current level
                     current_level = chosen;
-
-                    // Start from selected level with full lives (usually what you want)
-                    lives = constants::player_lives;
 
                     // Update level list header
                     level_menu_header.setString(static_cast<std::string>(strings::string_next_level_keys));
 
+                    // Set up level
                     const level_data& lvl = get_level(current_level);
                     setup_level(lvl, current_level, /*full_reset=*/false);
 
                     // Stop welcome audio
                     audio.stop(sfx_id::welcome);
 
+                    // Initiate level
                     state = game_state::start_level;
                     space_key_active = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space);
                 }
@@ -974,8 +978,7 @@ void game::ensure_ball_exists() {
     // And enable the game-over flag if the player runs out of lives
     if (lives <= 0) {
         state = game_state::game_over;
-        update_state_text(); // Optional
-        lives = constants::player_lives;
+        update_state_text();
     }
 }
 
@@ -1478,4 +1481,8 @@ void game::update_serve_frame() {
 
     // Keep the ball on the paddle while not launched
     stick_unlaunched_balls_to_paddle();
+
+    // Keep UI synced while waiting for Space
+    update_ui_texts({});
+
 }

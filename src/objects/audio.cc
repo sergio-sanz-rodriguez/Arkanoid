@@ -47,8 +47,8 @@ void audio_manager::play(sfx_id id)
             return;
         }
     }
-
     // drop sound if all voices are busy
+    //
 }
 
 // Stop all currently playing voices that use the given buffer (e.g., stop welcome music SFX).

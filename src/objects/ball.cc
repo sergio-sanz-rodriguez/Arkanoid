@@ -193,9 +193,6 @@ void bouncing_ball::update() {
 }
 void bouncing_ball::update(float stepScale) {
 
-    // Respond to user input as this will affect how the ball moves
-    //process_player_input();
-
     // Reset at start of frame
     hit_wall_this_frame = false;
 
