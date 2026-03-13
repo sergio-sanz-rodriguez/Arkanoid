@@ -84,7 +84,7 @@ Open `Arkanoid.sln`, build **Release | x64** (or your preferred config), and ens
 >  
 > ✅ 9 levels, level select, and progress tracking  
 > ✅ Power-ups: multiball, ballstorm, plasma/antimatter balls, paddle size, ball speed  
-> ✅ Solid physics (substeps to prevent tunneling), full audio, and a sci-fi theme  
+> ✅ Reliable collisions and ball physics, full audio, and a sci-fi theme  
 >  
 > If you want to try it, the installer and source are in the repo. Link in comments. 🔗
 
