@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/images/arkanoid_feature_collage_640h.png" alt="Arkanoid - Reclaiming the Solar System" width="100%">
+  <img src="assets/images/feature_image_s.png" alt="Arkanoid - Reclaiming the Solar System" width="100%">
 </p>
 
 # 🎮 Arkanoid: Reclaiming the Solar System
