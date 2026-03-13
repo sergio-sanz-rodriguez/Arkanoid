@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/images/arkanoid.png" alt="Arkanoid - Reclaiming the Solar System" width="70%">
+  <img src="assets/images/feature_image_s.png" alt="Arkanoid - Reclaiming the Solar System" width="100%">
 </p>
 
 # 🎮 Arkanoid: Reclaiming the Solar System
@@ -10,9 +10,7 @@
 
 ## 🚀 Download & play
 
-**[⬇️ Download the Windows installer (latest release)](https://github.com/YOUR_USERNAME/Arkanoid/releases/latest)**
-
-*Replace `YOUR_USERNAME` with your GitHub username, or use a direct link to your installer (e.g. from Releases or a file host).*
+**[⬇️ Download the Windows installer (latest release)](https://github.com/sergio-sanz-rodriguez/Arkanoid/releases/tag/Arkanoid_v1.1)**
 
 ---
 
@@ -73,20 +71,6 @@ Open `Arkanoid.sln`, build **Release | x64** (or your preferred config), and ens
 
 - **`src/`** — Core game logic, entities (ball, paddle, brick, bonus), systems (collisions, levels), and game state.
 - **`assets/`** — Images, sound effects, fonts, and level backgrounds.
-
----
-
-## 📌 LinkedIn-ready summary
-
-*You can copy this for your post:*
-
-> I just finished **Arkanoid: Reclaiming the Solar System** — a full Arkanoid game in C++17 with SFML.  
->  
-> ✅ 9 levels, level select, and progress tracking  
-> ✅ Power-ups: multiball, ballstorm, plasma/antimatter balls, paddle size, ball speed  
-> ✅ Reliable collisions and ball physics, full audio, and a sci-fi theme  
->  
-> If you want to try it, the installer and source are in the repo. Link in comments. 🔗
 
 ---
 
