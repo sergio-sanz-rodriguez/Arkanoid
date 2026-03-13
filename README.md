@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/images/arkanoid.png" alt="Arkanoid - Reclaiming the Solar System" width="70%">
+  <img src="assets/images/arkanoid_feature_collage_640h.png" alt="Arkanoid - Reclaiming the Solar System" width="100%">
 </p>
 
 # 🎮 Arkanoid: Reclaiming the Solar System
@@ -10,9 +10,7 @@
 
 ## 🚀 Download & play
 
-**[⬇️ Download the Windows installer (latest release)](https://github.com/YOUR_USERNAME/Arkanoid/releases/latest)**
-
-*Replace `YOUR_USERNAME` with your GitHub username, or use a direct link to your installer (e.g. from Releases or a file host).*
+**[⬇️ Download the Windows installer (latest release)](https://github.com/sergio-sanz-rodriguez/Arkanoid/releases/tag/Arkanoid_v1.1)**
 
 ---
 
